@@ -1,4 +1,4 @@
-const plugins = require('./build/rollup.plugins');
+const plugins = require('./rollup.plugins');
 const pkg = require('../../package.json');
 
 function createOutputConfig(file, format, cfg = {}) {

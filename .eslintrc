@@ -19,9 +19,10 @@
         "no-var-require": "off",
         "no-console": "off",
         "no-bitwise": "off",
-        "sort-imports": "warn",
         "quotes": ["error", "single"],
         "max-len": ["error", 120],
-        "@typescript-eslint/no-inferrable-types": "off"
+        "@typescript-eslint/no-inferrable-types": "off",
+        "@typescript-eslint/explicit-module-boundary-types": "off",
+        "@typescript-eslint/ban-types": "off"
     }
 }
