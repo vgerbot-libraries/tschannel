@@ -13,10 +13,14 @@ import { RMINamespace } from './RNamespace';
 export default class MessageAdaptor {
     private deferes: Record<string, Defer<unknown>> = {};
     constructor(
+        private readonly rmiId: string,
         private readonly communicator: Communicator,
         private readonly namespaces: Record<string, RMINamespace>
     ) {
         communicator.addReceiveMessageListener(message => {
+            if (message.rmiId !== this.rmiId) {
+                return;
+            }
             if (InvokeMethodPayload.isInvokeMethodData(message)) {
                 const { namespace: ns, methodName, callId } = message;
                 const namespace = namespaces[ns];
@@ -58,6 +62,7 @@ export default class MessageAdaptor {
     ): Promise<unknown> {
         const callId = uid('call-xxxx');
         const data: InvokeMethodData = {
+            rmiId: this.rmiId,
             namespace,
             methodName,
             callId,
@@ -71,6 +76,7 @@ export default class MessageAdaptor {
     }
     public throwError(callId: string, error: Error) {
         const payload = new MethodReturningPayload({
+            rmiId: this.rmiId,
             success: false,
             callId,
             error: {
@@ -82,6 +88,7 @@ export default class MessageAdaptor {
     }
     public returnValue(callId: string, value: SerializableValue) {
         const payload = new MethodReturningPayload({
+            rmiId: this.rmiId,
             success: true,
             callId,
             value

@@ -20,8 +20,8 @@ export class RMI {
     private readonly globalNamespace: RMINamespace;
     private readonly adaptor: MessageAdaptor;
     private readonly namespaces: Record<string, RMINamespace> = {};
-    constructor(communicator: Communicator) {
-        this.adaptor = new MessageAdaptor(communicator, this.namespaces);
+    constructor(id: string, communicator: Communicator) {
+        this.adaptor = new MessageAdaptor(id, communicator, this.namespaces);
         this.globalNamespace = new RMINamespace(uid(), this.adaptor);
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
