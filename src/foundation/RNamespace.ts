@@ -17,8 +17,8 @@ export class RMINamespace {
                     return this.adaptor.invoke(
                         this.id,
                         name,
-                        metadata.getParameterData(this, args),
-                        metadata.getTransferable(args)
+                        metadata.getParameterData(this, ...args),
+                        metadata.getTransferable(...args)
                     );
                 };
             }

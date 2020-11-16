@@ -12,7 +12,7 @@ export class RMIMethodMetadata {
         return this.methodName;
     }
     public getParameterData(namespace: RMINamespace, ...args): SerializableValue {
-        if (Array.isArray(this.options.paramTypes)) {
+        if (Array.isArray(this.options.paramTypes) && this.options.paramTypes.length > 0) {
             return this.options.paramTypes.map((it, index) => {
                 if (it === ParameterType.callback) {
                     const id = uid();
@@ -22,13 +22,13 @@ export class RMIMethodMetadata {
                 return args[index];
             }) as SerializableValue;
         }
-        return [];
+        return args;
     }
     public getTransferable(...args): Transferable[] {
         if (typeof this.options.transferables === 'function') {
             return this.options.transferables.apply(undefined, args);
         }
-        if (Array.isArray(this.options.paramTypes)) {
+        if (Array.isArray(this.options.paramTypes) && this.options.paramTypes.length > 0) {
             return this.options.paramTypes
                 .map((it, index) => {
                     if (it === ParameterType.transferable) {

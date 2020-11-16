@@ -22,7 +22,7 @@ export class RMI {
     private readonly namespaces: Record<string, RMINamespace> = {};
     constructor(id: string, communicator: Communicator) {
         this.adaptor = new MessageAdaptor(id, communicator, this.namespaces);
-        this.globalNamespace = new RMINamespace(uid(), this.adaptor);
+        this.globalNamespace = new RMINamespace('global', this.adaptor);
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
@@ -33,25 +33,32 @@ export class RMI {
         class cls extends clazz {
             public static id: string = (clazz as any).id;
             public readonly $namespace = new RMINamespace(uid(), rmi.adaptor);
+            public readonly $initPromise: Promise<void>;
             constructor(...args) {
                 super(...args);
                 rmi.namespaces[this.$namespace.id] = this.$namespace;
-                rmi.rmethod(new RMIMethodMetadata(cls.id + '-new-instance', {}))(this.$namespace.id, args);
+                this.$initPromise = rmi.rmethod(new RMIMethodMetadata(cls.id + '-new-instance', {}))(
+                    this.$namespace.id,
+                    args
+                ) as Promise<void>;
             }
         }
-        const propertyNames = Object.getOwnPropertyNames(clazz.prototype);
+        const propertyNames = Object.getOwnPropertyNames(clazz.prototype).filter(it => it !== 'constructor');
         propertyNames.forEach(propertyName => {
             const propertyValue = clazz.prototype[propertyName];
             if (typeof propertyValue != 'function') {
                 return;
             }
-            const method = cls.prototype[propertyValue] as RMIMethod;
+            const method = clazz.prototype[propertyName] as RMIMethod;
             if (method.isLocal) {
                 return;
             }
             const metadata = new RMIMethodMetadata(propertyName, method.options);
-            cls.prototype[propertyValue] = function(...args) {
-                return (this as cls).$namespace.rmethod(metadata).apply(this, args);
+            cls.prototype[propertyName] = function(...args) {
+                const self = this as cls;
+                return self.$initPromise.then(() => {
+                    return self.$namespace.rmethod(metadata).apply(this, args);
+                });
             };
         });
         return cls;
@@ -61,7 +68,7 @@ export class RMI {
         const methodNames = propertyNames.filter(propertyName => {
             return typeof clazz.prototype[propertyName] === 'function';
         });
-        this.lmethod(id + '-new-instance', (instanceNamespaceId, ...args) => {
+        this.lmethod(id + '-new-instance', (instanceNamespaceId, args: unknown[]) => {
             const namespace = (this.namespaces[instanceNamespaceId] = new RMINamespace(
                 instanceNamespaceId,
                 this.adaptor
