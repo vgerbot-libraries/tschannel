@@ -1,5 +1,5 @@
-const plugins = require('./rollup.plugins');
-const pkg = require('../../package.json');
+const plugins = require('./build/rollup.plugins');
+const pkg = require('./package.json');
 
 const rollupPlugins = [
     plugins.typescript({

@@ -1,7 +1,7 @@
 'use strict';
 
 const baseConfig = require('./karma.base.conf');
-const rollupConfig = require('../rollup/rollup-debug.config');
+const rollupConfig = require('./rollup-debug.config');
 
 module.exports = function (config) {
 
@@ -21,7 +21,7 @@ module.exports = function (config) {
             'karma-mocha',
             'karma-chai',
             'karma-mocha-reporter',
-            'karma-rollup-preprocessor',
+            '@vgerbot/karma-rollup-preprocessor',
             'karma-sourcemap-loader'
         ],
         singleRun: false
