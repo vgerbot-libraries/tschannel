@@ -4,10 +4,11 @@ import uid from './common/uid';
 import MessageAdaptor from './foundation/MessageAdaptor';
 import { RMINamespace } from './foundation/RNamespace';
 import { RMIMethodMetadata } from './metadata/RMIMethodMetadata';
-import { AnyConstructor } from './types/AnyConstructor';
+import { AnyConstructor, Constructor } from './types/AnyConstructor';
 import { AnyFunction } from './types/AnyFunction';
 import { Communicator } from './types/Communicator';
 import istatic from './types/istatic';
+import { PromisifyClass } from './types/PromisifyClass';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
 
@@ -26,12 +27,15 @@ export class RMI {
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
-    public rclass<T extends AnyConstructor>(clazz: T): T {
+    public rclass<T>(_clazz: Constructor<T>): Constructor<PromisifyClass<T>> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const rmi = this;
+        const clazz = (_clazz as unknown) as RMIClassConstructor;
+        if (typeof clazz.id !== 'string') {
+            throw new Error(`Incorrect remote class: ${clazz}, @rclass() decorator is missing!`);
+        }
         @istatic<RMIClassConstructor>()
         class cls extends clazz {
-            public static id: string = (clazz as any).id;
             public readonly $namespace = new RMINamespace(uid(), rmi.adaptor);
             public readonly $initPromise: Promise<void>;
             constructor(...args) {
@@ -60,7 +64,7 @@ export class RMI {
                 });
             };
         });
-        return cls;
+        return (cls as unknown) as Constructor<PromisifyClass<T>>;
     }
     public lclass(id: string, clazz: AnyConstructor) {
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype);

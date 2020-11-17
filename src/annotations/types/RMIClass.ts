@@ -4,7 +4,7 @@ export interface RMIClass {
     $namespace: RMINamespace;
 }
 
-export interface RMIClassConstructor {
-    new (...args): {};
+export interface RMIClassConstructor<T = RMIClass> {
+    new (...args): T;
     id: string;
 }

@@ -3,5 +3,6 @@ export interface AnyConstructor {
 }
 
 export interface Constructor<T> {
+    readonly prototype: T;
     new (...args): T;
 }
