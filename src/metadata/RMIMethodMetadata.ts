@@ -7,13 +7,20 @@ import { SerializableValue } from '../types/Serializable';
 import { Transferable } from '../types/Transferable';
 
 export class RMIMethodMetadata {
-    constructor(private readonly methodName: string, private readonly options: RemoteMethodOptions) {}
+    private namespace?: string;
+    private paramTypes?: ParameterType[];
+    private getTransferablesFn?: (this: void, ...args) => Transferable[];
+    constructor(private readonly methodName: string, options: RemoteMethodOptions = {}) {
+        this.namespace = options.namespace || 'global';
+        this.paramTypes = options.paramTypes;
+        this.getTransferablesFn = options.transferables;
+    }
     public getName(): string {
         return this.methodName;
     }
     public getParameterData(namespace: RMINamespace, ...args): SerializableValue {
-        if (Array.isArray(this.options.paramTypes) && this.options.paramTypes.length > 0) {
-            return this.options.paramTypes.map((it, index) => {
+        if (Array.isArray(this.paramTypes) && this.paramTypes.length > 0) {
+            return this.paramTypes.map((it, index) => {
                 if (it === ParameterType.callback) {
                     const id = uid();
                     namespace.lmethod(id, args[index]);
@@ -25,11 +32,11 @@ export class RMIMethodMetadata {
         return args;
     }
     public getTransferable(...args): Transferable[] {
-        if (typeof this.options.transferables === 'function') {
-            return this.options.transferables.apply(undefined, args);
+        if (typeof this.getTransferablesFn === 'function') {
+            return this.getTransferablesFn.apply(undefined, args);
         }
-        if (Array.isArray(this.options.paramTypes) && this.options.paramTypes.length > 0) {
-            return this.options.paramTypes
+        if (Array.isArray(this.paramTypes) && this.paramTypes.length > 0) {
+            return this.paramTypes
                 .map((it, index) => {
                     if (it === ParameterType.transferable) {
                         return args[index];
@@ -38,5 +45,8 @@ export class RMIMethodMetadata {
                 .filter(it => !!it) as Transferable[];
         }
         return [];
+    }
+    public getNamespace() {
+        return this.namespace;
     }
 }

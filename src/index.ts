@@ -54,10 +54,9 @@ export class RMI {
                 return;
             }
             const metadata = new RMIMethodMetadata(propertyName, method.options);
-            cls.prototype[propertyName] = function(...args) {
-                const self = this as cls;
-                return self.$initPromise.then(() => {
-                    return self.$namespace.rmethod(metadata).apply(this, args);
+            cls.prototype[propertyName] = function(this: cls, ...args) {
+                return this.$initPromise.then(() => {
+                    return this.$namespace.rmethod(metadata).apply(this, args);
                 });
             };
         });
@@ -66,7 +65,7 @@ export class RMI {
     public lclass(id: string, clazz: AnyConstructor) {
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype);
         const methodNames = propertyNames.filter(propertyName => {
-            return typeof clazz.prototype[propertyName] === 'function';
+            return propertyName !== 'constructor' && typeof clazz.prototype[propertyName] === 'function';
         });
         this.lmethod(id + '-new-instance', (instanceNamespaceId, args: unknown[]) => {
             const namespace = (this.namespaces[instanceNamespaceId] = new RMINamespace(
@@ -84,7 +83,7 @@ export class RMI {
             if (typeof value !== 'function') {
                 return;
             }
-            namespace.lmethod(name, value);
+            namespace.lmethod(name, value.bind(instance));
         });
         this.namespaces[namespace.id] = namespace;
     }
