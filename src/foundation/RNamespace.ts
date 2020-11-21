@@ -37,4 +37,14 @@ export class RMINamespace {
     public containsMethod(name: string): boolean {
         return typeof this.lmethods[name] === 'function';
     }
+    public clear() {
+        clearObject(this.lmethods);
+        clearObject(this.rmethods);
+    }
+}
+
+function clearObject(object: {}) {
+    Object.keys(object).forEach(key => {
+        delete object[key];
+    });
 }

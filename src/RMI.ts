@@ -112,4 +112,11 @@ export class RMI {
         delete this.namespaces[namespace.id];
         return this.globalNamespace.rmethod('release')(namespace.id) as Promise<void>;
     }
+    public destroy() {
+        this.adaptor.destroy();
+        this.globalNamespace.clear();
+        Object.keys(this.namespaces).forEach(id => {
+            this.namespaces[id].clear();
+        });
+    }
 }

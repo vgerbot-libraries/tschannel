@@ -11,13 +11,14 @@ import MethodReturningPayload from './MethodReturningPayload';
 import { RMINamespace } from './RNamespace';
 
 export default class MessageAdaptor {
-    private deferes: Record<string, Defer<unknown>> = {};
+    private readonly deferes: Record<string, Defer<unknown>> = {};
+    private readonly removeMessageReceiver: () => void;
     constructor(
         private readonly rmiId: string,
         private readonly communicator: Communicator,
         private readonly namespaces: Record<string, RMINamespace>
     ) {
-        communicator.addReceiveMessageListener(message => {
+        this.removeMessageReceiver = communicator.addReceiveMessageListener(message => {
             if (message.rmiId !== this.rmiId) {
                 return;
             }
@@ -51,6 +52,7 @@ export default class MessageAdaptor {
                 } else {
                     defer.reject(message.error);
                 }
+                delete this.deferes[message.callId];
             }
         });
     }
@@ -94,6 +96,16 @@ export default class MessageAdaptor {
             value
         });
         this.communicator.send(payload);
+    }
+    public destroy() {
+        this.removeMessageReceiver();
+        const destroyedError = new Error('Message adaptor destroyed!');
+        Object.keys(this.deferes).forEach(key => {
+            const defer = this.deferes[key];
+            defer.reject(destroyedError);
+            delete this.deferes[key];
+        });
+        this.communicator.close();
     }
     private createCallback(ns: string, id: string) {
         const namespace = this.namespaces[ns];
