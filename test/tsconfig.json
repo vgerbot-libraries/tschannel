@@ -6,12 +6,16 @@
         "sourceMap": true,
         "typeRoots": [
             "../src/typings",
-            "../node_modules/@types"
+            "../node_modules/@types",
+            "./typings"
         ],
         "types": [
             "mocha",
             "node",
-            "chai"
+            "chai",
+            "sinon",
+            "sinon-chai",
+            "chai-as-promised"
         ]
     },
     "include": [

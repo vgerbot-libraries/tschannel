@@ -3,7 +3,7 @@
 module.exports = {
     basePath: '',
 
-    frameworks: ['mocha', 'chai'],
+    frameworks: ['mocha', 'chai', 'sinon', 'sinon-chai'],
 
     restartBrowserBetweenTests: false,
 
@@ -44,5 +44,16 @@ module.exports = {
 
     singleRun: false,
 
-    concurrency: Infinity
+    concurrency: Infinity,
+
+    plugins: [
+        'karma-chrome-launcher',
+        'karma-mocha',
+        'karma-chai',
+        'karma-sinon',
+        'karma-sinon-chai',
+        'karma-mocha-reporter',
+        '@vgerbot/karma-rollup-preprocessor',
+        'karma-sourcemap-loader'
+    ]
 };

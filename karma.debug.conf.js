@@ -16,14 +16,6 @@ module.exports = function (config) {
 
         logLevel: config.LOG_DEBUG,
 
-        plugins: [
-            'karma-chrome-launcher',
-            'karma-mocha',
-            'karma-chai',
-            'karma-mocha-reporter',
-            '@vgerbot/karma-rollup-preprocessor',
-            'karma-sourcemap-loader'
-        ],
         singleRun: false
     });
 };
