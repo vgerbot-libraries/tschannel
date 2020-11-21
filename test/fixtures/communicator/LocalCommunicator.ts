@@ -24,4 +24,9 @@ export default class LocalCommunicator extends AbstractCommunicator implements C
         this.other?.close();
         this.other = undefined;
     }
+    public createRemote() {
+        const remote = new LocalCommunicator();
+        this.connectTo(remote);
+        return remote;
+    }
 }
