@@ -26,10 +26,12 @@ export class RMINamespace {
         }
     }
     public lmethod<T extends AnyFunction = AnyFunction>(name: string, func?: T): T {
-        if (this.containsMethod(name)) {
-            throw new Error(`Duplicate local method name in namespace, namespace: ${this.id}, method name: ${name}`);
-        }
         if (typeof func === 'function') {
+            if (this.containsMethod(name)) {
+                throw new Error(
+                    `Duplicate local method name in namespace, namespace: ${this.id}, method name: ${name}`
+                );
+            }
             this.lmethods[name] = func;
         }
         return this.lmethods[name] as T;

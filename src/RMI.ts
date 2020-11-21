@@ -96,9 +96,12 @@ export class RMI {
         this.namespaces[namespace.id] = namespace;
     }
     public rmethod<F extends AnyFunction, T = void>(
-        metadata: RMIMethodMetadata,
+        metadata: string | RMIMethodMetadata,
         context?: T
     ): (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>> {
+        if (typeof metadata === 'string') {
+            metadata = new RMIMethodMetadata(metadata, {});
+        }
         return this.globalNamespace.rmethod(metadata).bind(context) as Promisify<F, T>;
     }
     public lmethod(name: string, func?: AnyFunction) {
