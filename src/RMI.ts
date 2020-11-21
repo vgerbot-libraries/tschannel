@@ -27,7 +27,7 @@ export class RMI {
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
-    public rclass<T>(_clazz: Constructor<T>): Constructor<PromisifyClass<T>> {
+    public rclass<T>(_clazz: Constructor<T>): PromisifyClass<T> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const rmi = this;
         const clazz = (_clazz as unknown) as RMIClassConstructor;
@@ -64,14 +64,18 @@ export class RMI {
                 });
             };
         });
-        return (cls as unknown) as Constructor<PromisifyClass<T>>;
+        return (cls as unknown) as PromisifyClass<T>;
     }
     public lclass(id: string, clazz: AnyConstructor) {
+        const constructorMethodName = id + '-new-instance';
+        if (this.globalNamespace.containsMethod(constructorMethodName)) {
+            throw new Error(`Duplicate local class id: ${id}`);
+        }
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype);
         const methodNames = propertyNames.filter(propertyName => {
             return propertyName !== 'constructor' && typeof clazz.prototype[propertyName] === 'function';
         });
-        this.lmethod(id + '-new-instance', (instanceNamespaceId, args: unknown[]) => {
+        this.lmethod(constructorMethodName, (instanceNamespaceId, args: unknown[]) => {
             const namespace = (this.namespaces[instanceNamespaceId] = new RMINamespace(
                 instanceNamespaceId,
                 this.adaptor
