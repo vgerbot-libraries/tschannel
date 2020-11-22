@@ -46,7 +46,18 @@ export default class MessageAdaptor {
                     });
                     try {
                         const retValue = method(...args);
-                        this.returnValue(callId, retValue as SerializableValue);
+                        if (retValue instanceof Promise) {
+                            retValue.then(
+                                (value: SerializableValue) => {
+                                    this.returnValue(callId, value);
+                                },
+                                reason => {
+                                    this.throwError(callId, reason);
+                                }
+                            );
+                        } else {
+                            this.returnValue(callId, retValue as SerializableValue);
+                        }
                     } catch (error) {
                         this.throwError(callId, error);
                     }
