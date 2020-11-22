@@ -1,4 +1,4 @@
-import { rclass, RMI } from '../../src';
+import { ParameterType, rclass, rmethod, RMI } from '../../src';
 import LocalCommunicator from '../fixtures/communicator/LocalCommunicator';
 
 describe('Remote method invocation', () => {
@@ -66,17 +66,73 @@ describe('Remote method invocation', () => {
         @rclass({
             id: 'Animal'
         })
-        class Dog implements Animal {
+        class DogDef implements Animal {
             getType(): string {
                 throw new Error('Method not implemented.');
             }
         }
-        const RemoteDogClass = localRMI.rclass(Dog);
+        const RemoteDogClass = localRMI.rclass(DogDef);
 
         const remoteDog = new RemoteDogClass('dog');
 
         await expect(remoteDog.getType()).to.be.eventually.become('dog');
 
         await expect(localRMI.release(remoteDog)).to.be.eventually.become(true);
+    });
+
+    it('Should handle callbacks correctly', async () => {
+        interface MediaProcessor {
+            downloadAndParse(url: string, receive: (data: ArrayBuffer, offset: number, total: number) => void);
+        }
+        class MediaProcessorImpl implements MediaProcessor {
+            downloadAndParse(url: string, receive: (data: ArrayBuffer, offset: number, total: number) => void) {
+                for (let i = 0; i < 5; i++) {
+                    receive(new ArrayBuffer(10), i, 5);
+                }
+            }
+        }
+        remoteRMI.lclass('media-processor', MediaProcessorImpl);
+        @rclass({
+            id: 'media-processor'
+        })
+        class MediaProcessorDef implements MediaProcessor {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            downloadAndParse(url: string, receive: (data: ArrayBuffer, offset: number, total: number) => void) {
+                throw new Error('Method not implemented.');
+            }
+        }
+        const RemoteMediaProcessorImpl = localRMI.rclass(MediaProcessorDef);
+
+        const processor = new RemoteMediaProcessorImpl();
+
+        const callback = sinon.spy();
+
+        await processor.downloadAndParse('http://url', callback);
+
+        expect(callback).to.be.called;
+        expect(callback).to.be.callCount(5);
+    });
+
+    it('Should paramTypes of @rmethod() option work correctly', async () => {
+        function method(data: string, callback: (data: string) => void) {
+            callback(data);
+        }
+        rmethod({
+            paramTypes: [ParameterType.serializable, ParameterType.callback]
+        })(
+            {
+                m: method
+            },
+            'm'
+        );
+        const receiver = sinon.spy();
+        remoteCommunicator.addReceiveMessageListener(receiver);
+        remoteRMI.lmethod('method', method);
+        const callback = sinon.spy();
+        await localRMI.rmethod('method', method)('data', callback);
+
+        expect(callback).to.be.calledOnce;
+        expect(typeof receiver.args[0][0]).not.to.be.eql('function');
+        expect(callback.args[0][0]).to.be.eql('data');
     });
 });
