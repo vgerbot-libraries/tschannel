@@ -1,12 +1,11 @@
 import AbstractCommunicator from '../../../src/communicators/AbstractCommunicator';
-import { Communicator, CommunicatorMessageReceiver } from '../../../src/types/Communicator';
+import { Communicator } from '../../../src/types/Communicator';
 import { InvokeMethodData } from '../../../src/types/InvokeMethodData';
 import Payload from '../../../src/types/Payload';
 import { Returning } from '../../../src/types/Returning';
 import { SerializableValue } from '../../../src/types/Serializable';
 
 export default class LocalCommunicator extends AbstractCommunicator implements Communicator {
-    public messageReceivers: CommunicatorMessageReceiver[] = [];
     private other?: LocalCommunicator;
     connectTo(other: LocalCommunicator) {
         this.other = other;
@@ -21,8 +20,9 @@ export default class LocalCommunicator extends AbstractCommunicator implements C
     }
     close(): void {
         this.messageReceivers = [];
-        this.other?.close();
+        const other = this.other;
         this.other = undefined;
+        other?.close();
     }
     public createRemote() {
         const remote = new LocalCommunicator();

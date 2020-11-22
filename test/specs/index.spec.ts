@@ -1,16 +1,22 @@
-import { RMI } from '../../src';
+import { rclass, RMI } from '../../src';
 import LocalCommunicator from '../fixtures/communicator/LocalCommunicator';
 
 describe('Remote method invocation', () => {
-    let localCommunicator;
-    let remoteCommunicator;
+    let localCommunicator: LocalCommunicator;
+    let remoteCommunicator: LocalCommunicator;
+    let localRMI: RMI;
+    let remoteRMI: RMI;
     beforeEach(() => {
         localCommunicator = new LocalCommunicator();
         remoteCommunicator = localCommunicator.createRemote();
+        localRMI = new RMI('local', localCommunicator);
+        remoteRMI = new RMI('local', remoteCommunicator);
+    });
+    afterEach(() => {
+        localRMI.destroy();
+        remoteRMI.destroy();
     });
     it('Should be called correctly in the RMI object with the same method name and the same RMI id', async () => {
-        const localRMI = new RMI('local', localCommunicator);
-        const remoteRMI = new RMI('local', remoteCommunicator);
         const method = sinon.spy();
         remoteRMI.lmethod('method', method);
 
@@ -38,9 +44,39 @@ describe('Remote method invocation', () => {
         const method4 = sinon.spy(fakeMethod4);
 
         remoteRMI.lmethod('method4', method4);
-        try {
-            await localRMI.rmethod('method4')();
-        } catch (e) {}
-        expect(method4).to.been.thrown(fakeMethod4.exceptions[0]);
+        const promise = localRMI.rmethod('method4')();
+        await promise.catch((reason: Error) => {
+            const remoteError = fakeMethod4.exceptions[0] as Error;
+            expect(method4).to.been.thrown(remoteError);
+            expect(reason.message).to.be.equal(remoteError.message);
+            expect(reason.stack).to.be.equal(remoteError.stack);
+        });
+    });
+    it('Should create remote instance correctly', async () => {
+        interface Animal {
+            getType(): string;
+        }
+        class DogImpl implements Animal {
+            constructor(private type: string) {}
+            public getType() {
+                return this.type;
+            }
+        }
+        remoteRMI.lclass('Animal', DogImpl);
+        @rclass({
+            id: 'Animal'
+        })
+        class Dog implements Animal {
+            getType(): string {
+                throw new Error('Method not implemented.');
+            }
+        }
+        const RemoteDogClass = localRMI.rclass(Dog);
+
+        const remoteDog = new RemoteDogClass('dog');
+
+        await expect(remoteDog.getType()).to.be.eventually.become('dog');
+
+        await expect(localRMI.release(remoteDog)).to.be.eventually.become(true);
     });
 });
