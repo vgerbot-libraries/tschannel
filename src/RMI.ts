@@ -16,6 +16,7 @@ export class RMI {
     private globalInstance = {
         release: (namespace: string) => {
             delete this.namespaces[namespace];
+            return true;
         }
     };
     private readonly globalNamespace: RMINamespace;
@@ -107,13 +108,13 @@ export class RMI {
     public lmethod(name: string, func?: AnyFunction) {
         return this.globalNamespace.lmethod(name, func);
     }
-    public release(rinstance: RMIClass): Promise<void> {
-        const namespace = rinstance.$namespace;
+    public release<T>(rinstance: T): Promise<boolean> {
+        const namespace = ((rinstance as unknown) as RMIClass).$namespace;
         if (!namespace) {
-            return Promise.reject(new Error(''));
+            return Promise.reject(new Error('Inllegal argument: target is not a remote instance!'));
         }
         delete this.namespaces[namespace.id];
-        return this.globalNamespace.rmethod('release')(namespace.id) as Promise<void>;
+        return this.rmethod('release')(namespace.id) as Promise<boolean>;
     }
     public destroy() {
         this.adaptor.destroy();

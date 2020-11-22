@@ -5,6 +5,7 @@ export interface Returning {
     readonly callId: string;
     readonly success: boolean;
     readonly error?: {
+        readonly name: string;
         readonly message: string;
         readonly stack: string;
     };

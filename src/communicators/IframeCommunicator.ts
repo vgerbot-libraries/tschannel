@@ -1,6 +1,5 @@
-import { Communicator, CommunicatorMessageReceiver } from '../types/Communicator';
+import { Communicator } from '../types/Communicator';
 import Payload from '../types/Payload';
-import { Returning } from '../types/Returning';
 import { SerializableValue } from '../types/Serializable';
 import AbstractCommunicator from './AbstractCommunicator';
 

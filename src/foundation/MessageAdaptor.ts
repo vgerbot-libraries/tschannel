@@ -8,6 +8,7 @@ import { Transferable } from '../types/Transferable';
 import { CallbackParameter } from './CallbackParameter';
 import InvokeMethodPayload from './InvokeMethodPayload';
 import MethodReturningPayload from './MethodReturningPayload';
+import { RemoteError } from './RemoteError';
 import { RMINamespace } from './RNamespace';
 
 export default class MessageAdaptor {
@@ -42,15 +43,19 @@ export default class MessageAdaptor {
                         }
                         return it;
                     });
-                    const retValue = method(...args);
-                    this.returnValue(callId, retValue as SerializableValue);
+                    try {
+                        const retValue = method(...args);
+                        this.returnValue(callId, retValue as SerializableValue);
+                    } catch (error) {
+                        this.throwError(callId, error);
+                    }
                 }
             } else {
                 const defer = this.deferes[message.callId];
                 if (message.success) {
                     defer.resolve(message.value);
                 } else {
-                    defer.reject(message.error);
+                    defer.reject(new RemoteError(message.error));
                 }
                 delete this.deferes[message.callId];
             }
@@ -82,6 +87,7 @@ export default class MessageAdaptor {
             success: false,
             callId,
             error: {
+                name: error.name,
                 stack: error.stack || '',
                 message: error.message
             }
