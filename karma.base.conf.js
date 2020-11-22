@@ -3,11 +3,11 @@
 module.exports = {
     basePath: '',
 
-    frameworks: ['mocha', 'chai', 'sinon', 'sinon-chai'],
+    frameworks: ['mocha', 'sinon-chai', 'chai', 'sinon'],
 
     restartBrowserBetweenTests: false,
 
-    files: ['test/specs/**/*.spec.ts', {
+    files: ['test/prepare.ts', 'test/specs/**/*.spec.ts', {
         pattern: 'src/**/*.ts',
         served: true,
         included: false,

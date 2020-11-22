@@ -1,10 +1,10 @@
 'use strict';
 const path = require('path');
 
-const plugins = require('../rollup/rollup.plugins');
+const plugins = require('./build/rollup.plugins');
 const rollupPluginIstanbul = require('rollup-plugin-istanbul');
 const baseConfig = require('./karma.base.conf');
-const pkg = require('../../package.json');
+const pkg = require('./package.json');
 
 module.exports = function (config) {
     const coverageIstanbulReporter = {
@@ -36,7 +36,8 @@ module.exports = function (config) {
     ];
     config.set(Object.assign({}, baseConfig, {
         preprocessors: {
-            'test/specs/**/*.spec.ts': ['rollup']
+            'test/specs/**/*.spec.ts': ['rollup'],
+            'test/prepare.ts': ['rollup']
         },
         rollupPreprocessor: {
             context: 'this',
@@ -59,6 +60,10 @@ module.exports = function (config) {
 
         logLevel: config.LOG_DEBUG,
 
-        singleRun: true
+        singleRun: true,
+
+        plugins: baseConfig.plugins.concat([
+            'karma-coverage-istanbul-reporter'
+        ])
     }));
 };
