@@ -135,4 +135,15 @@ describe('Remote method invocation', () => {
         expect(typeof receiver.args[0][0]).not.to.be.eql('function');
         expect(callback.args[0][0]).to.be.eql('data');
     });
+
+    it('Should raise an error when register multiple local classes with same id', () => {
+        remoteRMI.lclass('computer', class Computer {});
+        const callback = sinon.spy(() => {
+            remoteRMI.lclass('computer', class Computer {});
+        });
+        expect(callback).to.throw();
+    });
+    it('Should raise an error when release an illegal remote instance', async () => {
+        await expect(localRMI.release({})).to.be.eventually.rejected;
+    });
 });

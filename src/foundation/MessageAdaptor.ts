@@ -20,6 +20,7 @@ export default class MessageAdaptor {
         private readonly namespaces: Record<string, RMINamespace>
     ) {
         this.removeMessageReceiver = communicator.addReceiveMessageListener(message => {
+            /* istanbul ignore if */
             if (message.rmiId !== this.rmiId) {
                 return;
             }
