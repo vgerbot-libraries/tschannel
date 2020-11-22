@@ -7,11 +7,9 @@ import { SerializableValue } from '../types/Serializable';
 import { Transferable } from '../types/Transferable';
 
 export class RMIMethodMetadata {
-    private namespace?: string;
     private paramTypes?: ParameterType[];
     private getTransferablesFn?: (this: void, ...args) => Transferable[];
     constructor(private readonly methodName: string, options: RemoteMethodOptions = {}) {
-        this.namespace = options.namespace || 'global';
         this.paramTypes = options.paramTypes;
         this.getTransferablesFn = options.transferables;
     }
@@ -45,8 +43,5 @@ export class RMIMethodMetadata {
                 .filter(it => !!it) as Transferable[];
         }
         return [];
-    }
-    public getNamespace() {
-        return this.namespace;
     }
 }
