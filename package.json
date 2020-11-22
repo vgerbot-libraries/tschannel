@@ -1,12 +1,12 @@
 {
-    "name": "rollup-ts-karma-mocha-chai-boilerplate",
+    "name": "rmi",
     "version": "1.0.0",
-    "description": "boilerplate project: typescript, rollup + karma + mocha + chai",
+    "description": "A library that provides a consistent and asynchrounous communication API for iframes, webworkers and even websocket to nodejs",
     "main": "dist/index.cjs.js",
     "module": "dist/index.esm.js",
     "browser": "dist/index.umd.js",
     "distDir": "dist/",
-    "library": "boilerplate",
+    "library": "rmi",
     "engines": {
         "node": ">=8.0"
     },
@@ -30,7 +30,7 @@
         "codecov": "codecov < coverage/cobertura-coverage.xml",
         "test:chromeheadless": "karma start ./karma.debug.conf.js --browsers HeadlessChrome --single-run true",
         "build": "rollup -c ./rollup.config.js --environment 'production'",
-        "gendoc": "typedoc ./src  --target es5 --out dist/docs --name rollup-ts-karma-mocha-chai-boilerplate --hideGenerator"
+        "gendoc": "typedoc ./src  --target es5 --out dist/docs --name rmi.js --hideGenerator"
     },
     "lint-staged": {
         "{src,test}/**/*.{js,ts,tsx}": [
@@ -40,18 +40,24 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/y1j2x34/rollup-ts-karma-mocha-chai-boilerplate.git"
+        "url": "git+https://github.com/y1j2x34/RMI.git"
     },
     "bugs": {
-        "url": "https://github.com/y1j2x34/rollup-ts-karma-mocha-chai-boilerplate/issues"
+        "url": "https://github.com/y1j2x34/RMI/issues"
     },
     "keywords": [
-        "rollup-ts-karma-mocha-chai-boilerplate"
+        "RMI",
+        "remote",
+        "method",
+        "invocation",
+        "iframe",
+        "websocket",
+        "webworker"
     ],
     "files": [
         "dist"
     ],
-    "homepage": "https://github.com/y1j2x34/rollup-ts-karma-mocha-chai-boilerplate#readme",
+    "homepage": "https://github.com/y1j2x34/RMI#readme",
     "author": "'y1j2x34' <y1j2x34@qq.com> (http://www.vgerbot.com/)",
     "license": "ISC",
     "devDependencies": {
