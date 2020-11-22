@@ -146,4 +146,41 @@ describe('Remote method invocation', () => {
     it('Should raise an error when release an illegal remote instance', async () => {
         await expect(localRMI.release({})).to.be.eventually.rejected;
     });
+    it('Should handle the asynchrounous methods correctly', async () => {
+        interface FileStorage {
+            read(): Promise<ArrayBuffer>;
+        }
+        // ========================== remote ==========================
+        const mockFileData = new ArrayBuffer(10);
+        class FileStorageImpl implements FileStorage {
+            read(): Promise<ArrayBuffer> {
+                return new Promise(resolve => {
+                    setTimeout(() => {
+                        resolve(mockFileData);
+                    }, 100);
+                });
+            }
+        }
+        remoteRMI.lclass('FileStorage', FileStorageImpl);
+        // ========================== remote end ==========================
+
+        // ========================== local ==========================
+        @rclass({
+            id: 'FileStorage'
+        })
+        class FileStorageDef implements FileStorage {
+            read(): Promise<ArrayBuffer> {
+                throw new Error('Method not implemented.');
+            }
+        }
+
+        const RemoteFileStorage = localRMI.rclass(FileStorageDef);
+
+        const storage = new RemoteFileStorage();
+
+        const promise = storage.read();
+        // ========================== local end ==========================
+
+        await expect(promise).to.be.eventually.become(mockFileData);
+    });
 });
