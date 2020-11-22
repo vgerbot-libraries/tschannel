@@ -98,10 +98,11 @@ export class RMI {
     }
     public rmethod<F extends AnyFunction, T = void>(
         metadata: string | RMIMethodMetadata,
+        func?: F,
         context?: T
     ): (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>> {
         if (typeof metadata === 'string') {
-            metadata = new RMIMethodMetadata(metadata, {});
+            metadata = new RMIMethodMetadata(metadata, ((func as unknown) as RMIMethod)?.options || {});
         }
         return this.globalNamespace.rmethod(metadata).bind(context) as Promisify<F, T>;
     }
