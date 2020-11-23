@@ -183,4 +183,40 @@ describe('Remote method invocation', () => {
 
         await expect(promise).to.be.eventually.become(mockFileData);
     });
+
+    it('Should work correctly to pass remote objects', async () => {
+        class A {}
+        class B {
+            method(a: A) {
+                console.info(a);
+                return a instanceof A;
+            }
+        }
+        remoteRMI.lclass('A', A);
+        remoteRMI.lclass('B', B);
+
+        @rclass({
+            id: 'A'
+        })
+        class ADef {}
+        @rclass({
+            id: 'B'
+        })
+        class BDef {
+            @rmethod({
+                paramTypes: [ParameterType.remoteObject]
+            })
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
+            method(_: A): boolean {
+                throw new Error('Method not implemented');
+            }
+        }
+        const RemoteA = localRMI.rclass(ADef);
+        const RemoteB = localRMI.rclass(BDef);
+
+        const remoteA = new RemoteA();
+        const remoteB = new RemoteB();
+
+        await expect(remoteB.method(remoteA)).to.become(true);
+    });
 });
