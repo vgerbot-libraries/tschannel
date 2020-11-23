@@ -1,6 +1,7 @@
 import { RemoteMethodOptions } from '../annotations/types/RemoteMethodOptions';
 import uid from '../common/uid';
 import { CallbackParameter } from '../foundation/CallbackParameter';
+import { RemoteInstance } from '../foundation/RemoteInstance';
 import { RMINamespace } from '../foundation/RNamespace';
 import { ParameterType } from '../types/ParameterType';
 import { SerializableValue } from '../types/Serializable';
@@ -19,10 +20,13 @@ export class RMIMethodMetadata {
     public getParameterData(namespace: RMINamespace, ...args): SerializableValue {
         if (Array.isArray(this.paramTypes) && this.paramTypes.length > 0) {
             return this.paramTypes.map((it, index) => {
-                if (it === ParameterType.callback) {
-                    const id = uid();
-                    namespace.lmethod(id, args[index]);
-                    return new CallbackParameter(namespace.id, id);
+                switch (it) {
+                    case ParameterType.callback:
+                        const id = uid();
+                        namespace.lmethod(id, args[index]);
+                        return new CallbackParameter(namespace.id, id);
+                    case ParameterType.remoteObject:
+                        return new RemoteInstance(args[index]);
                 }
                 return args[index];
             }) as SerializableValue;

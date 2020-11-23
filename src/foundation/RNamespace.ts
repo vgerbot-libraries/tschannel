@@ -5,7 +5,7 @@ import MessageAdaptor from './MessageAdaptor';
 export class RMINamespace {
     private readonly rmethods: Record<string, AnyFunction> = {};
     private readonly lmethods: Record<string, AnyFunction> = {};
-    constructor(public readonly id: string, private readonly adaptor: MessageAdaptor) {}
+    constructor(public readonly id: string, private readonly adaptor: MessageAdaptor, private origin: Object) {}
     public rmethod(nameOrMetadata: string | RMIMethodMetadata) {
         if (typeof nameOrMetadata === 'string') {
             return this.rmethods[nameOrMetadata];
@@ -24,6 +24,9 @@ export class RMINamespace {
             }
             return this.rmethods[name];
         }
+    }
+    public getOriginObject() {
+        return this.origin;
     }
     public lmethod<T extends AnyFunction = AnyFunction>(name: string, func?: T): T {
         if (typeof func === 'function') {

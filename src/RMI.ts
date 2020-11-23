@@ -24,7 +24,7 @@ export class RMI {
     private readonly namespaces: Record<string, RMINamespace> = {};
     constructor(id: string, communicator: Communicator) {
         this.adaptor = new MessageAdaptor(id, communicator, this.namespaces);
-        this.globalNamespace = new RMINamespace('global', this.adaptor);
+        this.globalNamespace = new RMINamespace('global', this.adaptor, this.globalInstance);
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
@@ -37,15 +37,12 @@ export class RMI {
         }
         @istatic<RMIClassConstructor>()
         class cls extends clazz {
-            public readonly $namespace = new RMINamespace(uid(), rmi.adaptor);
+            public readonly $namespace = new RMINamespace(uid(), rmi.adaptor, this);
             public readonly $initPromise: Promise<void>;
             constructor(...args) {
                 super(...args);
                 rmi.namespaces[this.$namespace.id] = this.$namespace;
-                this.$initPromise = rmi.rmethod(new RMIMethodMetadata(cls.id + '-new-instance', {}))(
-                    this.$namespace.id,
-                    args
-                ) as Promise<void>;
+                this.$initPromise = rmi.rmethod(cls.id + '-new-instance')(this.$namespace.id, args) as Promise<void>;
             }
         }
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype).filter(it => it !== 'constructor');
@@ -79,14 +76,15 @@ export class RMI {
         this.lmethod(constructorMethodName, (instanceNamespaceId, args: unknown[]) => {
             const namespace = (this.namespaces[instanceNamespaceId] = new RMINamespace(
                 instanceNamespaceId,
-                this.adaptor
+                this.adaptor,
+                this
             ));
             const instance = new clazz(...args);
             this.linstance(namespace, instance, methodNames);
         });
     }
     public linstance(id: string | RMINamespace, instance: Object, methodNames: string[] = Object.keys(instance)) {
-        const namespace = id instanceof RMINamespace ? id : new RMINamespace(id, this.adaptor);
+        const namespace = id instanceof RMINamespace ? id : new RMINamespace(id, this.adaptor, instance);
         methodNames.forEach(name => {
             const value = instance[name];
             if (typeof value !== 'function') {

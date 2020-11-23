@@ -9,6 +9,7 @@ import { CallbackParameter } from './CallbackParameter';
 import InvokeMethodPayload from './InvokeMethodPayload';
 import MethodReturningPayload from './MethodReturningPayload';
 import { RemoteError } from './RemoteError';
+import { isRemoteInstance } from './RemoteInstance';
 import { RMINamespace } from './RNamespace';
 
 export default class MessageAdaptor {
@@ -41,6 +42,8 @@ export default class MessageAdaptor {
                     const args = parameters.map(it => {
                         if (CallbackParameter.isCallback(it)) {
                             return this.createCallback(it.namespace, it.id);
+                        } else if (isRemoteInstance(it)) {
+                            return this.namespaces[it.id]?.getOriginObject();
                         }
                         return it;
                     });
