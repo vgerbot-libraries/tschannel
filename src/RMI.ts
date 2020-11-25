@@ -74,12 +74,12 @@ export class RMI {
             return propertyName !== 'constructor' && typeof clazz.prototype[propertyName] === 'function';
         });
         this.lmethod(constructorMethodName, (instanceNamespaceId, args: unknown[]) => {
+            const instance = new clazz(...args);
             const namespace = (this.namespaces[instanceNamespaceId] = new RMINamespace(
                 instanceNamespaceId,
                 this.adaptor,
-                this
+                instance
             ));
-            const instance = new clazz(...args);
             this.linstance(namespace, instance, methodNames);
         });
     }

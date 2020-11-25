@@ -3,7 +3,7 @@
       "module": "esnext",
       "moduleResolution": "node",
       "target": "es5",
-      "lib": ["dom", "es5", "es6", "esnext", "scripthost", "es2015.promise"],
+      "lib": ["dom", "es5", "es6", "esnext", "scripthost", "es2015.promise", "WebWorker"],
       "strict": true,
       "noImplicitAny": false,
       "noUnusedLocals": true,
