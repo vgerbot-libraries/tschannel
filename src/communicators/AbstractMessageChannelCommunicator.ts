@@ -21,7 +21,7 @@ export default abstract class AbstractMessageChannelCommunicator<
         };
     }
     send(payload: Payload<SerializableValue>): void {
-        if (this.target instanceof Window) {
+        if (typeof window !== 'undefined' && this.target instanceof Window) {
             throw new Error('Method not implemented.');
         } else {
             (this.target.postMessage as MessageChannel['postMessage']).call(

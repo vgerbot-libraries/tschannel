@@ -12,7 +12,7 @@ interface CachedParallelData {
     returns: Returning[];
 }
 
-export default class ParallelCommunicator extends AbstractCommunicator implements Communicator {
+export class ParallelCommunicator extends AbstractCommunicator implements Communicator {
     private communicationDataCache: Record<string, CachedParallelData> = {};
     constructor(
         private parallelRemoteCommunicators: Communicator[],
