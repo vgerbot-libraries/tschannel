@@ -36,8 +36,7 @@ module.exports = function (config) {
     ];
     config.set(Object.assign({}, baseConfig, {
         preprocessors: {
-            'test/specs/**/*.spec.ts': ['rollup'],
-            'test/prepare.ts': ['rollup']
+            'test/**/*.ts': ['rollup']
         },
         rollupPreprocessor: {
             context: 'this',

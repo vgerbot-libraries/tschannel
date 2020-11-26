@@ -12,6 +12,11 @@ module.exports = {
         served: true,
         included: false,
         watched: true
+    }, {
+        pattern: 'test/specs/**/*.external.ts',
+        served: true,
+        included: false,
+        watched: true
     }],
 
     mime: {
