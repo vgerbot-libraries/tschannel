@@ -1,8 +1,7 @@
+import { CommunicationData } from './CommunicationData';
 import { SerializableValue } from './Serializable';
 
-export interface Returning {
-    readonly rmiId: string;
-    readonly callId: string;
+export interface Returning extends CommunicationData {
     readonly success: boolean;
     readonly error?: {
         readonly name: string;
@@ -10,5 +9,4 @@ export interface Returning {
         readonly stack: string;
     };
     readonly value?: SerializableValue;
-    [key: string]: SerializableValue;
 }
