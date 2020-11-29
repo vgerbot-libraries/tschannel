@@ -1,8 +1,8 @@
 export interface MessageChannel {
-    postMessage(message: any, transfer?: Transferable[]): void;
+    postMessage(message: unknown, transfer?: Transferable[]): void;
     addEventListener<K extends keyof MessagePortEventMap>(
         type: K,
-        listener: (this: MessagePort, ev: MessagePortEventMap[K]) => any,
+        listener: (this: MessagePort, ev: MessagePortEventMap[K]) => unknown,
         options?: boolean | AddEventListenerOptions
     ): void;
     addEventListener(
@@ -12,7 +12,7 @@ export interface MessageChannel {
     ): void;
     removeEventListener<K extends keyof MessagePortEventMap>(
         type: K,
-        listener: (this: MessagePort, ev: MessagePortEventMap[K]) => any,
+        listener: (this: MessagePort, ev: MessagePortEventMap[K]) => unknown,
         options?: boolean | EventListenerOptions
     ): void;
     removeEventListener(
