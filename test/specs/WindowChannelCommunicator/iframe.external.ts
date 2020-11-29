@@ -1,7 +1,7 @@
-import { RMI, WebWorkerScopeCommunicator } from '../../../src';
-import { Animal, RMI_ID } from './common';
+import { RMI, WindowChannelCommunicator } from '../../../src';
+import { RMI_ID, Animal } from './common';
 
-const rmi = new RMI(RMI_ID, new WebWorkerScopeCommunicator());
+const rmi = new RMI(RMI_ID, new WindowChannelCommunicator(window.parent, window.parent.location.origin));
 
 rmi.lmethod('hello', () => 'world');
 
