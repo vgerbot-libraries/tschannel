@@ -1,5 +1,6 @@
-import AbstractMessageChannelCommunicator from './AbstractMessageChannelCommunicator';
+// istanbul ignore file
 
+import AbstractMessageChannelCommunicator from './AbstractMessageChannelCommunicator';
 export class WebWorkerScopeCommunicator extends AbstractMessageChannelCommunicator<typeof globalThis> {
     constructor() {
         super(globalThis);
