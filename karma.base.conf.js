@@ -3,6 +3,8 @@
 module.exports = {
     basePath: '',
 
+    hostname: '127.0.0.1',
+
     frameworks: ['mocha', 'sinon-chai', 'chai', 'sinon'],
 
     restartBrowserBetweenTests: false,
@@ -17,6 +19,11 @@ module.exports = {
         served: true,
         included: false,
         watched: true
+    }, {
+        pattern: 'test/specs/**/*.external.html',
+        served: true,
+        included: false,
+        watched: true
     }],
 
     mime: {
@@ -24,6 +31,9 @@ module.exports = {
     },
 
     reporters: ['mocha'],
+
+    customContextFile: 'test/karma/context.html',
+    customDebugFile: 'test/karma/debug.html',
 
     port: 9876,
 

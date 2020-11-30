@@ -11,6 +11,8 @@ just for immediate execution, without reporting to Karma server.
   <link href="favicon.ico" rel="icon" type="image/x-icon" />
   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" />
+  <link rel="prefetch" href="/base/test/specs/ParallelCommunicator/worker.external.js" as="worker">
+  <link rel="prefetch" href="/base/test/specs/WebWorkerCommunicator/worker.external.js" as="worker">
 </head>
 <body>
   <!-- The scripts need to be at the end of body, so that some test running frameworks
@@ -28,5 +30,13 @@ just for immediate execution, without reporting to Karma server.
   </script>
   <!-- Dynamically replaced with <script> tags -->
   %SCRIPTS%
+  <!-- Since %SCRIPTS% might include modules, the `loaded()` call needs to be in a module too.
+   This ensures all the tests will have been declared before karma tries to run them. -->
+  <script type="module">
+    window.__karma__.loaded();
+  </script>
+  <script nomodule>
+    window.__karma__.loaded();
+  </script>
 </body>
 </html>
