@@ -45,9 +45,8 @@ export class ParallelCommunicator extends AbstractCommunicator implements Commun
                         returned: 0,
                         returns: []
                     };
-                } else {
-                    cache.returned++;
                 }
+                cache.returned++;
                 cache.returns[no] = message as Returning;
                 if (cache.returned === parallelCount) {
                     const ret = this.reducer(cache.returns);

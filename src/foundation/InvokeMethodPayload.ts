@@ -12,6 +12,9 @@ export default class InvokeMethodPayload implements Payload<InvokeMethodData> {
     constructor(private readonly data: InvokeMethodData, private readonly transferableArray: Transferable[]) {
         data[INVOKE_METHOD_DATA_SYMBOL] = true;
     }
+    newPayload(data: InvokeMethodData, transferables?: Transferable[]): Payload<InvokeMethodData> {
+        return new InvokeMethodPayload(data, transferables || []);
+    }
     serialize(): InvokeMethodData {
         return this.data;
     }

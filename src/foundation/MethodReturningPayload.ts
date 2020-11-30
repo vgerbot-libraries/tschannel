@@ -4,6 +4,9 @@ import { Transferable } from '../types/Transferable';
 
 export default class MethodReturningPayload implements Payload<Returning> {
     constructor(private readonly data: Returning) {}
+    newPayload(data: Returning): Payload<Returning> {
+        return new MethodReturningPayload(data);
+    }
     serialize(): Returning {
         return this.data;
     }
