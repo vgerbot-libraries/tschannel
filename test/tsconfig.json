@@ -16,7 +16,8 @@
             "sinon",
             "sinon-chai",
             "chai-as-promised"
-        ]
+        ],
+        "experimentalDecorators": true
     },
     "include": [
         "../src", "./"

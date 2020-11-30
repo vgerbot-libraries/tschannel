@@ -1,4 +1,4 @@
-export const RMI_ID = 'web-worker-communicator-id';
+export const RMI_ID = 'window-channel-communicator-id';
 
 export interface Animal {
     getType(): string;
