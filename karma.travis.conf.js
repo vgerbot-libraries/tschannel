@@ -51,11 +51,14 @@ module.exports = function (config) {
                 if (warning.code === 'CIRCULAR_DEPENDENCY') {
                     return;
                 }
-                console.warn(`(!) ${warning.message}`);
+                // console.warn(`(!) ${warning.message}`);
             }
         },
         reporters: ['mocha', 'coverage-istanbul'],
         coverageIstanbulReporter: coverageIstanbulReporter,
+
+        pingTimeout: 1000 * 3000,
+        browserNoActivityTimeout: 1000 * 300,
 
         logLevel: config.LOG_DEBUG,
 
