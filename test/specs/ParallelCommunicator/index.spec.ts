@@ -1,7 +1,7 @@
 import { InvokeMethodData, ParallelCommunicator, RMI, WebWorkerCommunicator } from '../../../src';
 import { hex, RMI_ID } from './common';
 
-describe.only('ParallelCommunicator', function() {
+describe('ParallelCommunicator', function() {
     this.timeout(1000 * 300);
 
     const workerURL = '/base/test/specs/ParallelCommunicator/worker.external.js';
@@ -49,19 +49,18 @@ describe.only('ParallelCommunicator', function() {
             }
         )
     );
-    const buffer = new SharedArrayBuffer(parallels * 1024 * 1024 * 8);
-    before(() => {
+    const buffer = new SharedArrayBuffer(parallels * 1024 * 8);
+    before(async () => {
         const arr = new Uint8Array(buffer);
         arr.forEach((v, i) => {
             arr[i] = Math.floor(Math.random() * 0xff);
         });
+        await new Promise(resolve => setTimeout(resolve, 1000));
     });
     after(() => {
         rmi.destroy();
     });
-    it('Should parallel worker works more faster', async () => {
-        await new Promise(resolve => setTimeout(resolve, 1000));
-
+    it('Should parallel worker works correctly', async () => {
         const remoteHex = rmi.rmethod<typeof hex>('bin2hex');
 
         const lstartTime = Date.now();
@@ -76,6 +75,6 @@ describe.only('ParallelCommunicator', function() {
         const localTime = lendTime - lstartTime;
 
         console.info(parallelTime, localTime);
-        expect(localResult).to.be.equal(remoteResult);
+        expect(localResult.join('')).to.be.equal(remoteResult.join(''));
     });
 });
