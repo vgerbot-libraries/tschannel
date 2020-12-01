@@ -1,10 +1,3 @@
-# rollup-ts-karma-mocha-chai-boilerplate
+# aislejs
 
-Technology stacks:
-
-- typescript@3.7.4
-- rollup
-- karma
-- mocha + chai
-- istanbul
-- commitlint
+[![codecov](https://codecov.io/gh/y1j2x34/aislejs/branch/master/graph/badge.svg?token=fPomBmOknB)](https://codecov.io/gh/y1j2x34/aislejs)
