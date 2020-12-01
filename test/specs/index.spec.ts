@@ -80,6 +80,25 @@ describe('Remote method invocation', () => {
         await expect(localRMI.release(remoteDog)).to.be.eventually.become(true);
     });
 
+    it('Should raise error when remote class not defined', async () => {
+        @rclass({
+            id: 'nonexistent-remote-class'
+        })
+        class Def {
+            public method() {
+                //
+            }
+        }
+
+        const RemoteDef = localRMI.rclass(Def);
+        const instance = new RemoteDef();
+        const promise = instance.method();
+        promise.catch(reason => {
+            console.info(reason);
+        });
+        await expect(promise).to.be.eventually.rejected;
+    });
+
     it('Should handle callbacks correctly', async () => {
         interface MediaProcessor {
             downloadAndParse(url: string, receive: (data: ArrayBuffer, offset: number, total: number) => void);
