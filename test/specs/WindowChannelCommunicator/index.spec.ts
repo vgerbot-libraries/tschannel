@@ -3,11 +3,12 @@ import { Animal, RMI_ID } from './common';
 
 describe('WebWorkerCommunicator', () => {
     let rmi: RMI;
+    let iframe: HTMLIFrameElement;
 
     before(async () => {
         const url = location.origin + '/base/test/specs/WindowChannelCommunicator/iframe.external.html';
 
-        const iframe = document.createElement('iframe');
+        iframe = document.createElement('iframe');
         const promise = new Promise(resolve => {
             iframe.onload = resolve;
         });
@@ -15,6 +16,9 @@ describe('WebWorkerCommunicator', () => {
         document.body.appendChild(iframe);
         await promise;
         rmi = new RMI(RMI_ID, new WindowChannelCommunicator(iframe.contentWindow as Window, location.origin));
+    });
+    after(() => {
+        document.body.removeChild(iframe);
     });
 
     it('Should rmethod work correctly', async () => {

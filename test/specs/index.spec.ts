@@ -93,10 +93,11 @@ describe('Remote method invocation', () => {
         const RemoteDef = localRMI.rclass(Def);
         const instance = new RemoteDef();
         const promise = instance.method();
-        promise.catch(reason => {
-            console.info(reason);
-        });
         await expect(promise).to.be.eventually.rejected;
+    });
+
+    it('Should raise error when remote method not exist', async () => {
+        await expect(localRMI.rmethod('unexistent-method')()).to.be.eventually.rejected;
     });
 
     it('Should handle callbacks correctly', async () => {
