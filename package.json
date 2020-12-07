@@ -1,12 +1,12 @@
 {
-    "name": "rmi",
+    "name": "channel-ts",
     "version": "1.0.0",
     "description": "A library that provides a consistent and asynchrounous communication API for iframes, webworkers and even websocket to nodejs",
     "main": "dist/index.cjs.js",
     "module": "dist/index.esm.js",
     "browser": "dist/index.umd.js",
     "distDir": "dist/",
-    "library": "rmi",
+    "library": "ChannelTS",
     "engines": {
         "node": ">=8.0"
     },
@@ -30,7 +30,7 @@
         "codecov": "codecov < coverage/cobertura-coverage.xml",
         "test:chromeheadless": "karma start ./karma.debug.conf.js --browsers HeadlessChrome --single-run true",
         "build": "rollup -c ./rollup.config.js --environment 'production'",
-        "gendoc": "typedoc ./src  --target es5 --out dist/docs --name rmi.js --hideGenerator"
+        "gendoc": "typedoc ./src  --target es5 --out dist/docs --name channel-ts --hideGenerator"
     },
     "lint-staged": {
         "{src,test}/**/*.{js,ts,tsx}": [
@@ -40,13 +40,14 @@
     },
     "repository": {
         "type": "git",
-        "url": "git+https://github.com/y1j2x34/RMI.git"
+        "url": "git+https://github.com/y1j2x34/channel-ts.git"
     },
     "bugs": {
-        "url": "https://github.com/y1j2x34/RMI/issues"
+        "url": "https://github.com/y1j2x34/channel-ts/issues"
     },
     "keywords": [
         "RMI",
+        "channel",
         "remote",
         "method",
         "invocation",
@@ -57,7 +58,7 @@
     "files": [
         "dist"
     ],
-    "homepage": "https://github.com/y1j2x34/RMI#readme",
+    "homepage": "https://github.com/y1j2x34/channel-ts#readme",
     "author": "'y1j2x34' <y1j2x34@qq.com> (http://www.vgerbot.com/)",
     "license": "ISC",
     "devDependencies": {

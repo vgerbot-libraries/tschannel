@@ -1,6 +1,6 @@
 export { rmethod } from './annotations/rmethod';
 export { rclass } from './annotations/rclass';
-export { RMI } from './RMI';
+export { Channel } from './Channel';
 export { ParameterType } from './types/ParameterType';
 export {
     ParallelDataDistributor,

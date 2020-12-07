@@ -1,11 +1,11 @@
-import { RMI, WebWorkerScopeCommunicator } from '../../../src';
-import { Animal, RMI_ID } from './common';
+import { Channel, WebWorkerScopeCommunicator } from '../../../src';
+import { Animal, CHANNEL_ID } from './common';
 
-const rmi = new RMI(RMI_ID, new WebWorkerScopeCommunicator());
+const channel = new Channel(CHANNEL_ID, new WebWorkerScopeCommunicator());
 
-rmi.lmethod('hello', () => 'world');
+channel.lmethod('hello', () => 'world');
 
-rmi.lclass(
+channel.lclass(
     'Dog',
     class Dog implements Animal {
         constructor(private type: string) {}

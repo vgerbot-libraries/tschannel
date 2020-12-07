@@ -1,13 +1,13 @@
-import { InvokeMethodData, ParallelCommunicator, RMI, WebWorkerCommunicator } from '../../../src';
-import { hex, RMI_ID } from './common';
+import { InvokeMethodData, ParallelCommunicator, Channel, WebWorkerCommunicator } from '../../../src';
+import { hex, CHANNEL_ID } from './common';
 
 describe('ParallelCommunicator', function() {
     this.timeout(1000 * 300);
 
     const workerURL = '/base/test/specs/ParallelCommunicator/worker.external.js';
     const parallels = 4;
-    const rmi = new RMI(
-        RMI_ID,
+    const channel = new Channel(
+        CHANNEL_ID,
         new ParallelCommunicator(
             Array(parallels)
                 .fill(undefined)
@@ -58,10 +58,10 @@ describe('ParallelCommunicator', function() {
         await new Promise(resolve => setTimeout(resolve, 1000));
     });
     after(() => {
-        rmi.destroy();
+        channel.destroy();
     });
     it('Should parallel worker works correctly', async () => {
-        const remoteHex = rmi.rmethod<typeof hex>('bin2hex');
+        const remoteHex = channel.rmethod<typeof hex>('bin2hex');
 
         const lstartTime = Date.now();
         const localResult = hex(buffer, 0, buffer.byteLength);

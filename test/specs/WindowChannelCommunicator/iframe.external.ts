@@ -1,11 +1,11 @@
-import { RMI, WindowChannelCommunicator } from '../../../src';
-import { RMI_ID, Animal } from './common';
+import { Channel, WindowChannelCommunicator } from '../../../src';
+import { CHANNEL_ID, Animal } from './common';
 
-const rmi = new RMI(RMI_ID, new WindowChannelCommunicator(window.parent, window.parent.location.origin));
+const channel = new Channel(CHANNEL_ID, new WindowChannelCommunicator(window.parent, window.parent.location.origin));
 
-rmi.lmethod('hello', () => 'world');
+channel.lmethod('hello', () => 'world');
 
-rmi.lclass(
+channel.lclass(
     'Dog',
     class Dog implements Animal {
         constructor(private type: string) {}

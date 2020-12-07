@@ -1,50 +1,50 @@
-import { ParameterType, rclass, rmethod, RMI } from '../../src';
+import { ParameterType, rclass, rmethod, Channel } from '../../src';
 import LocalCommunicator from '../fixtures/communicator/LocalCommunicator';
 
 describe('Remote method invocation', () => {
     let localCommunicator: LocalCommunicator;
     let remoteCommunicator: LocalCommunicator;
-    let localRMI: RMI;
-    let remoteRMI: RMI;
+    let localChannel: Channel;
+    let remoteChannel: Channel;
     beforeEach(() => {
         localCommunicator = new LocalCommunicator();
         remoteCommunicator = localCommunicator.createRemote();
-        localRMI = new RMI('local', localCommunicator);
-        remoteRMI = new RMI('local', remoteCommunicator);
+        localChannel = new Channel('local', localCommunicator);
+        remoteChannel = new Channel('local', remoteCommunicator);
     });
     afterEach(() => {
-        localRMI.destroy();
-        remoteRMI.destroy();
+        localChannel.destroy();
+        remoteChannel.destroy();
     });
-    it('Should be called correctly in the RMI object with the same method name and the same RMI id', async () => {
+    it('Should be called correctly in the Channel object with the same method name and the same Channel id', async () => {
         const method = sinon.spy();
-        remoteRMI.lmethod('method', method);
+        remoteChannel.lmethod('method', method);
 
-        await localRMI.rmethod('method')();
+        await localChannel.rmethod('method')();
 
         expect(method).to.be.calledOnce;
 
         const method2 = sinon.spy();
 
-        remoteRMI.lmethod('method2', method2);
+        remoteChannel.lmethod('method2', method2);
 
-        await localRMI.rmethod('method2')(1);
+        await localChannel.rmethod('method2')(1);
 
         expect(method2).to.be.calledWith(1);
 
         const method3 = sinon.spy(sinon.fake.returns('hello'));
 
-        remoteRMI.lmethod('method3', method3);
+        remoteChannel.lmethod('method3', method3);
 
-        const ret = await localRMI.rmethod('method3')();
+        const ret = await localChannel.rmethod('method3')();
 
         expect(ret).to.be.eq('hello');
 
         const fakeMethod4 = sinon.fake.throws('error-message');
         const method4 = sinon.spy(fakeMethod4);
 
-        remoteRMI.lmethod('method4', method4);
-        const promise = localRMI.rmethod('method4')();
+        remoteChannel.lmethod('method4', method4);
+        const promise = localChannel.rmethod('method4')();
         await promise.catch((reason: Error) => {
             const remoteError = fakeMethod4.exceptions[0] as Error;
             expect(method4).to.been.thrown(remoteError);
@@ -62,7 +62,7 @@ describe('Remote method invocation', () => {
                 return this.type;
             }
         }
-        remoteRMI.lclass('Animal', DogImpl);
+        remoteChannel.lclass('Animal', DogImpl);
         @rclass({
             id: 'Animal'
         })
@@ -71,13 +71,13 @@ describe('Remote method invocation', () => {
                 throw new Error('Method not implemented.');
             }
         }
-        const RemoteDogClass = localRMI.rclass(DogDef);
+        const RemoteDogClass = localChannel.rclass(DogDef);
 
         const remoteDog = new RemoteDogClass('dog');
 
         await expect(remoteDog.getType()).to.be.eventually.become('dog');
 
-        await expect(localRMI.release(remoteDog)).to.be.eventually.become(true);
+        await expect(localChannel.release(remoteDog)).to.be.eventually.become(true);
     });
 
     it('Should raise error when remote class not defined', async () => {
@@ -90,14 +90,14 @@ describe('Remote method invocation', () => {
             }
         }
 
-        const RemoteDef = localRMI.rclass(Def);
+        const RemoteDef = localChannel.rclass(Def);
         const instance = new RemoteDef();
         const promise = instance.method();
         await expect(promise).to.be.eventually.rejected;
     });
 
     it('Should raise error when remote method not exist', async () => {
-        await expect(localRMI.rmethod('unexistent-method')()).to.be.eventually.rejected;
+        await expect(localChannel.rmethod('unexistent-method')()).to.be.eventually.rejected;
     });
 
     it('Should handle callbacks correctly', async () => {
@@ -111,7 +111,7 @@ describe('Remote method invocation', () => {
                 }
             }
         }
-        remoteRMI.lclass('media-processor', MediaProcessorImpl);
+        remoteChannel.lclass('media-processor', MediaProcessorImpl);
         @rclass({
             id: 'media-processor'
         })
@@ -121,7 +121,7 @@ describe('Remote method invocation', () => {
                 throw new Error('Method not implemented.');
             }
         }
-        const RemoteMediaProcessorImpl = localRMI.rclass(MediaProcessorDef);
+        const RemoteMediaProcessorImpl = localChannel.rclass(MediaProcessorDef);
 
         const processor = new RemoteMediaProcessorImpl();
 
@@ -147,9 +147,9 @@ describe('Remote method invocation', () => {
         );
         const receiver = sinon.spy();
         remoteCommunicator.addReceiveMessageListener(receiver);
-        remoteRMI.lmethod('method', method);
+        remoteChannel.lmethod('method', method);
         const callback = sinon.spy();
-        await localRMI.rmethod('method', method)('data', callback);
+        await localChannel.rmethod('method', method)('data', callback);
 
         expect(callback).to.be.calledOnce;
         expect(typeof receiver.args[0][0]).not.to.be.eql('function');
@@ -157,14 +157,14 @@ describe('Remote method invocation', () => {
     });
 
     it('Should raise an error when register multiple local classes with same id', () => {
-        remoteRMI.lclass('computer', class Computer {});
+        remoteChannel.lclass('computer', class Computer {});
         const callback = sinon.spy(() => {
-            remoteRMI.lclass('computer', class Computer {});
+            remoteChannel.lclass('computer', class Computer {});
         });
         expect(callback).to.throw();
     });
     it('Should raise an error when release an illegal remote instance', async () => {
-        await expect(localRMI.release({})).to.be.eventually.rejected;
+        await expect(localChannel.release({})).to.be.eventually.rejected;
     });
     it('Should handle the asynchrounous methods correctly', async () => {
         interface FileStorage {
@@ -181,7 +181,7 @@ describe('Remote method invocation', () => {
                 });
             }
         }
-        remoteRMI.lclass('FileStorage', FileStorageImpl);
+        remoteChannel.lclass('FileStorage', FileStorageImpl);
         // ========================== remote end ==========================
 
         // ========================== local ==========================
@@ -194,7 +194,7 @@ describe('Remote method invocation', () => {
             }
         }
 
-        const RemoteFileStorage = localRMI.rclass(FileStorageDef);
+        const RemoteFileStorage = localChannel.rclass(FileStorageDef);
 
         const storage = new RemoteFileStorage();
 
@@ -212,8 +212,8 @@ describe('Remote method invocation', () => {
                 return a instanceof A;
             }
         }
-        remoteRMI.lclass('A', A);
-        remoteRMI.lclass('B', B);
+        remoteChannel.lclass('A', A);
+        remoteChannel.lclass('B', B);
 
         @rclass({
             id: 'A'
@@ -231,8 +231,8 @@ describe('Remote method invocation', () => {
                 throw new Error('Method not implemented');
             }
         }
-        const RemoteA = localRMI.rclass(ADef);
-        const RemoteB = localRMI.rclass(BDef);
+        const RemoteA = localChannel.rclass(ADef);
+        const RemoteB = localChannel.rclass(BDef);
 
         const remoteA = new RemoteA();
         const remoteB = new RemoteB();

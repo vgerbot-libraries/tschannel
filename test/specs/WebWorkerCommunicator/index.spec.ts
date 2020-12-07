@@ -1,16 +1,20 @@
-import { rclass, RMI, WebWorkerCommunicator } from '../../../src';
-import { Animal, RMI_ID } from './common';
+import { rclass, Channel, WebWorkerCommunicator } from '../../../src';
+import { Animal, CHANNEL_ID } from './common';
 
 describe('WebWorkerCommunicator', () => {
-    const rmi = new RMI(RMI_ID, new WebWorkerCommunicator('/base/test/specs/WebWorkerCommunicator/worker.external.js'));
+    const channel = new Channel(
+        CHANNEL_ID,
+        new WebWorkerCommunicator('/base/test/specs/WebWorkerCommunicator/worker.external.js')
+    );
     it('Should rmethod work correctly', async () => {
-        await expect(rmi.rmethod<() => string>('hello')()).to.eventually.become('world');
+        await expect(channel.rmethod<() => string>('hello')()).to.eventually.become('world');
     });
     it('Should create remove instance correctly', async () => {
         @rclass({
             id: 'Dog'
         })
         class RemoteDogDef implements Animal {
+            // eslint-disable-next-line @typescript-eslint/no-unused-vars
             constructor(_: string) {
                 //
             }
@@ -18,7 +22,7 @@ describe('WebWorkerCommunicator', () => {
                 throw new Error('');
             }
         }
-        const RemoteDog = rmi.rclass(RemoteDogDef);
+        const RemoteDog = channel.rclass(RemoteDogDef);
         const dog = new RemoteDog('Loki');
 
         expect(dog.getType()).to.eventually.become('Loki');

@@ -11,7 +11,7 @@ export class StorageChannelCommunicator extends AbstractCommunicator {
     private key: string;
     constructor(private readonly storage: Storage, private readonly rmiId: string) {
         super();
-        this.key = 'rmi-communication-data-' + this.rmiId;
+        this.key = 'storage-communication-data-' + this.rmiId;
         window.addEventListener('storage', e => {
             if (!e.newValue) {
                 return;

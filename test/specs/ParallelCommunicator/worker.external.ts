@@ -1,6 +1,6 @@
-import { RMI, WebWorkerScopeCommunicator } from '../../../src';
-import { hex, RMI_ID } from './common';
+import { Channel, WebWorkerScopeCommunicator } from '../../../src';
+import { hex, CHANNEL_ID } from './common';
 
-const rmi = new RMI(RMI_ID, new WebWorkerScopeCommunicator());
+const channel = new Channel(CHANNEL_ID, new WebWorkerScopeCommunicator());
 
-rmi.lmethod('bin2hex', hex);
+channel.lmethod('bin2hex', hex);

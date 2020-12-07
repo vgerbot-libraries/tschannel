@@ -1,8 +1,8 @@
-import { RMI, StorageChannelCommunicator } from '../../../src';
-import { RMI_ID } from './common';
+import { Channel, StorageChannelCommunicator } from '../../../src';
+import { CHANNEL_ID } from './common';
 
 describe('StorageChannelCommunicator', () => {
-    let rmi: RMI;
+    let channel: Channel;
     let iframe: HTMLIFrameElement;
     before(async () => {
         localStorage.clear();
@@ -15,16 +15,16 @@ describe('StorageChannelCommunicator', () => {
         iframe.src = url;
         document.body.appendChild(iframe);
         await promise;
-        rmi = new RMI(RMI_ID, new StorageChannelCommunicator(localStorage, RMI_ID));
+        channel = new Channel(CHANNEL_ID, new StorageChannelCommunicator(localStorage, CHANNEL_ID));
     });
     after(() => {
         document.body.removeChild(iframe);
-        rmi.destroy();
+        channel.destroy();
         expect(localStorage.length).to.be.eql(0);
     });
 
     it('Should rmethod work correctly', async () => {
-        await expect(rmi.rmethod<() => string>('hello')()).to.be.eventually.become('world');
+        await expect(channel.rmethod<() => string>('hello')()).to.be.eventually.become('world');
     });
 
     it('Should buffer data be transmitted correctly', async () => {
@@ -32,6 +32,6 @@ describe('StorageChannelCommunicator', () => {
         for (let i = 0; i < 16; i++) {
             u8ia[i] = 0xf0;
         }
-        await expect(rmi.rmethod('receive-buffer')(u8ia)).to.be.eventually.become(true);
+        await expect(channel.rmethod('receive-buffer')(u8ia)).to.be.eventually.become(true);
     });
 });

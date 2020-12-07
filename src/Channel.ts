@@ -12,7 +12,7 @@ import { PromisifyClass } from './types/PromisifyClass';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
 
-export class RMI {
+export class Channel {
     private globalInstance = {
         release: (namespace: string) => {
             delete this.namespaces[namespace];
@@ -30,19 +30,21 @@ export class RMI {
     }
     public rclass<T>(_clazz: Constructor<T>): PromisifyClass<T> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
-        const rmi = this;
+        const channel = this;
         const clazz = (_clazz as unknown) as RMIClassConstructor;
         if (typeof clazz.id !== 'string') {
             throw new Error(`Incorrect remote class: ${clazz}, @rclass() decorator is missing!`);
         }
         @istatic<RMIClassConstructor>()
         class cls extends clazz {
-            public readonly $namespace = new RMINamespace(uid(), rmi.adaptor, this);
+            public readonly $namespace = new RMINamespace(uid(), channel.adaptor, this);
             public readonly $initPromise: Promise<void>;
             constructor(...args) {
                 super(...args);
-                rmi.namespaces[this.$namespace.id] = this.$namespace;
-                this.$initPromise = rmi.rmethod(cls.id + '-new-instance')(this.$namespace.id, args) as Promise<void>;
+                channel.namespaces[this.$namespace.id] = this.$namespace;
+                this.$initPromise = channel.rmethod(cls.id + '-new-instance')(this.$namespace.id, args) as Promise<
+                    void
+                >;
             }
         }
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype).filter(it => it !== 'constructor');
