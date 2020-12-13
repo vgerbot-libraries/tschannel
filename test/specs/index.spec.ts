@@ -1,5 +1,5 @@
 import { ParameterType, rclass, rmethod, Channel } from '../../src';
-import LocalCommunicator from '../fixtures/communicator/LocalCommunicator';
+import LocalCommunicator from '../common/communicator/LocalCommunicator';
 
 describe('Remote method invocation', () => {
     let localCommunicator: LocalCommunicator;
