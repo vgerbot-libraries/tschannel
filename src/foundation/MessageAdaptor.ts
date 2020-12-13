@@ -29,12 +29,17 @@ export default class MessageAdaptor {
                 const { namespace: ns, methodName, callId } = message;
                 const namespace = namespaces[ns];
                 if (!namespace) {
-                    this.throwError(callId, new Error(`namespace not exist: ${ns}`));
+                    this.throwError(callId, new Error(`namespace not exist: ${ns}`), ns, methodName);
                     return;
                 }
                 const method = namespace.lmethod(methodName);
                 if (typeof method !== 'function') {
-                    this.throwError(callId, new Error(`Method not exit: namespace: ${ns}, methodName: ${methodName}`));
+                    this.throwError(
+                        callId,
+                        new Error(`Method not exit: namespace: ${ns}, methodName: ${methodName}`),
+                        ns,
+                        methodName
+                    );
                     return;
                 }
                 const parameters = message.parameters;
@@ -52,17 +57,17 @@ export default class MessageAdaptor {
                         if (retValue instanceof Promise) {
                             retValue.then(
                                 (value: SerializableValue) => {
-                                    this.returnValue(callId, value);
+                                    this.returnValue(callId, value, ns, methodName);
                                 },
                                 reason => {
-                                    this.throwError(callId, reason);
+                                    this.throwError(callId, reason, ns, methodName);
                                 }
                             );
                         } else {
-                            this.returnValue(callId, retValue as SerializableValue);
+                            this.returnValue(callId, retValue as SerializableValue, ns, methodName);
                         }
                     } catch (error) {
-                        this.throwError(callId, error);
+                        this.throwError(callId, error, ns, methodName);
                     }
                 }
             } else {
@@ -90,32 +95,44 @@ export default class MessageAdaptor {
             callId,
             parameters
         };
-        const payload = new InvokeMethodPayload(data, transferables);
+        const payload = new InvokeMethodPayload(data, transferables, namespace, methodName);
         const defer = new Defer();
         this.deferes[callId] = defer;
         this.communicator.send(payload);
         return defer.promise;
     }
-    public throwError(callId: string, error: Error) {
-        const payload = new MethodReturningPayload({
-            rmiId: this.rmiId,
-            success: false,
-            callId,
-            error: {
-                name: error.name,
-                stack: error.stack || '',
-                message: error.message
-            }
-        });
+    public throwError(callId: string, error: Error, namespace: string, methodName: string) {
+        const payload = new MethodReturningPayload(
+            {
+                rmiId: this.rmiId,
+                success: false,
+                callId,
+                error: {
+                    name: error.name,
+                    stack: error.stack || '',
+                    message: error.message
+                },
+                namespace,
+                methodName
+            },
+            namespace,
+            methodName
+        );
         this.communicator.send(payload);
     }
-    public returnValue(callId: string, value: SerializableValue) {
-        const payload = new MethodReturningPayload({
-            rmiId: this.rmiId,
-            success: true,
-            callId,
-            value
-        });
+    public returnValue(callId: string, value: SerializableValue, namespace: string, methodName: string) {
+        const payload = new MethodReturningPayload(
+            {
+                rmiId: this.rmiId,
+                success: true,
+                callId,
+                value,
+                namespace,
+                methodName
+            },
+            namespace,
+            methodName
+        );
         this.communicator.send(payload);
     }
     public destroy() {

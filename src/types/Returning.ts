@@ -9,4 +9,6 @@ export interface Returning extends CommunicationData {
         readonly stack: string;
     };
     readonly value?: SerializableValue;
+    readonly namespace: string;
+    readonly methodName: string;
 }
