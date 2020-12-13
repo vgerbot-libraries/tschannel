@@ -1,5 +1,7 @@
 import { InvokeMethodData, ParallelCommunicator, Channel, WebWorkerCommunicator } from '../../../src';
 import { hex, CHANNEL_ID } from './common';
+import istanbul from 'istanbul-lib-coverage';
+import { sendCoverageData } from '../../../src/common/sendCoverageData';
 
 describe('ParallelCommunicator', function() {
     this.timeout(1000 * 300);
@@ -13,6 +15,9 @@ describe('ParallelCommunicator', function() {
                 .fill(undefined)
                 .map(() => new WebWorkerCommunicator(workerURL)),
             (no: number, payload) => {
+                if (payload.getMethodName() === 'get-coverage') {
+                    return payload;
+                }
                 const data = payload.serialize() as InvokeMethodData;
                 const [buffer] = data.parameters as Parameters<typeof hex>;
                 const partSize = buffer.byteLength / parallels;
@@ -57,7 +62,13 @@ describe('ParallelCommunicator', function() {
         });
         await new Promise(resolve => setTimeout(resolve, 1000));
     });
-    after(() => {
+    after(async () => {
+        if (typeof __coverage__ === 'object') {
+            const coverageDatas = await channel.rmethod<() => istanbul.CoverageMapData[]>('get-coverage')();
+            for (let i = 0; i < coverageDatas.length; i++) {
+                await sendCoverageData(coverageDatas[i]);
+            }
+        }
         channel.destroy();
     });
     it('Should parallel worker works correctly', async () => {
