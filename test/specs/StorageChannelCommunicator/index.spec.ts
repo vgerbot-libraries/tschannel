@@ -1,5 +1,7 @@
 import { Channel, StorageChannelCommunicator } from '../../../src';
+import { sendCoverageData } from '../../../src/common/sendCoverageData';
 import { CHANNEL_ID } from './common';
+import istanbul from 'istanbul-lib-coverage';
 
 describe('StorageChannelCommunicator', () => {
     let channel: Channel;
@@ -17,11 +19,6 @@ describe('StorageChannelCommunicator', () => {
         await promise;
         channel = new Channel(CHANNEL_ID, new StorageChannelCommunicator(localStorage, CHANNEL_ID));
     });
-    after(() => {
-        document.body.removeChild(iframe);
-        channel.destroy();
-        expect(localStorage.length).to.be.eql(0);
-    });
 
     it('Should rmethod work correctly', async () => {
         await expect(channel.rmethod<() => string>('hello')()).to.be.eventually.become('world');
@@ -33,5 +30,15 @@ describe('StorageChannelCommunicator', () => {
             u8ia[i] = 0xf0;
         }
         await expect(channel.rmethod('receive-buffer')(u8ia)).to.be.eventually.become(true);
+    });
+
+    after(async () => {
+        if (typeof __coverage__ !== 'undefined') {
+            const coverageData = await channel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
+            await sendCoverageData(coverageData);
+        }
+        document.body.removeChild(iframe);
+        channel.destroy();
+        expect(localStorage.length).to.be.eql(0);
     });
 });

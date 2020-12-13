@@ -32,8 +32,8 @@ module.exports = {
 
     reporters: ['mocha'],
 
-    customContextFile: 'test/karma/context.html',
-    customDebugFile: 'test/karma/debug.html',
+    customContextFile: 'test/karmajs/context.html',
+    customDebugFile: 'test/karmajs/debug.html',
 
     port: 9876,
 

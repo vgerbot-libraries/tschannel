@@ -1,5 +1,7 @@
 import { rclass, Channel, WebWorkerCommunicator } from '../../../src';
 import { Animal, CHANNEL_ID } from './common';
+import istanbul from 'istanbul-lib-coverage';
+import { sendCoverageData } from '../../../src/common/sendCoverageData';
 
 describe('WebWorkerCommunicator', () => {
     const channel = new Channel(
@@ -26,5 +28,12 @@ describe('WebWorkerCommunicator', () => {
         const dog = new RemoteDog('Loki');
 
         expect(dog.getType()).to.eventually.become('Loki');
+    });
+    after(async () => {
+        if (typeof __coverage__ !== 'undefined') {
+            const coverageData = await channel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
+            await sendCoverageData(coverageData);
+        }
+        channel.destroy();
     });
 });

@@ -14,3 +14,6 @@ channel.lclass(
         }
     }
 );
+channel.lmethod('get-coverage', () => {
+    return __coverage__;
+});

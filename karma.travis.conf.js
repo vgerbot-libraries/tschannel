@@ -27,10 +27,10 @@ module.exports = function (config) {
             tsconfig: 'test/tsconfig.json'
         }),
         rollupPluginIstanbul({
-            exclude: ['test/**/*.ts', "node_modules/**/*"],
+            exclude: ['test/**/*.ts', 'node_modules/**/*'],
             instrumenterConfig: {
-                embedSource: true,
-                debug: true
+                embedSource: false,
+                debug: false
             }
         })
     ];
@@ -38,6 +38,9 @@ module.exports = function (config) {
         preprocessors: {
             'test/**/*.ts': ['rollup']
         },
+        files: baseConfig.files.concat(
+            'test/utils/coverage-utils.ts'
+        ),
         rollupPreprocessor: {
             context: 'this',
             watch: false,
@@ -60,7 +63,7 @@ module.exports = function (config) {
         pingTimeout: 1000 * 3000,
         browserNoActivityTimeout: 1000 * 300,
 
-        logLevel: config.LOG_DEBUG,
+        logLevel: config.LOG_ERROR,
 
         singleRun: true,
 
