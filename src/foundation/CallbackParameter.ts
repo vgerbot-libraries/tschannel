@@ -1,6 +1,6 @@
 import { SerializableObject, SerializableValue } from '../types/Serializable';
 
-const CALLBACK_PARAMETER_SYMBOLE = 'is-call-back-parameter';
+const CALLBACK_PARAMETER_SYMBOLE = 'is-callback-parameter';
 
 export class CallbackParameter {
     constructor(public namespace: string, public readonly id: string) {
