@@ -3,6 +3,7 @@ import uid from '../common/uid';
 import { RMIMethodMetadata } from '../metadata/RMIMethodMetadata';
 import { Communicator } from '../types/Communicator';
 import { InvokeMethodData } from '../types/InvokeMethodData';
+import { Returning } from '../types/Returning';
 import { SerializableValue } from '../types/Serializable';
 import { Transferable } from '../types/Transferable';
 import { CallbackParameter } from './CallbackParameter';
@@ -26,58 +27,9 @@ export default class MessageAdaptor {
                 return;
             }
             if (InvokeMethodPayload.isInvokeMethodData(message)) {
-                const { namespace: ns, methodName, callId } = message;
-                const namespace = namespaces[ns];
-                if (!namespace) {
-                    this.throwError(callId, new Error(`namespace not exist: ${ns}`), ns, methodName);
-                    return;
-                }
-                const method = namespace.lmethod(methodName);
-                if (typeof method !== 'function') {
-                    this.throwError(
-                        callId,
-                        new Error(`Method not exit: namespace: ${ns}, methodName: ${methodName}`),
-                        ns,
-                        methodName
-                    );
-                    return;
-                }
-                const parameters = message.parameters;
-                if (Array.isArray(parameters)) {
-                    const args = parameters.map(it => {
-                        if (CallbackParameter.isCallback(it)) {
-                            return this.createCallback(it.namespace, it.id);
-                        } else if (isRemoteInstance(it)) {
-                            return this.namespaces[it.id]?.getOriginObject();
-                        }
-                        return it;
-                    });
-                    try {
-                        const retValue = method(...args);
-                        if (retValue instanceof Promise) {
-                            retValue.then(
-                                (value: SerializableValue) => {
-                                    this.returnValue(callId, value, ns, methodName);
-                                },
-                                reason => {
-                                    this.throwError(callId, reason, ns, methodName);
-                                }
-                            );
-                        } else {
-                            this.returnValue(callId, retValue as SerializableValue, ns, methodName);
-                        }
-                    } catch (error) {
-                        this.throwError(callId, error, ns, methodName);
-                    }
-                }
+                this.handleInvokeMethodData(message);
             } else {
-                const defer = this.deferes[message.callId];
-                if (message.success) {
-                    defer.resolve(message.value);
-                } else {
-                    defer.reject(new RemoteError(message.error));
-                }
-                delete this.deferes[message.callId];
+                this.handleReturningData(message);
             }
         });
     }
@@ -144,6 +96,63 @@ export default class MessageAdaptor {
             delete this.deferes[key];
         });
         this.communicator.close();
+    }
+    private handleReturningData(message: Returning) {
+        const defer = this.deferes[message.callId];
+        if (message.success) {
+            defer.resolve(message.value);
+        } else {
+            defer.reject(new RemoteError(message.error));
+        }
+        delete this.deferes[message.callId];
+    }
+    private handleInvokeMethodData(message: InvokeMethodData) {
+        const { namespace: ns, methodName, callId } = message;
+        const namespace = this.namespaces[ns];
+        if (!namespace) {
+            return this.throwError(callId, new Error(`namespace not exist: ${ns}`), ns, methodName);
+        }
+        const method = namespace.lmethod(methodName);
+        if (typeof method !== 'function') {
+            return this.throwError(
+                callId,
+                new Error(`Method not exit: namespace: ${ns}, methodName: ${methodName}`),
+                ns,
+                methodName
+            );
+        }
+        const parameters = message.parameters;
+        if (!Array.isArray(parameters)) {
+            throw new Error('Unexpected parameters array: ' + parameters);
+        }
+        const args = this.normalizeArguments(parameters);
+        try {
+            const retValue = method(...args);
+            if (retValue instanceof Promise) {
+                retValue.then(
+                    (value: SerializableValue) => {
+                        this.returnValue(callId, value, ns, methodName);
+                    },
+                    reason => {
+                        this.throwError(callId, reason, ns, methodName);
+                    }
+                );
+            } else {
+                this.returnValue(callId, retValue as SerializableValue, ns, methodName);
+            }
+        } catch (error) {
+            this.throwError(callId, error, ns, methodName);
+        }
+    }
+    private normalizeArguments(parameters: SerializableValue[]) {
+        return parameters.map(it => {
+            if (CallbackParameter.isCallback(it)) {
+                return this.createCallback(it.namespace, it.id);
+            } else if (isRemoteInstance(it)) {
+                return this.namespaces[it.id]?.getOriginObject();
+            }
+            return it;
+        });
     }
     private createCallback(ns: string, id: string) {
         const namespace = this.namespaces[ns];
