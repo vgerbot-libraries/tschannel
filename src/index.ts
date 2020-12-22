@@ -4,7 +4,7 @@ export { Channel } from './Channel';
 export { ParameterType } from './types/ParameterType';
 export {
     ParallelDataDistributor,
-    ParallelDataReducer,
+    ParallelDataCombiner,
     ParallelCommunicator
 } from './communicators/ParallelCommunicator';
 

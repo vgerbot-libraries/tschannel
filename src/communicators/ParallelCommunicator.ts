@@ -5,7 +5,7 @@ import { Returning } from '../types/Returning';
 import AbstractCommunicator from './AbstractCommunicator';
 
 export type ParallelDataDistributor<T extends CommunicationData> = (no: number, payload: Payload<T>) => Payload<T>;
-export type ParallelDataReducer = (data: Returning[]) => Returning;
+export type ParallelDataCombiner = (data: Returning[]) => Returning;
 
 interface CachedParallelData {
     returned: number;
@@ -17,7 +17,7 @@ export class ParallelCommunicator extends AbstractCommunicator implements Commun
     constructor(
         private parallelRemoteCommunicators: Communicator[],
         private distributor: ParallelDataDistributor<CommunicationData>,
-        private reducer: ParallelDataReducer
+        private combiner: ParallelDataCombiner
     ) {
         super();
         this.prepare();
@@ -49,7 +49,7 @@ export class ParallelCommunicator extends AbstractCommunicator implements Commun
                 cache.returned++;
                 cache.returns[no] = message as Returning;
                 if (cache.returned === parallelCount) {
-                    const ret = this.reducer(cache.returns);
+                    const ret = this.combiner(cache.returns);
                     this.messageReceivers.forEach(receiver => {
                         receiver(ret);
                     });
