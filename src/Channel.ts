@@ -28,12 +28,12 @@ export class Channel {
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
-    public rclass<T>(_clazz: Constructor<T>): PromisifyClass<T> {
+    public rclass<T>(_clazz: Constructor<T>, classId: string = _clazz.name): PromisifyClass<T> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const channel = this;
         const clazz = (_clazz as unknown) as RMIClassConstructor;
-        if (typeof clazz.id !== 'string') {
-            throw new Error(`Incorrect remote class: ${clazz}, @rclass() decorator is missing!`);
+        if (typeof classId !== 'string' || classId.length < 1) {
+            throw new Error(`Incorrect classId: ${classId}`);
         }
         @istatic<RMIClassConstructor>()
         class cls extends clazz {
@@ -42,7 +42,7 @@ export class Channel {
             constructor(...args) {
                 super(...args);
                 channel.namespaces[this.$namespace.id] = this.$namespace;
-                this.$initPromise = channel.rmethod(cls.id + '-new-instance')(this.$namespace.id, args) as Promise<
+                this.$initPromise = channel.rmethod(classId + '-new-instance')(this.$namespace.id, args) as Promise<
                     void
                 >;
             }
