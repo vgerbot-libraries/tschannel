@@ -13,7 +13,10 @@ module.exports = function (config) {
         skipFilesWithNoCoverage: true
     };
 
-    const rollupPlugins = [
+    const rollupPlugins = [,
+        plugins.typescript({
+            tsconfig: 'test/tsconfig.json'
+        }),
         plugins.nodeResolve(),
         plugins.commonjs({
             include: 'node_modules/**',
@@ -22,9 +25,6 @@ module.exports = function (config) {
             namedExports: {
                 chai: ['expect']
             }
-        }),
-        plugins.typescript({
-            tsconfig: 'test/tsconfig.json'
         }),
         rollupPluginIstanbul({
             exclude: ['test/**/*.ts', 'node_modules/**/*'],
