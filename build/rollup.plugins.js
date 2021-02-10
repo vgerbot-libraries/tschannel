@@ -30,10 +30,7 @@ module.exports = {
     },
     nodeResolve(opt){
         return nodeResolve(ext({
-            jsnext: true,
-            main: true,
-            module: true,
-            browser: true,
+            mainFields: ['jsnext', 'main', 'module', 'browser'],
             preferBuiltins: false
         }, opt));
     },

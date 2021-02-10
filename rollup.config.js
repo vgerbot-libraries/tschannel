@@ -23,18 +23,15 @@ module.exports = [
             [pkg.main, 'cjs']
         ].map(confs => createOutputConfig(...confs)),
         plugins: [
+            plugins.typescript(),
             plugins.nodeResolve({
-                main: true,
-                browser: true,
-                module: true
+                mainFields: ['main', 'browser', 'module']
             }),
             plugins.commonjs({
                 include: 'node_modules/**',
                 ignore: ['js-base64'],
                 sourceMap: false
-            }),
-            plugins.strip(),
-            plugins.typescript()
+            })
         ],
         external: ['txon']
     }
