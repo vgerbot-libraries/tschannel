@@ -7,7 +7,7 @@ export class CallbackParameter {
         this[CALLBACK_PARAMETER_SYMBOLE] = true;
     }
     static isCallback(value: SerializableValue): value is CallbackParameter {
-        return !!(value as Object)[CALLBACK_PARAMETER_SYMBOLE];
+        return !!value && !!(value as Object)[CALLBACK_PARAMETER_SYMBOLE];
     }
 }
 
