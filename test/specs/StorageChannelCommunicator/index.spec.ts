@@ -56,6 +56,11 @@ describe('StorageChannelCommunicator', function() {
         await expect(method(mockData, spyCallback)).to.be.eventually.fulfilled;
         expect(spyCallback).to.be.calledOnceWith(mockData);
 
+        if (typeof __coverage__ !== 'undefined' && !channel.isDestroyed) {
+            const coverageData = await channel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
+            await sendCoverageData(coverageData);
+        }
+
         channel.destroy();
         expect(() => {
             method(mockData, sinon.spy());
@@ -63,7 +68,7 @@ describe('StorageChannelCommunicator', function() {
     });
 
     afterEach(async () => {
-        if (typeof __coverage__ !== 'undefined') {
+        if (typeof __coverage__ !== 'undefined' && !channel.isDestroyed) {
             const coverageData = await channel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
             await sendCoverageData(coverageData);
         }
