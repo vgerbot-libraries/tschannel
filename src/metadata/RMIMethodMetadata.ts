@@ -22,7 +22,7 @@ export class RMIMethodMetadata {
             return this.paramTypes.map((it, index) => {
                 switch (it) {
                     case ParameterType.callback:
-                        const id = uid();
+                        const id = uid('cb-xxxxxxxx');
                         namespace.lmethod(id, args[index]);
                         return new CallbackParameter(namespace.id, id);
                     case ParameterType.remoteObject:
@@ -30,8 +30,16 @@ export class RMIMethodMetadata {
                 }
                 return args[index];
             }) as SerializableValue;
+        } else {
+            return args.map(it => {
+                if (typeof it === 'function') {
+                    const id = uid('cb-xxxxxxxx');
+                    namespace.lmethod(id, it);
+                    return new CallbackParameter(namespace.id, id);
+                }
+                return it;
+            });
         }
-        return args;
     }
     public getTransferable(...args): Transferable[] {
         if (typeof this.getTransferablesFn === 'function') {
