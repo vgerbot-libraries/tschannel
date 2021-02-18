@@ -12,6 +12,11 @@ import { PromisifyClass } from './types/PromisifyClass';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
+export interface Remote {
+    // readonly $namespace;
+}
+
 export class Channel {
     private globalInstance = {
         release: (namespace: string) => {
@@ -28,7 +33,7 @@ export class Channel {
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
-    public rclass<T>(_clazz: Constructor<T>, classId: string = _clazz.name): PromisifyClass<T> {
+    public rclass<T>(_clazz: Constructor<T>, classId: string = _clazz.name): PromisifyClass<T & Remote> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const channel = this;
         const clazz = (_clazz as unknown) as RMIClassConstructor;
@@ -36,7 +41,7 @@ export class Channel {
             throw new Error(`Incorrect classId: ${classId}`);
         }
         @istatic<RMIClassConstructor>()
-        class cls extends clazz {
+        class cls extends clazz implements Remote {
             public readonly $namespace = new RMINamespace(uid(), channel.adaptor, this);
             public readonly $initPromise: Promise<void>;
             constructor(...args) {
@@ -64,7 +69,7 @@ export class Channel {
                 });
             };
         });
-        return (cls as unknown) as PromisifyClass<T>;
+        return (cls as unknown) as PromisifyClass<T & Remote>;
     }
     public lclass(id: string, clazz: AnyConstructor) {
         const constructorMethodName = id + '-new-instance';
