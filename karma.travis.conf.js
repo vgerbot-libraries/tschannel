@@ -8,7 +8,7 @@ const pkg = require('./package.json');
 
 module.exports = function (config) {
     const coverageIstanbulReporter = {
-        reports: ['lcov', 'text-summary', 'cobertura'],
+        reports: ['html', 'text-summary', 'cobertura'],
         dir: path.join(__dirname, 'coverage'),
         skipFilesWithNoCoverage: true
     };
