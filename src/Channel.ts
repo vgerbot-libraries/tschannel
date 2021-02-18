@@ -27,6 +27,7 @@ export class Channel {
     private readonly globalNamespace: RMINamespace;
     private readonly adaptor: MessageAdaptor;
     private readonly namespaces: Record<string, RMINamespace> = {};
+    private _isDestroyed = false;
     constructor(id: string, communicator: Communicator) {
         this.adaptor = new MessageAdaptor(id, communicator, this.namespaces);
         this.globalNamespace = new RMINamespace('global', this.adaptor, this.globalInstance);
@@ -122,11 +123,18 @@ export class Channel {
         delete this.namespaces[namespace.id];
         return this.rmethod('release')(namespace.id) as Promise<boolean>;
     }
+    public get isDestroyed() {
+        return this._isDestroyed;
+    }
     public destroy() {
+        if (this._isDestroyed) {
+            return;
+        }
         this.adaptor.destroy();
         this.globalNamespace.clear();
         Object.keys(this.namespaces).forEach(id => {
             this.namespaces[id].clear();
         });
+        this._isDestroyed = true;
     }
 }
