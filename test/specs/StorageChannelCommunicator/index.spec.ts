@@ -3,10 +3,11 @@ import { sendCoverageData } from '../../../src/common/sendCoverageData';
 import { CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 
-describe('StorageChannelCommunicator', () => {
+describe('StorageChannelCommunicator', function() {
+    this.timeout(1000 * 20000);
     let channel: Channel;
     let iframe: HTMLIFrameElement;
-    before(async () => {
+    beforeEach(async () => {
         localStorage.clear();
         const url = location.origin + '/base/test/specs/StorageChannelCommunicator/iframe.external.html';
         iframe = document.createElement('iframe');
@@ -31,8 +32,37 @@ describe('StorageChannelCommunicator', () => {
         }
         await expect(channel.rmethod('receive-buffer')(u8ia)).to.be.eventually.become(true);
     });
+    it('should handle callbacks correctly', async () => {
+        const mockData = 'hello world';
+        type DataType = typeof mockData;
+        const method = channel.rmethod('callback') as (
+            data: DataType,
+            callback: (data: DataType) => void
+        ) => Promise<void>;
+        const spyCallback = sinon.spy();
 
-    after(async () => {
+        await expect(method(mockData, spyCallback)).to.be.eventually.fulfilled;
+        expect(spyCallback).to.be.calledOnceWith(mockData);
+    });
+    it('Should be destroyed correctly', async () => {
+        const mockData = 'hello world';
+        type DataType = typeof mockData;
+        const method = channel.rmethod('callback') as (
+            data: DataType,
+            callback: (data: DataType) => void
+        ) => Promise<void>;
+        const spyCallback = sinon.spy();
+
+        await expect(method(mockData, spyCallback)).to.be.eventually.fulfilled;
+        expect(spyCallback).to.be.calledOnceWith(mockData);
+
+        channel.destroy();
+        expect(() => {
+            method(mockData, sinon.spy());
+        }).to.throws('Cannot invoke methods after the message channel is destroyed!');
+    });
+
+    afterEach(async () => {
         if (typeof __coverage__ !== 'undefined') {
             const coverageData = await channel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
             await sendCoverageData(coverageData);

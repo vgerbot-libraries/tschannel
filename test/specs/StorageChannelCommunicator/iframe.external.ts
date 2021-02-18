@@ -11,3 +11,6 @@ channel.lmethod('receive-buffer', (arr: Uint8Array) => {
 channel.lmethod('get-coverage', () => {
     return __coverage__;
 });
+channel.lmethod('callback', <T>(data: T, callback: (data) => void) => {
+    callback(data);
+});
