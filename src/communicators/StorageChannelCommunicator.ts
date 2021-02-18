@@ -9,10 +9,11 @@ type CommunicationData = InvokeMethodData | Returning;
 
 export class StorageChannelCommunicator extends AbstractCommunicator {
     private key: string;
+    private storageEventListener: (e: StorageEvent) => void;
     constructor(private readonly storage: Storage, private readonly rmiId: string) {
         super();
         this.key = 'storage-communication-data-' + this.rmiId;
-        window.addEventListener('storage', e => {
+        this.storageEventListener = e => {
             if (!e.newValue) {
                 return;
             }
@@ -26,7 +27,8 @@ export class StorageChannelCommunicator extends AbstractCommunicator {
             this.messageReceivers.forEach(receiver => {
                 receiver(data);
             });
-        });
+        };
+        window.addEventListener('storage', this.storageEventListener);
     }
     send(payload: Payload<SerializableValue>): void {
         const data = payload.serialize();
@@ -36,5 +38,6 @@ export class StorageChannelCommunicator extends AbstractCommunicator {
     close(): void {
         this.storage.removeItem(this.key);
         this.messageReceivers.length = 0;
+        window.removeEventListener('storage', this.storageEventListener);
     }
 }
