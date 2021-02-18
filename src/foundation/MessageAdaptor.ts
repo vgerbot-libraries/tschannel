@@ -16,6 +16,7 @@ import { RMINamespace } from './RNamespace';
 export default class MessageAdaptor {
     private readonly deferes: Record<string, Defer<unknown>> = {};
     private readonly removeMessageReceiver: () => void;
+    private isDestroyed: boolean = false;
     constructor(
         private readonly rmiId: string,
         private readonly communicator: Communicator,
@@ -39,6 +40,9 @@ export default class MessageAdaptor {
         parameters: SerializableValue,
         transferables: Transferable[]
     ): Promise<unknown> {
+        if (this.isDestroyed) {
+            throw new Error('Cannot invoke methods after the message channel is destroyed!');
+        }
         const callId = uid('call-xxxx');
         const data: InvokeMethodData = {
             rmiId: this.rmiId,
@@ -93,12 +97,18 @@ export default class MessageAdaptor {
         Object.keys(this.deferes).forEach(key => {
             const defer = this.deferes[key];
             defer.reject(destroyedError);
-            delete this.deferes[key];
         });
         this.communicator.close();
+        this.isDestroyed = true;
     }
     private handleReturningData(message: Returning) {
+        if (this.isDestroyed) {
+            return;
+        }
         const defer = this.deferes[message.callId];
+        if (!defer) {
+            return;
+        }
         if (message.success) {
             defer.resolve(message.value);
         } else {
