@@ -3,7 +3,7 @@ import uid from './uid';
 
 export function sendCoverageData(coverage: istanbul.CoverageMapData) {
     const callId = uid();
-    return new Promise(resolve => {
+    return new Promise<void>(resolve => {
         const messageListener = (e: MessageEvent) => {
             if (e.data === callId) {
                 window.removeEventListener('message', messageListener);
