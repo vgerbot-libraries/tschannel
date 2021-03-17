@@ -1,5 +1,5 @@
 import { Channel, StorageChannelCommunicator } from '../../../src';
-import { sendCoverageData } from '../../../src/common/sendCoverageData';
+import { sendCoverageData } from '../../common/sendCoverageData';
 import { CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 

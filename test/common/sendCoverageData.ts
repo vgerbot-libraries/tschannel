@@ -1,5 +1,5 @@
 import istanbul from 'istanbul-lib-coverage';
-import uid from './uid';
+import uid from '../../src/common/uid';
 
 export function sendCoverageData(coverage: istanbul.CoverageMapData) {
     const callId = uid();
