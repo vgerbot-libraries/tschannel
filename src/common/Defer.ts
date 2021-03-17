@@ -1,9 +1,9 @@
 export default class Defer<T> {
     private readonly _promise: Promise<T>;
-    private _resolve!: (value?: T | PromiseLike<T> | undefined) => void;
+    private _resolve!: (value: T | PromiseLike<T>) => void;
     private _reject!: (reason?: unknown) => void;
     constructor() {
-        this._promise = new Promise((resolve, reject) => {
+        this._promise = new Promise<T>((resolve, reject) => {
             this._resolve = resolve;
             this._reject = reject;
         });
