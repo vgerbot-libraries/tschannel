@@ -18,13 +18,13 @@ export default class MessageAdaptor {
     private readonly removeMessageReceiver: () => void;
     private isDestroyed: boolean = false;
     constructor(
-        private readonly rmiId: string,
+        private readonly channelId: string,
         private readonly communicator: Communicator,
         private readonly namespaces: Record<string, RMINamespace>
     ) {
         this.removeMessageReceiver = communicator.addReceiveMessageListener(message => {
             /* istanbul ignore if */
-            if (message.rmiId !== this.rmiId) {
+            if (message.channelId !== this.channelId) {
                 return;
             }
             if (InvokeMethodPayload.isInvokeMethodData(message)) {
@@ -45,7 +45,7 @@ export default class MessageAdaptor {
         }
         const callId = uid('call-xxxx');
         const data: InvokeMethodData = {
-            rmiId: this.rmiId,
+            channelId: this.channelId,
             namespace,
             methodName,
             callId,
@@ -60,7 +60,7 @@ export default class MessageAdaptor {
     public throwError(callId: string, error: Error, namespace: string, methodName: string) {
         const payload = new MethodReturningPayload(
             {
-                rmiId: this.rmiId,
+                channelId: this.channelId,
                 success: false,
                 callId,
                 error: {
@@ -79,7 +79,7 @@ export default class MessageAdaptor {
     public returnValue(callId: string, value: SerializableValue, namespace: string, methodName: string) {
         const payload = new MethodReturningPayload(
             {
-                rmiId: this.rmiId,
+                channelId: this.channelId,
                 success: true,
                 callId,
                 value,

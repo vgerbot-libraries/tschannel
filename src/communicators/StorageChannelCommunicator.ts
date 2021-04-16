@@ -10,9 +10,9 @@ type CommunicationData = InvokeMethodData | Returning;
 export class StorageChannelCommunicator extends AbstractCommunicator {
     private key: string;
     private storageEventListener: (e: StorageEvent) => void;
-    constructor(private readonly storage: Storage, private readonly rmiId: string) {
+    constructor(private readonly storage: Storage, private readonly channelId: string) {
         super();
-        this.key = 'storage-communication-data-' + this.rmiId;
+        this.key = 'storage-communication-data-' + this.channelId;
         this.storageEventListener = e => {
             if (!e.newValue) {
                 return;
@@ -21,7 +21,7 @@ export class StorageChannelCommunicator extends AbstractCommunicator {
                 return;
             }
             const data = txon.parse(e.newValue) as CommunicationData;
-            if (data.rmiId !== this.rmiId) {
+            if (data.channelId !== this.channelId) {
                 return;
             }
             this.messageReceivers.forEach(receiver => {
