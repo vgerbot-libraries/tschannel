@@ -16,3 +16,4 @@ export { Returning } from './types/Returning';
 export { default as InvokeMethodPayload } from './foundation/InvokeMethodPayload';
 export { default as MethodReturningPayload } from './foundation/MethodReturningPayload';
 export { StorageChannelCommunicator } from './communicators/StorageChannelCommunicator';
+export { Adaptor } from './Adaptor';
