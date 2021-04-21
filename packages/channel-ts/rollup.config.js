@@ -28,7 +28,7 @@ module.exports = [
                 mainFields: ['main', 'browser', 'module']
             }),
             plugins.commonjs({
-                include: 'node_modules/**',
+                include: /node_modules/,
                 ignore: ['js-base64'],
                 sourceMap: false
             })

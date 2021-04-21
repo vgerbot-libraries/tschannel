@@ -19,7 +19,7 @@ module.exports = function (config) {
         }),
         plugins.nodeResolve(),
         plugins.commonjs({
-            include: 'node_modules/**',
+            include: /node_modules/,
             ignore: ['js-base64'],
             sourceMap: false,
             namedExports: {
@@ -27,7 +27,7 @@ module.exports = function (config) {
             }
         }),
         rollupPluginIstanbul({
-            exclude: ['test/**/*.ts', 'node_modules/**/*'],
+            exclude: ['test/**/*.ts', '**/node_modules/**/*'],
             instrumenterConfig: {
                 embedSource: false,
                 debug: false

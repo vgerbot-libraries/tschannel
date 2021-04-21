@@ -1,0 +1,106 @@
+{
+    "name": "channel-ts",
+    "version": "1.0.0",
+    "description": "A library that provides a consistent and asynchrounous communication API for iframes, webworkers and even websocket to nodejs",
+    "main": "dist/index.cjs.js",
+    "module": "dist/index.esm.js",
+    "browser": "dist/index.umd.js",
+    "distDir": "dist/",
+    "library": "ChannelTS",
+    "engines": {
+        "node": ">=8.0"
+    },
+    "directories": {
+        "src": "src",
+        "test": "test"
+    },
+    "scripts": {
+        "release": "standard-version",
+        "lint": " eslint {src,test}/**/*.{js,ts,tsx}",
+        "format": "eslint --fix {src,test}/**/*.{js,ts,tsx}",
+        "pretest:debug": "npm run lint",
+        "test:debug": "karma start ./karma.debug.conf.js --browsers Chrome",
+        "ci": "karma start ./karma.travis.conf.js --browsers HeadlessChrome --single-run true",
+        "debug:ci": "karma start ./karma.travis.conf.js --browsers Chrome --single-run false",
+        "codecov": "codecov < coverage/cobertura-coverage.xml",
+        "test:chromeheadless": "karma start ./karma.debug.conf.js --browsers HeadlessChrome --single-run true",
+        "build": "rollup -c ./rollup.config.js --environment 'production'",
+        "gendoc": "typedoc ./src  --target es5 --out dist/docs --name channel-ts --hideGenerator"
+    },
+    "repository": {
+        "type": "git",
+        "url": "git+https://github.com/y1j2x34/channel-ts.git"
+    },
+    "bugs": {
+        "url": "https://github.com/y1j2x34/channel-ts/issues"
+    },
+    "keywords": [
+        "RMI",
+        "channel",
+        "remote",
+        "method",
+        "invocation",
+        "iframe",
+        "websocket",
+        "webworker"
+    ],
+    "files": [
+        "dist"
+    ],
+    "homepage": "https://github.com/y1j2x34/channel-ts/blob/master/packages/channel-ts#readme",
+    "author": "'y1j2x34' <y1j2x34@qq.com> (http://www.vgerbot.com/)",
+    "license": "ISC",
+    "devDependencies": {
+        "@rollup/plugin-commonjs": "11.0.1",
+        "@rollup/plugin-json": "4.0.1",
+        "@rollup/plugin-node-resolve": "7.0.0",
+        "@rollup/plugin-strip": "1.3.1",
+        "@types/chai": "^4.2.7",
+        "@types/chai-as-promised": "^7.1.3",
+        "@types/istanbul-lib-coverage": "^2.0.3",
+        "@types/karma": "^5.0.1",
+        "@types/mocha": "^5.2.7",
+        "@types/node": "^13.1.6",
+        "@types/sinon": "^9.0.8",
+        "@types/sinon-chai": "^3.2.5",
+        "@types/websocket": "1.0.0",
+        "@typescript-eslint/eslint-plugin": "^4.6.1",
+        "@typescript-eslint/parser": "^4.6.1",
+        "@vgerbot/karma-rollup-preprocessor": "^7.0.2",
+        "chai": "^4.2.0",
+        "chai-as-promised": "^7.1.1",
+        "codecov": "^3.8.1",
+        "eslint": "^7.13.0",
+        "eslint-config-prettier": "^6.15.0",
+        "eslint-plugin-prettier": "^3.1.4",
+        "fs-extra": "8.1.0",
+        "istanbul-lib-coverage": "^3.0.0",
+        "karma": "4.4.1",
+        "karma-chai": "^0.1.0",
+        "karma-chrome-launcher": "3.1.0",
+        "karma-coverage-istanbul-reporter": "2.1.1",
+        "karma-mocha": "^1.3.0",
+        "karma-mocha-reporter": "^2.2.5",
+        "karma-rollup-preprocessor": "7.0.2",
+        "karma-sinon": "^1.0.5",
+        "karma-sinon-chai": "^2.0.2",
+        "karma-sourcemap-loader": "0.3.7",
+        "mocha": "^7.0.0",
+        "phantomjs-polyfill-object-assign": "0.0.2",
+        "prettier": "1.19.1",
+        "rollup": "1.29.0",
+        "rollup-plugin-istanbul": "2.0.1",
+        "rollup-plugin-node-builtins": "2.1.2",
+        "rollup-plugin-typescript2": "0.25.3",
+        "rollup-plugin-uglify": "6.0.4",
+        "sinon": "^9.2.1",
+        "sinon-chai": "^3.5.0",
+        "ts-node": "^8.6.1",
+        "typedoc": "0.16.2",
+        "typescript": "3.7.4"
+    },
+    "dependencies": {
+        "tslib": "^1.10.0",
+        "txon": "^1.0.1"
+    }
+}
