@@ -48,9 +48,10 @@ export class Channel {
             constructor(...args) {
                 super(...args);
                 channel.namespaces[this.$namespace.id] = this.$namespace;
-                this.$initPromise = channel.rmethod(classId + '-new-instance')(this.$namespace.id, args) as Promise<
-                    void
-                >;
+                this.$initPromise = channel.rmethod(classId + '-new-instance')(
+                    this.$namespace.id,
+                    args
+                ) as Promise<void>;
             }
         }
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype).filter(it => it !== 'constructor');
@@ -64,7 +65,7 @@ export class Channel {
                 return;
             }
             const metadata = new RMIMethodMetadata(propertyName, method.options);
-            cls.prototype[propertyName] = function(this: cls, ...args) {
+            cls.prototype[propertyName] = function (this: cls, ...args) {
                 return this.$initPromise.then(() => {
                     return this.$namespace.rmethod(metadata).apply(this, args);
                 });

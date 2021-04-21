@@ -23,6 +23,7 @@
         "max-len": ["error", 120],
         "@typescript-eslint/no-inferrable-types": "off",
         "@typescript-eslint/explicit-module-boundary-types": "off",
-        "@typescript-eslint/ban-types": "off"
+        "@typescript-eslint/ban-types": "off",
+        "arrow-parens": "off"
     }
 }
