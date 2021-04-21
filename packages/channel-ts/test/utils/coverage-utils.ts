@@ -22,7 +22,7 @@ window.addEventListener('message', e => {
 
 const complete = __karma__.complete;
 
-__karma__.complete = function(options) {
+__karma__.complete = function (options) {
     const coverageMap = istanbul.createCoverageMap(options.coverage);
     coverageDatas.forEach(coverageData => {
         coverageMap.merge(coverageData);

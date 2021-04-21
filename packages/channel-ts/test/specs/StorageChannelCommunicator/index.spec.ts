@@ -3,7 +3,7 @@ import { sendCoverageData } from '../../common/sendCoverageData';
 import { CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 
-describe('StorageChannelCommunicator', function() {
+describe('StorageChannelCommunicator', function () {
     this.timeout(1000 * 20000);
     let channel: Channel;
     let iframe: HTMLIFrameElement;
