@@ -8,7 +8,7 @@ import { AnyConstructor, Constructor } from './types/AnyConstructor';
 import { AnyFunction } from './types/AnyFunction';
 import { Communicator } from './types/Communicator';
 import istatic from './types/istatic';
-import { PromisifyClass } from './types/PromisifyClass';
+import { PromisifyClass } from './types/PromisifyType';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
 
