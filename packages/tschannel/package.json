@@ -1,5 +1,5 @@
 {
-    "name": "channel-ts",
+    "name": "tschannel",
     "version": "1.0.0",
     "description": "A library that provides a consistent and asynchrounous communication API for iframes, webworkers and even websocket to nodejs",
     "main": "dist/index.cjs.js",
