@@ -34,7 +34,7 @@ export class Channel {
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
-    public rclass<T>(_clazz: Constructor<T>, classId: string = _clazz.name): PromisifyClass<T & Remote> {
+    public rclass<T>(_clazz?: Constructor<T>, classId: string | undefined = _clazz?.name): PromisifyClass<T & Remote> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const channel = this;
         const clazz = (_clazz as unknown) as RMIClassConstructor;
