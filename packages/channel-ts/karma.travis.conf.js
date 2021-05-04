@@ -5,6 +5,7 @@ const plugins = require('./build/rollup.plugins');
 const rollupPluginIstanbul = require('rollup-plugin-istanbul');
 const baseConfig = require('./karma.base.conf');
 const pkg = require('./package.json');
+const channelTsTransformer = require('channel-ts-transformer').default;
 
 module.exports = function (config) {
     const coverageIstanbulReporter = {
@@ -15,7 +16,15 @@ module.exports = function (config) {
 
     const rollupPlugins = [,
         plugins.typescript({
-            tsconfig: 'test/tsconfig.json'
+            tsconfig: 'test/tsconfig.json',
+            transformers: [
+                (languageService) => {
+                    const program = languageService.getProgram();
+                    return {
+                        before: [channelTsTransformer(program)]
+                    };
+                }
+            ]
         }),
         plugins.nodeResolve(),
         plugins.commonjs({

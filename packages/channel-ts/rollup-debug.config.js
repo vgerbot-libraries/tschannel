@@ -1,5 +1,6 @@
 const plugins = require('./build/rollup.plugins');
 const pkg = require('./package.json');
+const channelTsTransformer = require('channel-ts-transformer').default;
 
 const rollupPlugins = [
     plugins.typescript({
@@ -8,7 +9,15 @@ const rollupPlugins = [
             compilerOptions: {
                 inlineSourceMap: false
             }
-        }
+        },
+        transformers: [
+            (languageService) => {
+                const program = languageService.getProgram();
+                return {
+                    before: [channelTsTransformer(program)]
+                };
+            }
+        ]
     }),
     plugins.nodeResolve(),
     plugins.commonjs({
