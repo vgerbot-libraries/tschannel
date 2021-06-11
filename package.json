@@ -6,7 +6,8 @@
     "scripts": {
         "commit": "git-cz",
         "lint:all": "yarn workspace channel-ts lint",
-        "transformer": "yarn workspace channel-ts-transformer"
+        "transformer": "yarn workspace channel-ts-transformer",
+        "transformer:debug": "yarn workspace transformer-debugger"
     },
     "repository": {
         "type": "git",

@@ -1,0 +1,19 @@
+{
+    "compilerOptions": {
+        "module": "CommonJS",
+        "moduleResolution": "Node",
+        "target": "ES6",
+        "lib": ["ESNext"],
+        "strict": true,
+        "noImplicitAny": true,
+        "noUnusedLocals": true,
+        "removeComments": true,
+        "sourceMap": true,
+        "importHelpers": true,
+        "esModuleInterop": true,
+        "declaration": true,
+        "outDir": "./lib",
+        "skipLibCheck": true
+    },
+    "include": ["src"]
+}

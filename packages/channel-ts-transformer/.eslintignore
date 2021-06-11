@@ -1,0 +1,4 @@
+commitlint.config.js
+jest.config.js
+{dist,test_dist}/**/*.js
+node_modules

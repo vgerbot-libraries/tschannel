@@ -1,0 +1,16 @@
+{
+    "extends": "../tsconfig.json",
+    "compilerOptions": {
+        "plugins": [
+            {
+                "transform": "../src/transformer/index.ts"
+            }
+        ],
+        "declaration": false,
+        "sourceMap": true,
+        "outDir": "../test_dist"
+    },
+    "include": [
+        "./specs"
+    ]
+}

@@ -1,0 +1,13 @@
+{
+    "compilerOptions": {
+        "target": "ESNext",
+        "lib": ["ESNext", "DOM", "ScriptHost"],
+        "module": "CommonJS",
+        "esModuleInterop": true,
+        "moduleResolution": "node",
+        "plugins": [{
+            "transform": "channel-ts-transformer"
+        }]
+    },
+    "include": ["src"]
+}
