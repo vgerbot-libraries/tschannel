@@ -5,26 +5,6 @@ class ChannelProgramContext {
     public channelClassSymbol?: ts.Symbol;
     public channelInstanceSymbols: Array<ts.Symbol> = [];
     public sourceFileNode!: ts.SourceFile;
-    public readonly localStack = new LocalStack();
-}
-
-class LocalStack {
-    private readonly locals: Array<Map<string, ts.Symbol>> = [];
-    put(locals: Map<string, ts.Symbol>) {
-        this.locals.unshift(locals);
-    }
-    pop() {
-        this.locals.shift();
-    }
-    get(name: string): ts.Symbol | undefined {
-        const scopeLocals = this.locals.find(it => it.has(name));
-        if(scopeLocals) {
-            return scopeLocals.get(name);
-        }
-    }
-    clear() {
-        this.locals.length = 0;
-    }
 }
 
 export default function transformer(program: ts.Program): ts.TransformerFactory<ts.Node> {
@@ -53,7 +33,6 @@ function visitNode(
     programCtx: ChannelProgramContext,
     context: ts.TransformationContext
 ): undefined | ts.Node | Array<ts.Node> {
-    const tss = ts;
     const typeChecker = program.getTypeChecker();
     const factory = context.factory;
 
@@ -111,41 +90,47 @@ function visitNode(
             if (!typeArgs || typeArgs.length < 1) {
                 return;
             }
-            console.log(node.getText(), node);
 
             const typeNode = typeArgs[0];
-            const className = ts.factory.createUniqueName(typeNode.getText());
-            const type = typeChecker.getTypeFromTypeNode(typeNode);
-            const members = typeChecker.getPropertiesOfType(type);
-            const classMembers = members
-                .filter(it => ts.isMethodSignature(it.valueDeclaration))
-                .map(it => {
-                    return factory.createMethodDeclaration(
-                        [],
-                        [],
-                        undefined,
-                        it.name,
-                        undefined,
-                        [],
-                        [], // parameters
-                        undefined,
-                        undefined
-                    );
-                });
-            const classExpression = factory.createClassExpression(
-                [],
-                [],
-                className,
-                [],
-                [ts.factory.createHeritageClause(ts.SyntaxKind.ImplementsKeyword, [])],
-                classMembers
-            );
-            console.info(typeNode.getText(), members.map(it => it.getName()));
+            const classExpression = createRemoteClassExpression(typeNode, typeChecker, factory);
+            let classIdArg = node.arguments[0];
+            if(!classIdArg) {
+                classIdArg = factory.createStringLiteral(typeNode.getText())
+            }
             return factory.createCallExpression(node.expression, [], [
+                classIdArg,
                 classExpression
             ]);
         }
     }
 }
-// TODO: interface to class
-// TODO: hoist class declaration
+function createRemoteClassExpression(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker, factory: ts.NodeFactory) {
+    const className = ts.factory.createUniqueName(typeNode.getText());
+    const type = typeChecker.getTypeFromTypeNode(typeNode);
+    const members = typeChecker.getPropertiesOfType(type);
+    const classMembers = members
+        .filter(it => ts.isMethodSignature(it.valueDeclaration))
+        .map(it => {
+            return factory.createMethodDeclaration(
+                [],
+                [],
+                undefined,
+                it.getName(),
+                undefined,
+                [],
+                [],
+                undefined,
+                factory.createBlock([], false)
+            );
+        });
+    const classExpression = factory.createClassExpression(
+        [],
+        [],
+        className,
+        [],
+        [ts.factory.createHeritageClause(ts.SyntaxKind.ImplementsKeyword, [])],
+        classMembers
+    );
+    return classExpression;
+}
+
