@@ -63,12 +63,8 @@ describe('Remote method invocation', () => {
             }
         }
         remoteChannel.lclass('Animal', DogImpl);
-        class DogDef implements Animal {
-            getType(): string {
-                throw new Error('Method not implemented.');
-            }
-        }
-        const RemoteDogClass = localChannel.rclass(DogDef, 'Animal');
+
+        const RemoteDogClass = localChannel.rclass<Animal>();
 
         const remoteDog = new RemoteDogClass('dog');
 
@@ -78,13 +74,11 @@ describe('Remote method invocation', () => {
     });
 
     it('Should raise error when remote class not defined', async () => {
-        class Def {
-            public method() {
-                //
-            }
+        interface Def {
+            method();
         }
 
-        const RemoteDef = localChannel.rclass(Def, 'nonexistent-remote-class');
+        const RemoteDef = localChannel.rclass<Def>();
         const instance = new RemoteDef();
         const promise = instance.method();
         await expect(promise).to.be.eventually.rejected;
@@ -105,14 +99,9 @@ describe('Remote method invocation', () => {
                 }
             }
         }
-        remoteChannel.lclass('media-processor', MediaProcessorImpl);
-        class MediaProcessorDef implements MediaProcessor {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            downloadAndParse(url: string, receive: (data: ArrayBuffer, offset: number, total: number) => void) {
-                throw new Error('Method not implemented.');
-            }
-        }
-        const RemoteMediaProcessorImpl = localChannel.rclass(MediaProcessorDef, 'media-processor');
+        remoteChannel.lclass('MediaProcessor', MediaProcessorImpl);
+
+        const RemoteMediaProcessorImpl = localChannel.rclass<MediaProcessor>();
 
         const processor = new RemoteMediaProcessorImpl();
 
@@ -177,13 +166,7 @@ describe('Remote method invocation', () => {
 
         // ========================== local ==========================
 
-        class FileStorageDef implements FileStorage {
-            read(): Promise<ArrayBuffer> {
-                throw new Error('Method not implemented.');
-            }
-        }
-
-        const RemoteFileStorage = localChannel.rclass(FileStorageDef, 'FileStorage');
+        const RemoteFileStorage = localChannel.rclass<FileStorage>('FileStorage');
 
         const storage = new RemoteFileStorage();
 
@@ -204,19 +187,17 @@ describe('Remote method invocation', () => {
         remoteChannel.lclass('A', A);
         remoteChannel.lclass('B', B);
 
-        class ADef {}
-
-        class BDef {
-            @rmethod({
-                paramTypes: [ParameterType.remoteObject]
-            })
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            method(_: A): boolean {
-                throw new Error('Method not implemented');
-            }
-        }
-        const RemoteA = localChannel.rclass(ADef, 'A');
-        const RemoteB = localChannel.rclass(BDef, 'B');
+        // class BDef {
+        //     @rmethod({
+        //         paramTypes: [ParameterType.remoteObject]
+        //     })
+        //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
+        //     method(_: A): boolean {
+        //         throw new Error('Method not implemented');
+        //     }
+        // }
+        const RemoteA = localChannel.rclass<A>();
+        const RemoteB = localChannel.rclass<B>();
 
         const remoteA = new RemoteA();
         const remoteB = new RemoteB();

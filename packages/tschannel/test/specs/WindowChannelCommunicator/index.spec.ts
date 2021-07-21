@@ -27,16 +27,7 @@ describe('WebWorkerCommunicator', () => {
         await expect(channel.rmethod<() => string>('hello')()).to.eventually.become('world');
     });
     it('Should create remove instance correctly', async () => {
-        class RemoteDogDef implements Animal {
-            // eslint-disable-next-line @typescript-eslint/no-unused-vars
-            constructor(type: string) {
-                //
-            }
-            public getType(): string {
-                throw new Error('');
-            }
-        }
-        const RemoteDog = channel.rclass(RemoteDogDef, 'Dog');
+        const RemoteDog = channel.rclass<Animal>('Dog');
         const dog = new RemoteDog('Loki');
 
         expect(dog.getType()).to.eventually.become('Loki');
