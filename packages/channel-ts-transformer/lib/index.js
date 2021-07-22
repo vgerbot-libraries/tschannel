@@ -4,7 +4,7 @@ const tslib_1 = require("tslib");
 const typescript_1 = tslib_1.__importDefault(require("typescript"));
 class ChannelProgramContext {
     constructor() {
-        this.channelInstanceSymbols = [];
+        this.channelInstanceDeclarations = [];
     }
 }
 function transformer(program) {
@@ -30,7 +30,31 @@ function visitNode(node, program, programCtx, context) {
     var _a;
     const typeChecker = program.getTypeChecker();
     const factory = context.factory;
-    if (typescript_1.default.isImportDeclaration(node)) {
+    if (typescript_1.default.isPropertyAssignment(node)) {
+        const initializer = node.initializer;
+        if (typescript_1.default.isNewExpression(initializer)) {
+            const typeSymbol = typeChecker.getSymbolAtLocation(initializer.expression);
+            if (typeSymbol === programCtx.channelClassSymbol) {
+                const variableSymbol = typeChecker.getSymbolAtLocation(node.name);
+                if (!variableSymbol) {
+                    return;
+                }
+                programCtx.channelInstanceDeclarations.push(variableSymbol.valueDeclaration);
+            }
+        }
+    }
+    if ((typescript_1.default.isParameter(node) || typescript_1.default.isPropertyDeclaration(node) || typescript_1.default.isVariableDeclaration(node)) && node.type) {
+        const type = node.type;
+        const typeSymbol = typeChecker.getSymbolAtLocation(type.typeName);
+        if (typeSymbol === programCtx.channelClassSymbol) {
+            const variableSymbol = typeChecker.getSymbolAtLocation(node.name);
+            if (!variableSymbol) {
+                return;
+            }
+            programCtx.channelInstanceDeclarations.push(variableSymbol.valueDeclaration);
+        }
+    }
+    else if (typescript_1.default.isImportDeclaration(node)) {
         if (!typescript_1.default.isStringLiteral(node.moduleSpecifier)) {
             return;
         }
@@ -48,34 +72,26 @@ function visitNode(node, program, programCtx, context) {
             programCtx.channelClassSymbol = typeChecker.getSymbolAtLocation(channelClassDeclaration === null || channelClassDeclaration === void 0 ? void 0 : channelClassDeclaration.getChildAt(0));
         }
     }
-    else if (typescript_1.default.isNewExpression(node)) {
-        const symbol = typeChecker.getSymbolAtLocation(node.expression);
-        if (symbol === programCtx.channelClassSymbol) {
-            if (typescript_1.default.isVariableDeclaration(node.parent)) {
-                const variabelSymbol = typeChecker.getSymbolAtLocation(node.parent.getChildAt(0));
-                if (!variabelSymbol) {
-                    return;
-                }
-                programCtx.channelInstanceSymbols.push(variabelSymbol);
-            }
-        }
-    }
     else if (typescript_1.default.isCallExpression(node)) {
-        const firstChild = node.getChildAt(0);
-        if (firstChild && typescript_1.default.isPropertyAccessExpression(firstChild)) {
-            const expression = firstChild.expression;
-            if (typescript_1.default.isNewExpression(expression)) {
-                const classSymbol = typeChecker.getSymbolAtLocation(expression.expression);
+        const propertyExpression = node.expression;
+        if (typescript_1.default.isPropertyAccessExpression(propertyExpression)) {
+            const propertyName = propertyExpression.name.text;
+            if (propertyName !== 'rclass') {
+                return;
+            }
+            const ownerExpression = propertyExpression.expression;
+            if (typescript_1.default.isNewExpression(ownerExpression)) {
+                const classSymbol = typeChecker.getSymbolAtLocation(ownerExpression.expression);
                 if (classSymbol !== programCtx.channelClassSymbol) {
                     return;
                 }
             }
             else {
-                const symbol = typeChecker.getSymbolAtLocation(firstChild.expression);
+                const symbol = typeChecker.getSymbolAtLocation(ownerExpression);
                 if (!symbol) {
                     return;
                 }
-                const index = programCtx.channelInstanceSymbols.indexOf(symbol);
+                const index = programCtx.channelInstanceDeclarations.indexOf(symbol.valueDeclaration);
                 if (index < 0) {
                     return;
                 }
