@@ -7,14 +7,18 @@ class ChannelProgramContext {
         this.channelInstanceDeclarations = [];
     }
 }
-function transformer(program) {
+const CHANNEL_MODULE_NAME = 'tschannel';
+;
+const DEFAULT_TRANSFORMER_OPTIONS = {};
+function transformer(program, options) {
+    const resolvedOptions = Object.assign(Object.assign({}, DEFAULT_TRANSFORMER_OPTIONS), (options || {}));
     return (context) => {
         return (file) => {
             const programCtx = new ChannelProgramContext();
             programCtx.sourceFileNode = file;
             return typescript_1.default.visitEachChild(file, visitor, context);
             function visitor(node) {
-                const ret = visitNode(node, program, programCtx, context);
+                const ret = visitNode(node, program, programCtx, context, resolvedOptions);
                 if (!ret) {
                     return typescript_1.default.visitEachChild(node, visitor, context);
                 }
@@ -26,14 +30,17 @@ function transformer(program) {
     };
 }
 exports.default = transformer;
-function visitNode(node, program, programCtx, context) {
-    var _a;
+function visitNode(node, program, programCtx, context, options) {
+    var _a, _b;
     const typeChecker = program.getTypeChecker();
     const factory = context.factory;
     if (typescript_1.default.isPropertyAssignment(node)) {
-        const initializer = node.initializer;
-        if (typescript_1.default.isNewExpression(initializer)) {
-            const typeSymbol = typeChecker.getSymbolAtLocation(initializer.expression);
+        resolveInitializerExpression(node, typeChecker, programCtx);
+    }
+    else if ((typescript_1.default.isParameter(node) || typescript_1.default.isPropertyDeclaration(node) || typescript_1.default.isVariableDeclaration(node))) {
+        const type = node.type;
+        if (type) {
+            const typeSymbol = typeChecker.getSymbolAtLocation(type.typeName);
             if (typeSymbol === programCtx.channelClassSymbol) {
                 const variableSymbol = typeChecker.getSymbolAtLocation(node.name);
                 if (!variableSymbol) {
@@ -42,16 +49,8 @@ function visitNode(node, program, programCtx, context) {
                 programCtx.channelInstanceDeclarations.push(variableSymbol.valueDeclaration);
             }
         }
-    }
-    if ((typescript_1.default.isParameter(node) || typescript_1.default.isPropertyDeclaration(node) || typescript_1.default.isVariableDeclaration(node)) && node.type) {
-        const type = node.type;
-        const typeSymbol = typeChecker.getSymbolAtLocation(type.typeName);
-        if (typeSymbol === programCtx.channelClassSymbol) {
-            const variableSymbol = typeChecker.getSymbolAtLocation(node.name);
-            if (!variableSymbol) {
-                return;
-            }
-            programCtx.channelInstanceDeclarations.push(variableSymbol.valueDeclaration);
+        else if (node.initializer) {
+            resolveInitializerExpression(node, typeChecker, programCtx);
         }
     }
     else if (typescript_1.default.isImportDeclaration(node)) {
@@ -59,7 +58,7 @@ function visitNode(node, program, programCtx, context) {
             return;
         }
         const moduleName = node.moduleSpecifier.text;
-        if (moduleName !== 'tschannel') {
+        if (moduleName !== CHANNEL_MODULE_NAME) {
             return;
         }
         const namedImports = (_a = node.importClause) === null || _a === void 0 ? void 0 : _a.namedBindings;
@@ -101,11 +100,26 @@ function visitNode(node, program, programCtx, context) {
                 return;
             }
             const typeNode = typeArgs[0];
-            const classExpression = createRemoteClassExpression(typeNode, typeChecker, factory);
+            const typeNodeObj = typeChecker.getTypeFromTypeNode(typeNode);
+            const declarations = (_b = typeNodeObj.getSymbol()) === null || _b === void 0 ? void 0 : _b.getDeclarations();
+            if (!declarations || declarations.length < 1) {
+                return;
+            }
+            const typeNodeDeclaration = declarations[0];
+            if (!typeNodeDeclaration) {
+                return;
+            }
             let classIdArg = node.arguments[0];
             if (!classIdArg) {
                 classIdArg = factory.createStringLiteral(typeNode.getText());
             }
+            if (typescript_1.default.isClassDeclaration(typeNodeDeclaration)) {
+                return factory.createCallExpression(node.expression, [], [
+                    classIdArg,
+                    factory.createRegularExpressionLiteral(typeNode.getText())
+                ]);
+            }
+            const classExpression = createRemoteClassExpression(typeNode, typeChecker, factory);
             return factory.createCallExpression(node.expression, [], [
                 classIdArg,
                 classExpression
@@ -124,5 +138,21 @@ function createRemoteClassExpression(typeNode, typeChecker, factory) {
     });
     const classExpression = factory.createClassExpression([], [], className, [], [typescript_1.default.factory.createHeritageClause(typescript_1.default.SyntaxKind.ImplementsKeyword, [])], classMembers);
     return classExpression;
+}
+function resolveInitializerExpression(node, typeChecker, programCtx) {
+    const initializer = node.initializer;
+    if (!initializer) {
+        return;
+    }
+    if (typescript_1.default.isNewExpression(initializer)) {
+        const typeSymbol = typeChecker.getSymbolAtLocation(initializer.expression);
+        if (typeSymbol === programCtx.channelClassSymbol) {
+            const variableSymbol = typeChecker.getSymbolAtLocation(node.name);
+            if (!variableSymbol) {
+                return;
+            }
+            programCtx.channelInstanceDeclarations.push(variableSymbol.valueDeclaration);
+        }
+    }
 }
 //# sourceMappingURL=index.js.map

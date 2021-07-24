@@ -1,2 +1,4 @@
 import ts from 'typescript';
-export default function transformer(program: ts.Program): ts.TransformerFactory<ts.Node>;
+export interface TransformerOptions {
+}
+export default function transformer(program: ts.Program, options?: Partial<TransformerOptions>): ts.TransformerFactory<ts.Node>;
