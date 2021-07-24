@@ -17,7 +17,10 @@
             "sinon-chai",
             "chai-as-promised"
         ],
-        "experimentalDecorators": true
+        "experimentalDecorators": true,
+        "paths": {
+            "tschannel": ["../src/index.ts"]
+        }
     },
     "include": [
         "../src", "./"

@@ -19,13 +19,14 @@
         "lint": " eslint {src,test}/**/*.{js,ts,tsx}",
         "format": "eslint --fix {src,test}/**/*.{js,ts,tsx}",
         "pretest:debug": "npm run lint",
-        "test:debug": "karma start ./karma.debug.conf.js --browsers Chrome",
+        "debug": "karma start ./karma.debug.conf.js --browsers Chrome",
         "ci": "karma start ./karma.travis.conf.js --browsers HeadlessChrome --single-run true",
         "debug:ci": "karma start ./karma.travis.conf.js --browsers Chrome --single-run false",
         "codecov": "codecov < coverage/cobertura-coverage.xml",
         "test:chromeheadless": "karma start ./karma.debug.conf.js --browsers HeadlessChrome --single-run true",
         "build": "rollup -c ./rollup.config.js --environment 'production'",
-        "gendoc": "typedoc ./src  --target es5 --out dist/docs --name channel-ts --hideGenerator"
+        "gendoc": "typedoc ./src  --target es5 --out dist/docs --name channel-ts --hideGenerator",
+        "debug:transformer": "node --inspect node_modules/.bin/rollup -c ./rollup-debug.config.js --watch -i test/specs/WebWorkerCommunicator/index.spec.ts -o dist/test.js"
     },
     "repository": {
         "type": "git",

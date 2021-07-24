@@ -1,4 +1,4 @@
-import { Channel, WebWorkerCommunicator } from '../../../src';
+import { Channel, WebWorkerCommunicator } from 'tschannel';
 import { Animal, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';
@@ -25,3 +25,4 @@ describe('WebWorkerCommunicator', () => {
         channel.destroy();
     });
 });
+

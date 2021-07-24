@@ -1,4 +1,4 @@
-import { Channel, WebWorkerScopeCommunicator } from '../../../src';
+import { Channel, WebWorkerScopeCommunicator } from 'tschannel';
 import { Animal, CHANNEL_ID } from './common';
 
 const channel = new Channel(CHANNEL_ID, new WebWorkerScopeCommunicator());

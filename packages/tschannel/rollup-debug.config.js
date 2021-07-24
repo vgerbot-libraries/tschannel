@@ -31,7 +31,6 @@ const rollupPlugins = [
 ];
 module.exports = {
     context: 'this',
-    watch: true,
     output: {
         format: 'iife',
         name: pkg.library,

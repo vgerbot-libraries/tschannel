@@ -1,4 +1,4 @@
-import { ParameterType, rmethod, Channel } from '../../src';
+import { ParameterType, rmethod, Channel } from 'tschannel';
 import LocalCommunicator from '../common/communicator/LocalCommunicator';
 
 describe('Remote method invocation', () => {
@@ -196,6 +196,7 @@ describe('Remote method invocation', () => {
         //         throw new Error('Method not implemented');
         //     }
         // }
+
         const RemoteA = localChannel.rclass<A>();
         const RemoteB = localChannel.rclass<B>();
 

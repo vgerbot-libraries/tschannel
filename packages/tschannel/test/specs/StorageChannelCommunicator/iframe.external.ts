@@ -1,4 +1,4 @@
-import { Channel, StorageChannelCommunicator } from '../../../src';
+import { Channel, StorageChannelCommunicator } from 'tschannel';
 import { CHANNEL_ID } from './common';
 
 const channel = new Channel(CHANNEL_ID, new StorageChannelCommunicator(localStorage, CHANNEL_ID));
