@@ -6,6 +6,8 @@ class ChannelProgramContext {
     constructor() {
         this.channelInstanceDeclarations = [];
     }
+    isChannelType(node) {
+    }
 }
 const CHANNEL_MODULE_NAME = 'tschannel';
 ;
@@ -63,12 +65,18 @@ function visitNode(node, program, programCtx, context, options) {
         }
         const namedImports = (_a = node.importClause) === null || _a === void 0 ? void 0 : _a.namedBindings;
         if (namedImports && typescript_1.default.isNamedImports(namedImports)) {
-            const channelClassDeclaration = namedImports.elements.find((it) => it.getText() === 'Channel');
+            const channelClassDeclaration = namedImports.elements.find((it) => {
+                const propertyName = it.propertyName;
+                if (propertyName) {
+                    return propertyName.text === 'Channel';
+                }
+                return it.name.text === 'Channel';
+            });
             if (!channelClassDeclaration) {
                 return;
             }
             programCtx.channelClassDeclaration = channelClassDeclaration;
-            programCtx.channelClassSymbol = typeChecker.getSymbolAtLocation(channelClassDeclaration === null || channelClassDeclaration === void 0 ? void 0 : channelClassDeclaration.getChildAt(0));
+            programCtx.channelClassSymbol = typeChecker.getSymbolAtLocation(channelClassDeclaration.name);
         }
     }
     else if (typescript_1.default.isCallExpression(node)) {
@@ -140,6 +148,49 @@ function createRemoteClassExpression(typeNode, typeChecker, factory) {
     return classExpression;
 }
 function resolveInitializerExpression(node, typeChecker, programCtx) {
+    var _a;
+    const errorType = typeChecker.getTypeAtLocation(undefined);
+    const type = typeChecker.getTypeAtLocation(node);
+    if (type !== errorType) {
+        const aliasSymbol = type.aliasSymbol;
+        let isTypeMatch = false;
+        if (aliasSymbol) {
+            const intersectionDeclarations = (_a = aliasSymbol.declarations) === null || _a === void 0 ? void 0 : _a.filter(it => typescript_1.default.isInterfaceDeclaration(it));
+            if (!intersectionDeclarations) {
+                return;
+            }
+            isTypeMatch = intersectionDeclarations.some(it => {
+                if (!typescript_1.default.isTypeAliasDeclaration(it)) {
+                    return;
+                }
+                if (!typescript_1.default.isIntersectionTypeNode(it.type)) {
+                    return;
+                }
+                const types = it.type.types;
+                return types.some(it => {
+                    if (!typescript_1.default.isTypeReferenceNode(it)) {
+                        return;
+                    }
+                    const symbol = typeChecker.getSymbolAtLocation(it.typeName);
+                    if (programCtx.channelClassSymbol === symbol) {
+                        return true;
+                    }
+                });
+            });
+        }
+        else if (type.getSymbol() === programCtx.channelClassSymbol) {
+            isTypeMatch = true;
+        }
+        if (isTypeMatch) {
+            const variableSymbol = typeChecker.getSymbolAtLocation(node.name);
+            const nodeDeclarations = variableSymbol === null || variableSymbol === void 0 ? void 0 : variableSymbol.getDeclarations();
+            if (!nodeDeclarations) {
+                return;
+            }
+            programCtx.channelInstanceDeclarations.push(...nodeDeclarations);
+            return;
+        }
+    }
     const initializer = node.initializer;
     if (!initializer) {
         return;
@@ -153,6 +204,39 @@ function resolveInitializerExpression(node, typeChecker, programCtx) {
             }
             programCtx.channelInstanceDeclarations.push(variableSymbol.valueDeclaration);
         }
+    }
+    else if (typescript_1.default.isIdentifier(initializer)) {
+        const initializerSymbol = typeChecker.getSymbolAtLocation(initializer);
+        if (!initializerSymbol) {
+            return;
+        }
+        const declarations = initializerSymbol.getDeclarations();
+        if (!declarations || declarations.length < 1) {
+            return;
+        }
+        const declaration = declarations[0];
+        if (programCtx.channelInstanceDeclarations.indexOf(declaration) === -1) {
+            return;
+        }
+        const nodeSymbol = typeChecker.getSymbolAtLocation(node.name);
+        const nodeDeclarations = nodeSymbol === null || nodeSymbol === void 0 ? void 0 : nodeSymbol.getDeclarations();
+        if (!nodeDeclarations) {
+            return;
+        }
+        programCtx.channelInstanceDeclarations.push(...nodeDeclarations);
+    }
+    else if (typescript_1.default.isAsExpression(initializer)) {
+        const typeNode = initializer.type;
+        const classSymbol = typeChecker.getSymbolAtLocation(typeNode.typeName);
+        if (programCtx.channelClassSymbol !== classSymbol) {
+            return;
+        }
+        const nodeSymbol = typeChecker.getSymbolAtLocation(node.name);
+        const nodeDeclarations = nodeSymbol === null || nodeSymbol === void 0 ? void 0 : nodeSymbol.getDeclarations();
+        if (!nodeDeclarations) {
+            return;
+        }
+        programCtx.channelInstanceDeclarations.push(...nodeDeclarations);
     }
 }
 //# sourceMappingURL=index.js.map

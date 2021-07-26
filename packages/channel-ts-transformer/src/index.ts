@@ -5,6 +5,9 @@ class ChannelProgramContext {
     public channelClassSymbol?: ts.Symbol;
     public channelInstanceDeclarations: Array<ts.Declaration> = [];
     public sourceFileNode!: ts.SourceFile;
+    public isChannelType(node: ts.Node) {
+
+    }
 }
 
 const CHANNEL_MODULE_NAME = 'tschannel';
@@ -74,13 +77,19 @@ function visitNode(
         }
         const namedImports = node.importClause?.namedBindings;
         if (namedImports && ts.isNamedImports(namedImports)) {
-            const channelClassDeclaration = namedImports.elements.find((it) => it.getText() === 'Channel');
+            const channelClassDeclaration = namedImports.elements.find((it) => {
+                const propertyName = it.propertyName;
+                if(propertyName) {
+                    return propertyName.text === 'Channel';
+                }
+                return it.name.text === 'Channel'
+            });
             if (!channelClassDeclaration) {
                 return;
             }
             programCtx.channelClassDeclaration = channelClassDeclaration;
             programCtx.channelClassSymbol = typeChecker.getSymbolAtLocation(
-                channelClassDeclaration?.getChildAt(0)
+                channelClassDeclaration.name
             );
         }
     } else if (ts.isCallExpression(node)) {
@@ -174,6 +183,47 @@ function resolveInitializerExpression(
     typeChecker: ts.TypeChecker,
     programCtx: ChannelProgramContext
 ) {
+    const errorType = typeChecker.getTypeAtLocation(undefined as unknown as ts.Node);
+    const type = typeChecker.getTypeAtLocation(node);
+    if(type !== errorType) {
+        const aliasSymbol = type.aliasSymbol;
+        let isTypeMatch = false;
+        if(aliasSymbol) {
+            const intersectionDeclarations = aliasSymbol.declarations?.filter(it => ts.isInterfaceDeclaration(it));
+            if(!intersectionDeclarations) {
+                return;
+            }
+            isTypeMatch = intersectionDeclarations.some(it => {
+                if(!ts.isTypeAliasDeclaration(it)) {
+                    return;
+                }
+                if(!ts.isIntersectionTypeNode(it.type)) {
+                    return;
+                }
+                const types = it.type.types;
+                return types.some(it => {
+                    if(!ts.isTypeReferenceNode(it)) {
+                        return;
+                    }
+                    const symbol = typeChecker.getSymbolAtLocation(it.typeName);
+                    if(programCtx.channelClassSymbol === symbol) {
+                        return true;
+                    }
+                })
+            });
+        } else if(type.getSymbol() === programCtx.channelClassSymbol) {
+            isTypeMatch = true;
+        }
+        if(isTypeMatch) {
+            const variableSymbol = typeChecker.getSymbolAtLocation(node.name);
+            const nodeDeclarations = variableSymbol?.getDeclarations();
+            if(!nodeDeclarations) {
+                return;
+            }
+            programCtx.channelInstanceDeclarations.push(...nodeDeclarations);
+            return;
+        }
+    }
     const initializer = node.initializer;
     if(!initializer) {
         return;
@@ -187,5 +237,36 @@ function resolveInitializerExpression(
             }
             programCtx.channelInstanceDeclarations.push(variableSymbol.valueDeclaration);
         }
+    } else if(ts.isIdentifier(initializer)) {
+        const initializerSymbol = typeChecker.getSymbolAtLocation(initializer);
+        if(!initializerSymbol) {
+            return;
+        }
+        const declarations = initializerSymbol.getDeclarations();
+        if(!declarations || declarations.length < 1) {
+            return;
+        }
+        const declaration = declarations[0];
+        if(programCtx.channelInstanceDeclarations.indexOf(declaration) === -1) {
+            return;
+        }
+        const nodeSymbol = typeChecker.getSymbolAtLocation(node.name);
+        const nodeDeclarations = nodeSymbol?.getDeclarations();
+        if(!nodeDeclarations) {
+            return;
+        }
+        programCtx.channelInstanceDeclarations.push(...nodeDeclarations);
+    } else if(ts.isAsExpression(initializer)) {
+        const typeNode = initializer.type as ts.TypeReferenceNode;
+        const classSymbol = typeChecker.getSymbolAtLocation(typeNode.typeName);
+        if(programCtx.channelClassSymbol !== classSymbol) {
+            return;
+        }
+        const nodeSymbol = typeChecker.getSymbolAtLocation(node.name);
+        const nodeDeclarations = nodeSymbol?.getDeclarations();
+        if(!nodeDeclarations) {
+            return;
+        }
+        programCtx.channelInstanceDeclarations.push(...nodeDeclarations);
     }
 }
