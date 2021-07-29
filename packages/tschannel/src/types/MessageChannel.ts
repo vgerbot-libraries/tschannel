@@ -1,5 +1,4 @@
 export interface MessageChannel {
-    postMessage(message: unknown, transfer?: Transferable[]): void;
     addEventListener<K extends keyof MessagePortEventMap>(
         type: K,
         listener: (this: MessagePort, ev: MessagePortEventMap[K]) => unknown,

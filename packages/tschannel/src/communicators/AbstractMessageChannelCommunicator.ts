@@ -1,10 +1,15 @@
-import { MessageChannel } from '../types/MessageChannel';
 import Payload from '../types/Payload';
 import { SerializableValue } from '../types/Serializable';
+import { Transferable } from '../types/Transferable';
 import AbstractCommunicator from './AbstractCommunicator';
 
+export interface EventTarget {
+    addEventListener(type: string, callback: (e: MessageEvent) => void)
+    removeEventListener(type: string, callback: (e: MessageEvent) => void)
+}
+
 export default abstract class AbstractMessageChannelCommunicator<
-    T extends MessageChannel | Window
+    T extends EventTarget
 > extends AbstractCommunicator {
     protected removeEventListener: () => void;
     constructor(protected target: T) {
@@ -21,16 +26,12 @@ export default abstract class AbstractMessageChannelCommunicator<
         };
     }
     send(payload: Payload<SerializableValue>): void {
-        if (typeof window !== 'undefined' && this.target instanceof Window) {
-            throw new Error('Method not implemented.');
-        } else {
-            (this.target.postMessage as MessageChannel['postMessage']).call(
-                this.target,
-                payload.serialize(),
-                payload.transferables()
-            );
-        }
+        this.sendPayload(
+            payload.serialize(),
+            payload.transferables()
+        );
     }
+    abstract sendPayload(serializable: SerializableValue, transferables: Transferable[]): void;
     close() {
         this.removeEventListener();
     }
