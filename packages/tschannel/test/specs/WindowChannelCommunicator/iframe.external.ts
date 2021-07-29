@@ -1,4 +1,4 @@
-import { Channel, WindowChannelCommunicator } from 'tschannel';
+import { Channel, WindowChannelCommunicator } from '@tschannel/core';
 import { CHANNEL_ID, Animal } from './common';
 
 const channel = new Channel(CHANNEL_ID, new WindowChannelCommunicator(window.parent, window.parent.location.origin));

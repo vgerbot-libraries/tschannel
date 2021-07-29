@@ -1,4 +1,4 @@
-import { Channel, WebWorkerScopeCommunicator } from 'tschannel';
+import { Channel, WebWorkerScopeCommunicator } from '@tschannel/core';
 import { hex, CHANNEL_ID } from './common';
 
 const channel = new Channel(CHANNEL_ID, new WebWorkerScopeCommunicator());

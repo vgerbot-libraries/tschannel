@@ -19,7 +19,7 @@
         ],
         "experimentalDecorators": true,
         "paths": {
-            "tschannel": ["../src/index.ts"]
+            "@tschannel/core": ["../src/index.ts"]
         }
     },
     "include": [

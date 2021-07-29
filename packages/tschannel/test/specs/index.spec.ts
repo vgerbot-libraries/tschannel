@@ -1,4 +1,4 @@
-import { ParameterType, rmethod, Channel } from 'tschannel';
+import { ParameterType, rmethod, Channel } from '@tschannel/core';
 import LocalCommunicator from '../common/communicator/LocalCommunicator';
 
 describe('Remote method invocation', () => {

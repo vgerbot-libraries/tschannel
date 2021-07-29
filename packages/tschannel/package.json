@@ -1,10 +1,11 @@
 {
-    "name": "tschannel",
+    "name": "@tschannel/core",
     "version": "1.0.0",
     "description": "A library that provides a consistent and asynchrounous communication API for iframes, webworkers and even websocket to nodejs",
     "main": "dist/index.cjs.js",
     "module": "dist/index.esm.js",
     "browser": "dist/index.umd.js",
+    "types": "dist/index.d.ts",
     "distDir": "dist/",
     "library": "ChannelTS",
     "engines": {
@@ -70,7 +71,7 @@
         "@vgerbot/karma-rollup-preprocessor": "^7.0.2",
         "chai": "^4.2.0",
         "chai-as-promised": "^7.1.1",
-        "channel-ts-transformer": "^1.0.0",
+        "@tschannel/transformer": "^1.0.0",
         "codecov": "^3.8.1",
         "eslint": "^7.13.0",
         "eslint-config-prettier": "^6.15.0",

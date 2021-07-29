@@ -1,4 +1,4 @@
-import { InvokeMethodData, ParallelCommunicator, Channel, WebWorkerCommunicator } from 'tschannel';
+import { InvokeMethodData, ParallelCommunicator, Channel, WebWorkerCommunicator } from '@tschannel/core';
 import { hex, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';

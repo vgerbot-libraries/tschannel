@@ -1,6 +1,6 @@
 const plugins = require('./build/rollup.plugins');
 const pkg = require('./package.json');
-const channelTsTransformer = require('channel-ts-transformer').default;
+const channelTsTransformer = require('@tschannel/transformer').default;
 
 const rollupPlugins = [
     plugins.typescript({

@@ -1,4 +1,4 @@
-import { Channel, StorageChannelCommunicator } from 'tschannel';
+import { Channel, StorageChannelCommunicator } from '@tschannel/core';
 import { sendCoverageData } from '../../common/sendCoverageData';
 import { CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
