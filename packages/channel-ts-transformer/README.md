@@ -1,11 +1,11 @@
-# `channel-ts-transformer`
+# `@tschannel/transformer`
 
 > TODO: description
 
 ## Usage
 
 ```
-const channelTsTransformer = require('channel-ts-transformer');
+const channelTsTransformer = require('@tschannel/transformer');
 
 // TODO: DEMONSTRATE API
 ```

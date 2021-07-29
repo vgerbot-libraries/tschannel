@@ -9,7 +9,7 @@ class ChannelProgramContext {
     isChannelType(node) {
     }
 }
-const CHANNEL_MODULE_NAME = 'tschannel';
+const CHANNEL_MODULE_NAME = '@tschannel/core';
 ;
 const DEFAULT_TRANSFORMER_OPTIONS = {};
 function transformer(program, options) {

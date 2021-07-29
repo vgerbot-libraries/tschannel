@@ -10,7 +10,7 @@ class ChannelProgramContext {
     }
 }
 
-const CHANNEL_MODULE_NAME = 'tschannel';
+const CHANNEL_MODULE_NAME = '@tschannel/core';
 
 export interface TransformerOptions {
 };
