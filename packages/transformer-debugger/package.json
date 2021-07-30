@@ -28,11 +28,11 @@
     "url": "https://github.com/y1j2x34/channel-ts/issues"
   },
   "dependencies": {
-    "tschannel": "^1.0.0",
+    "@tschannel/core": "^1.0.0",
     "tslib": "^2.2.0"
   },
   "devDependencies": {
-    "channel-ts-transformer": "^1.0.0",
+    "@tschannel/transformer": "^1.0.0",
     "ttypescript": "1.5.12"
   }
 }
