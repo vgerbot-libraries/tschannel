@@ -29,5 +29,5 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn workspace tschannel ci
-      - run: yarn workspace tschannel codecov
+      - run: yarn workspace @tschannel/core ci
+      - run: yarn workspace @tschannel/core codecov
