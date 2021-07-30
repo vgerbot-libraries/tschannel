@@ -60,7 +60,16 @@ module.exports = {
     singleRun: false,
 
     concurrency: Infinity,
-
+    // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/SharedArrayBuffer#security_requirements
+    customHeaders: [{
+        match: '.*\\.html',
+        name: 'Cross-Origin-Opener-Policy',
+        value: 'same-origin'
+    }, {
+        match: '.*\\.(html|js)',
+        name: 'Cross-Origin-Embedder-Policy',
+        value: 'require-corp'
+    }],
     plugins: [
         'karma-chrome-launcher',
         'karma-mocha',
