@@ -21,10 +21,10 @@ jobs:
           - 14.x
           - 16.x
     steps:
-      - uses: borales/actions-yarn@2.3.0
-        with:
-          cmd: install # yarn install
-      - uses: actions/checkout@v2
+      - name: CHECK-OUT GIT REPOSITORY
+        uses: actions/checkout@v2
+      - name: INSTALL PROJECT DEPENDENCIES (yarn)
+        run: yarn install
       - name: Test
         uses: actions/setup-node@v1
         with:
