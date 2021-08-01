@@ -1,4 +1,3 @@
-import Payload from '../types/Payload';
 import { SerializableValue } from '../types/Serializable';
 import { Transferable } from '../types/Transferable';
 import AbstractMessageChannelCommunicator from './AbstractMessageChannelCommunicator';
@@ -9,8 +8,6 @@ export class WindowChannelCommunicator extends AbstractMessageChannelCommunicato
     }
     sendPayload(serializable: SerializableValue, transferables: Transferable[]): void {
         this.targetWindow.postMessage(serializable, this.targetOrigin, transferables);
-    }
-    send(payload: Payload<SerializableValue>): void {
     }
     close(): void {
         super.close();

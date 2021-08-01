@@ -3,7 +3,7 @@ import { Animal, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';
 
-describe('WebWorkerCommunicator', () => {
+describe('WindowsChannelCommunicator', () => {
     let channel: Channel;
     let iframe: HTMLIFrameElement;
 
