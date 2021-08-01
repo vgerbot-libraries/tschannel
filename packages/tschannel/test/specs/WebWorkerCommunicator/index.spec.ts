@@ -8,8 +8,8 @@ describe('WebWorkerCommunicator', () => {
         CHANNEL_ID,
         new WebWorkerCommunicator('/base/test/specs/WebWorkerCommunicator/worker.external.js')
     );
-    it('Should rmethod work correctly', async () => {
-        await expect(channel.rmethod<() => string>('hello')()).to.eventually.become('world');
+    it('Should rmethod work correctly', () => {
+        return expect(channel.rmethod<() => string>('hello')()).to.eventually.become('world');
     });
     it('Should create remove instance correctly', async () => {
         const RemoteDog = channel.rclass<Animal>('Dog');
