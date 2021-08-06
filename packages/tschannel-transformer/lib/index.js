@@ -3,7 +3,8 @@ Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
 const typescript_1 = tslib_1.__importDefault(require("typescript"));
 class ChannelProgramContext {
-    isChannelType(node) {
+    constructor() {
+        this.interfaceImplMap = new Map();
     }
 }
 const CHANNEL_MODULE_NAME = '@tschannel/core';
@@ -14,8 +15,11 @@ function transformer(program, options) {
     return (context) => {
         return (file) => {
             const programCtx = new ChannelProgramContext();
-            programCtx.sourceFileNode = file;
-            return typescript_1.default.visitEachChild(file, visitor, context);
+            const sourceFileNode = typescript_1.default.visitEachChild(file, visitor, context);
+            return typescript_1.default.factory.updateSourceFile(sourceFileNode, [
+                ...sourceFileNode.statements,
+                ...programCtx.interfaceImplMap.values()
+            ]);
             function visitor(node) {
                 const ret = visitNode(node, program, programCtx, context, resolvedOptions);
                 if (!ret) {
@@ -98,24 +102,39 @@ function visitNode(node, program, programCtx, context, options) {
                     factory.createRegularExpressionLiteral(typeNode.getText())
                 ]);
             }
-            const classExpression = createRemoteClassExpression(typeNode, typeChecker, factory);
+            const classIdentifier = createRemoteClassExpression(typeNode, typeChecker, factory, programCtx);
             return factory.createCallExpression(node.expression, [], [
                 classIdArg,
-                classExpression
+                classIdentifier
             ]);
         }
     }
 }
-function createRemoteClassExpression(typeNode, typeChecker, factory) {
-    const className = typescript_1.default.factory.createUniqueName(typeNode.getText());
+function createRemoteClassExpression(typeNode, typeChecker, factory, programCtx) {
     const type = typeChecker.getTypeFromTypeNode(typeNode);
-    const members = typeChecker.getPropertiesOfType(type);
-    const classMembers = members
-        .filter(it => typescript_1.default.isMethodSignature(it.valueDeclaration))
-        .map(it => {
-        return factory.createMethodDeclaration([], [], undefined, it.getName(), undefined, [], [], undefined, factory.createBlock([], false));
-    });
-    const classExpression = factory.createClassExpression([], [], className, [], [typescript_1.default.factory.createHeritageClause(typescript_1.default.SyntaxKind.ImplementsKeyword, [])], classMembers);
-    return classExpression;
+    const symbol = type.getSymbol();
+    if (!symbol) {
+        return;
+    }
+    const typeDeclarations = symbol.declarations;
+    if (typeDeclarations.length === 0) {
+        return;
+    }
+    let classDeclaration;
+    if (programCtx.interfaceImplMap.has(symbol)) {
+        classDeclaration = programCtx.interfaceImplMap.get(symbol);
+    }
+    else {
+        const members = typeChecker.getPropertiesOfType(type);
+        const classMembers = members
+            .filter(it => typescript_1.default.isMethodSignature(it.valueDeclaration))
+            .map(it => {
+            return factory.createMethodDeclaration([], [], undefined, it.getName(), undefined, [], [], undefined, factory.createBlock([], false));
+        });
+        const className = factory.createUniqueName(typeNode.getText() + 'Impl');
+        classDeclaration = factory.createClassDeclaration([], [], className, [], [factory.createHeritageClause(typescript_1.default.SyntaxKind.ImplementsKeyword, [])], classMembers);
+        programCtx.interfaceImplMap.set(symbol, classDeclaration);
+    }
+    return classDeclaration.name;
 }
 //# sourceMappingURL=index.js.map

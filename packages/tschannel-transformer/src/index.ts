@@ -4,9 +4,7 @@ class ChannelProgramContext {
     public channelClassSymbol?: ts.Symbol;
     public rclassSymbol?: ts.Symbol;
     public sourceFileNode!: ts.SourceFile;
-    public isChannelType(node: ts.Node) {
-
-    }
+    public interfaceImplMap: Map<ts.Symbol, ts.ClassDeclaration> = new Map();
 }
 
 const CHANNEL_MODULE_NAME = '@tschannel/core';
@@ -25,8 +23,13 @@ export default function transformer(program: ts.Program, options?: Partial<Trans
     return (context: ts.TransformationContext) => {
         return (file: ts.Node) => {
             const programCtx = new ChannelProgramContext();
-            programCtx.sourceFileNode = file as ts.SourceFile;
-            return ts.visitEachChild(file, visitor, context);
+            const sourceFileNode = ts.visitEachChild(file, visitor, context) as ts.SourceFile;
+            return ts.factory.updateSourceFile(
+                sourceFileNode, [
+                    ...sourceFileNode.statements,
+                    ...programCtx.interfaceImplMap.values()
+                ]
+            );
 
             function visitor(node: ts.Node): ts.Node | Array<ts.Node> {
                 const ret = visitNode(node, program, programCtx, context, resolvedOptions);
@@ -115,40 +118,52 @@ function visitNode(
                     factory.createRegularExpressionLiteral(typeNode.getText())
                 ]);
             }
-            const classExpression = createRemoteClassExpression(typeNode, typeChecker, factory);
+            const classIdentifier = createRemoteClassExpression(typeNode, typeChecker, factory, programCtx);
+
             return factory.createCallExpression(node.expression, [], [
                 classIdArg,
-                classExpression
+                classIdentifier!
             ]);
         }
     }
 }
-function createRemoteClassExpression(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker, factory: ts.NodeFactory) {
-    const className = ts.factory.createUniqueName(typeNode.getText());
+function createRemoteClassExpression(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker, factory: ts.NodeFactory, programCtx: ChannelProgramContext): ts.Identifier | undefined {
     const type = typeChecker.getTypeFromTypeNode(typeNode);
-    const members = typeChecker.getPropertiesOfType(type);
-    const classMembers = members
-        .filter(it => ts.isMethodSignature(it.valueDeclaration))
-        .map(it => {
-            return factory.createMethodDeclaration(
-                [],
-                [],
-                undefined,
-                it.getName(),
-                undefined,
-                [],
-                [],
-                undefined,
-                factory.createBlock([], false)
-            );
-        });
-    const classExpression = factory.createClassExpression(
-        [],
-        [],
-        className,
-        [],
-        [ts.factory.createHeritageClause(ts.SyntaxKind.ImplementsKeyword, [])],
-        classMembers
-    );
-    return classExpression;
+    const symbol = type.getSymbol();
+    if(!symbol) {
+        return;
+    }
+    const typeDeclarations = symbol.declarations;
+    if(typeDeclarations.length === 0) {
+        return;
+    }
+    let classDeclaration: ts.ClassDeclaration;
+    if(programCtx.interfaceImplMap.has(symbol)) {
+        classDeclaration = programCtx.interfaceImplMap.get(symbol) as ts.ClassDeclaration;
+    } else {
+        const members = typeChecker.getPropertiesOfType(type);
+        const classMembers = members
+            .filter(it => ts.isMethodSignature(it.valueDeclaration))
+            .map(it => {
+                return factory.createMethodDeclaration(
+                    [],
+                    [],
+                    undefined,
+                    it.getName(),
+                    undefined,
+                    [],
+                    [],
+                    undefined,
+                    factory.createBlock([], false)
+                );
+            });
+        const className = factory.createUniqueName(typeNode.getText()+'Impl');
+        classDeclaration = factory.createClassDeclaration(
+            [], [], className, [],
+            [factory.createHeritageClause(ts.SyntaxKind.ImplementsKeyword, [])],
+            classMembers
+        );
+        programCtx.interfaceImplMap.set(symbol, classDeclaration);
+    }
+    return classDeclaration.name;
 }
