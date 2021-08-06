@@ -6,7 +6,7 @@
         "esModuleInterop": true,
         "moduleResolution": "node",
         "plugins": [{
-            "transform": "channel-ts-transformer"
+            "transform": "@tschannel/transformer"
         }]
     },
     "include": ["src"]

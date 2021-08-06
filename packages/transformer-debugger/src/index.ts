@@ -1,4 +1,4 @@
-import { Channel, StorageChannelCommunicator } from 'tschannel';
+import { Channel, StorageChannelCommunicator } from '@tschannel/core';
 import { Remote } from './api';
 
 const channelId = 'test-transformer';
@@ -16,6 +16,8 @@ function run() {
     // api.init();
 
     channel.rclass<RemoteAPI2>()
+    channel.rclass<RemoteAPI>()
+    channel.rclass<RemoteAPI>()
     channel.rclass<Remote>()
 
     interface RemoteAPI2 {
@@ -29,3 +31,4 @@ interface RemoteAPI {
     init();
 }
 run()
+//
