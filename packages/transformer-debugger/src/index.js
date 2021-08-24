@@ -1,11 +1,9 @@
-"use strict";
-Object.defineProperty(exports, "__esModule", { value: true });
-const core_1 = require("@tschannel/core");
-const channelId = 'test-transformer';
-const communicator1 = new core_1.StorageChannelCommunicator(localStorage, channelId);
-const channel = new core_1.Channel(channelId, communicator1);
+import { Channel, StorageChannelCommunicator } from '@tschannel/core';
+var channelId = 'test-transformer';
+var communicator1 = new StorageChannelCommunicator(localStorage, channelId);
+var channel = new Channel(channelId, communicator1);
 function run() {
-    new core_1.Channel(channelId, communicator1).rclass("RemoteAPI", RemoteAPIImpl_1);
+    new Channel(channelId, communicator1).rclass("RemoteAPI", RemoteAPIImpl_1);
     // const RRemoteAPI = channel.rclass<RemoteAPI>();
     // const api = new RRemoteAPI();
     // api.init();
@@ -15,13 +13,22 @@ function run() {
     channel.rclass("Remote", RemoteImpl_1);
 }
 run();
-class RemoteAPIImpl_1 {
-    init() { }
-}
-class RemoteAPI2Impl_1 {
-    init() { }
-}
-class RemoteImpl_1 {
-    method() { }
-    method2() { }
-}
+var default_1 = /** @class */ (function () {
+    function default_1() {
+    }
+    default_1.prototype.init = function () { };
+    return default_1;
+}());
+var default_2 = /** @class */ (function () {
+    function default_2() {
+    }
+    default_2.prototype.init = function () { };
+    return default_2;
+}());
+var default_3 = /** @class */ (function () {
+    function default_3() {
+    }
+    default_3.prototype.method = function () { };
+    default_3.prototype.method2 = function () { };
+    return default_3;
+}());
