@@ -7,7 +7,8 @@
         "commit": "git-cz",
         "lint:all": "yarn workspace @tschannel/core lint",
         "transformer": "yarn workspace @tschannel/transformer",
-        "transformer:debug": "yarn workspace transformer-debugger"
+        "transformer:debug": "yarn workspace transformer-debugger",
+        "debug:ci": "yarn workspace @tschannel/core debug:ci"
     },
     "repository": {
         "type": "git",
