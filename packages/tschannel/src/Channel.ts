@@ -7,7 +7,6 @@ import { RMIMethodMetadata } from './metadata/RMIMethodMetadata';
 import { AnyConstructor, Constructor } from './types/AnyConstructor';
 import { AnyFunction } from './types/AnyFunction';
 import { Communicator } from './types/Communicator';
-import istatic from './types/istatic';
 import { PromisifyClass } from './types/PromisifyType';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
@@ -34,14 +33,26 @@ export class Channel {
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
-    public rclass<T>(remoteClassId?: string, _clazz?: Constructor<T>): PromisifyClass<T & Remote> {
+    public rclass<T>(remoteClassId?: string, _clazzOrMembers?: Constructor<T> | Array<keyof T>): PromisifyClass<T & Remote> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const channel = this;
-        const clazz = (_clazz as unknown) as RMIClassConstructor;
+        let clazz;
+        if(Array.isArray(_clazzOrMembers)) {
+            clazz = class {};
+            const abstractMethod = () => { };
+            Object.assign(
+                clazz.prototype,
+                _clazzOrMembers.reduce((members, member) => {
+                    members[member as string] = abstractMethod;
+                    return members;
+                }, {} as Record<string | symbol, typeof abstractMethod>)
+            );
+        } else {
+            clazz = (_clazzOrMembers as unknown) as RMIClassConstructor;
+        }
         if (typeof remoteClassId !== 'string' || remoteClassId.length < 1) {
             throw new Error(`Incorrect classId: ${remoteClassId}`);
         }
-        @istatic<RMIClassConstructor>()
         class cls extends clazz implements Remote {
             public readonly $namespace = new RMINamespace(uid(), channel.adaptor, this);
             public readonly $initPromise: Promise<void>;

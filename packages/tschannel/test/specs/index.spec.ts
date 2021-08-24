@@ -180,22 +180,11 @@ describe('Remote method invocation', () => {
         class A {}
         class B {
             method(a: A) {
-                console.info(a);
                 return a instanceof A;
             }
         }
         remoteChannel.lclass('A', A);
         remoteChannel.lclass('B', B);
-
-        // class BDef {
-        //     @rmethod({
-        //         paramTypes: [ParameterType.remoteObject]
-        //     })
-        //     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        //     method(_: A): boolean {
-        //         throw new Error('Method not implemented');
-        //     }
-        // }
 
         const RemoteA = localChannel.rclass<A>();
         const RemoteB = localChannel.rclass<B>();
@@ -204,5 +193,26 @@ describe('Remote method invocation', () => {
         const remoteB = new RemoteB();
 
         await expect(remoteB.method(remoteA)).to.become(true);
+    });
+
+    it('Should rclass() work correctly using the member name array', async () => {
+        interface RemoteAPI {
+            method1(): string;
+            method2(): string;
+        }
+        localChannel.lclass('RemoteAPI', class implements RemoteAPI {
+            method1() {
+                return 'method1';
+            }
+            method2() {
+                return 'method2';
+            }
+
+        })
+        const RemoteAPIImpl = remoteChannel.rclass<RemoteAPI>('RemoteAPI', ['method1', 'method2']);
+
+        const instance = new RemoteAPIImpl();
+        await expect(instance.method1()).to.become('method1');
+        await expect(instance.method2()).to.become('method2');
     });
 });
