@@ -29,5 +29,11 @@ jobs:
         uses: actions/setup-node@v1
         with:
           node-version: ${{ matrix.node-version }}
-      - run: yarn workspace @tschannel/core ci
-      - run: yarn workspace @tschannel/core codecov
+      - name: Test @tschannel/core
+        run: yarn workspace @tschannel/core ci
+      - name: Collecting coverage data of @tschannel/core
+        run: yarn workspace @tschannel/core codecov
+      - name: Test @tschannel/transformer
+        run: yarn workspace @tschannel/transformer test
+      - name: Collecting cpverage data pf @tschannel/transformer
+        run: yarn workspace @tschannel/transformer codecov
