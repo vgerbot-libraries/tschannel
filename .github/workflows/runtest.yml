@@ -35,5 +35,5 @@ jobs:
         run: yarn workspace @tschannel/core codecov
       - name: Test @tschannel/transformer
         run: yarn workspace @tschannel/transformer test
-      - name: Collecting cpverage data pf @tschannel/transformer
+      - name: Collecting coverage data pf @tschannel/transformer
         run: yarn workspace @tschannel/transformer codecov
