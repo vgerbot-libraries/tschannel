@@ -15,7 +15,7 @@ export interface TransformerOptions {
 const DEFAULT_TRANSFORMER_OPTIONS = {
 };
 
-export default function transformer(program: ts.Program, options?: Partial<TransformerOptions>): ts.TransformerFactory<ts.Node> {
+export default function transformer(program: ts.Program, options?: Partial<TransformerOptions>): ts.TransformerFactory<ts.SourceFile> {
     const resolvedOptions = {
         ...DEFAULT_TRANSFORMER_OPTIONS,
         ...(options || {})
@@ -69,7 +69,7 @@ function visitNode(
                     return propertyName.text === 'Channel';
                 }
                 return it.name.text === 'Channel'
-            });
+            }) as ts.ImportSpecifier;
             if (!channelClassDeclaration) {
                 return;
             }
