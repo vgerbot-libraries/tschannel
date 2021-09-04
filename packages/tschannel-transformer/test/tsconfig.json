@@ -1,14 +1,13 @@
 {
     "extends": "../tsconfig.json",
     "compilerOptions": {
-        "plugins": [
-            {
-                "transform": "../src/transformer/index.ts"
-            }
-        ],
         "declaration": false,
         "sourceMap": true,
-        "outDir": "../test_dist"
+        "outDir": "../test_dist",
+        "paths": {
+            "@tschannel/core": ["./mock/Channel.ts"],
+            "transformer": ["../src/index.ts"]
+        }
     },
     "include": [
         "./specs"

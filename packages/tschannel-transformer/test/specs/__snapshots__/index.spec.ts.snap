@@ -1,0 +1,11 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`@tschannel/transformer should run normally with the transformer 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+exports.x = void 0;
+const core_1 = require(\\"@tschanel/core\\");
+exports.x = 'string';
+console.info(core_1.Channel);
+"
+`;

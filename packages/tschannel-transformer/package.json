@@ -21,12 +21,12 @@
         "url": "git+https://github.com/y1j2x34/channel-ts.git"
     },
     "scripts": {
-        "test": "jest",
+        "test": "jest --coverage",
         "lint": "eslint {src,test}/**/*.{ts,tsc}",
         "format": "eslint --fix {src,test}/**/*.{ts,tsc}",
         "build": "ttsc --project ./tsconfig.json",
         "prepublish": "ttsc",
-        "pretest": "ttsc && ttsc --project ./test/tsconfig.json"
+        "codecov": "codecov -F '@tschannel/transformer' < coverage/cobertura-coverage.xml"
     },
     "bugs": {
         "url": "https://github.com/y1j2x34/channel-ts/issues"
@@ -36,16 +36,16 @@
         "@types/node": "^14.14.41",
         "@typescript-eslint/eslint-plugin": "^4.22.0",
         "@typescript-eslint/parser": "^4.22.0",
-        "codecov": "^3.8.1",
-        "eslint": "^7.24.0",
+        "codecov": "*",
+        "eslint": "7.24.0",
         "eslint-config-prettier": "^8.2.0",
         "eslint-plugin-prettier": "^3.4.0",
-        "husky": "^6.0.0",
-        "jest": "^26.6.3",
-        "jest-cli": "^26.6.3",
+        "husky": "6.0.0",
+        "jest": "~26.6.3",
         "lint-staged": "^10.5.4",
         "prettier": "^2.2.1",
-        "ts-node": "^9.1.1",
+        "ts-jest": "^26.4.4",
+        "ts-node": "9.1.1",
         "tsconfig-paths": "^3.9.0",
         "typescript": "4.1.5"
     },
