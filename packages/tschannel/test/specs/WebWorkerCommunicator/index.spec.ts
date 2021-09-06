@@ -11,7 +11,7 @@ describe('WebWorkerCommunicator', () => {
     it('Should rmethod work correctly', () => {
         return expect(channel.rmethod<() => string>('hello')()).to.eventually.become('world');
     });
-    it('Should create remove instance correctly', async () => {
+    it('Should create remote instance correctly', async () => {
         const RemoteDog = channel.rclass<Animal>('Dog');
         const dog = new RemoteDog('Loki');
 
