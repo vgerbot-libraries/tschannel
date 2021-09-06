@@ -1,4 +1,7 @@
+/* istanbul ignore file */
 import ts from 'typescript';
+import path from 'path';
+import fs from 'fs';
 
 const extTs = ts as unknown as ExtTs;
 
@@ -32,15 +35,22 @@ export function transpile(code: string, transpileOptions: TranspileOptions): str
     options.suppressOutputPathCheck = true;
     options.allowNonTsExtensions = true;
     const inputFileName = 'module.ts';
+    const scriptTarget = options.target || ts.ScriptTarget.ESNext;
+    const mockTSChannelCode = fs.readFileSync(path.resolve(__dirname, '../mock/Channel.ts')).toString('utf-8');
+    const tschannelCoreModuleName = '@tschannel/core';
 
-    const sourceFile = ts.createSourceFile(inputFileName, code, options.target || ts.ScriptTarget.ESNext);
+    const sourceFile = ts.createSourceFile(inputFileName, code, scriptTarget);
+
+    const channelSourceFile = ts.createSourceFile(tschannelCoreModuleName, mockTSChannelCode, scriptTarget);
 
     const newLine = extTs.getNewLineCharacter(options);
     let outputText: string = '';
     const compilerHost: ts.CompilerHost = {
         getSourceFile: (fileName: string) => {
-            if(fileName === extTs.normalizePath(inputFileName)) {
+            if(fileName === inputFileName) {
                 return sourceFile;
+            } else if(fileName === channelSourceFile.fileName) {
+                return channelSourceFile;
             }
             return undefined;
         },
@@ -48,7 +58,10 @@ export function transpile(code: string, transpileOptions: TranspileOptions): str
             if(extTs.fileExtensionIs(name, '.map')) {
                 return;
             }
-            outputText = text;
+            const moduleFileName = (ts as unknown as ExtTs).normalizePath(inputFileName);
+            if(moduleFileName === inputFileName) {
+                outputText = text;
+            }
         },
         getDefaultLibFileName: () => 'lib.d.ts',
         useCaseSensitiveFileNames: () => false,
