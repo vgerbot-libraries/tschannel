@@ -2,20 +2,24 @@
 import ts from 'typescript';
 import path from 'path';
 import fs from 'fs';
-
-const extTs = ts as unknown as ExtTs;
+import { createSystem, createVirtualCompilerHost } from '@typescript/vfs';
 
 export type TSChannelTransformerType = (program: ts.Program) => ts.TransformerFactory<ts.SourceFile>;
 
+const TSCHANNEL_CORE_MODULE_NAME = '@tschannel/core';
+const TSCHANNEL_PATH = path.resolve(__dirname, '../mock/Channel.ts');
+
 const compilerOptions: ts.CompilerOptions = {
     module: ts.ModuleKind.CommonJS,
-    moduleResolution: ts.ModuleResolutionKind.NodeJs,
+    moduleResolution: ts.ModuleResolutionKind.Classic,
     target: ts.ScriptTarget.ESNext,
     strict: true,
     sourceMap: false,
     importHelpers: false,
     esModuleInterop: true,
-    skipLibCheck: true
+    skipLibCheck: false,
+    noImplicitAny: true,
+    include: '/'
 };
 
 export type TranspileOptions = {
@@ -24,56 +28,45 @@ export type TranspileOptions = {
     transformers?: Array<ts.TransformerFactory<ts.SourceFile>>;
 };
 
-interface ExtTs {
-    getNewLineCharacter(options: ts.CompilerOptions): string;
-    normalizePath(path: string): string;
-    fileExtensionIs(path: string, extension: string): boolean;
-}
-
 export function transpile(code: string, transpileOptions: TranspileOptions): string {
     const options = Object.assign({}, compilerOptions, transpileOptions.options || {});
     options.suppressOutputPathCheck = true;
     options.allowNonTsExtensions = true;
-    const inputFileName = 'module.ts';
-    const scriptTarget = options.target || ts.ScriptTarget.ESNext;
-    const mockTSChannelCode = fs.readFileSync(path.resolve(__dirname, '../mock/Channel.ts')).toString('utf-8');
-    const tschannelCoreModuleName = '@tschannel/core';
+    const mockTSChannelCode = fs.readFileSync(TSCHANNEL_PATH).toString('utf-8');
 
-    const sourceFile = ts.createSourceFile(inputFileName, code, scriptTarget);
+    const fsMap = new Map<string, string>();
+    fsMap.set('index.ts', code);
+    fsMap.set('/'+TSCHANNEL_CORE_MODULE_NAME+'.ts', mockTSChannelCode);
+    fsMap.set('/lib.esnext.full.d.ts', ' ');
 
-    const channelSourceFile = ts.createSourceFile(tschannelCoreModuleName, mockTSChannelCode, scriptTarget);
+    const system = createSystem(fsMap);
+    const host = createVirtualCompilerHost(system, options, ts);
 
-    const newLine = extTs.getNewLineCharacter(options);
-    let outputText: string = '';
-    const compilerHost: ts.CompilerHost = {
-        getSourceFile: (fileName: string) => {
-            if(fileName === inputFileName) {
-                return sourceFile;
-            } else if(fileName === channelSourceFile.fileName) {
-                return channelSourceFile;
-            }
-            return undefined;
-        },
-        writeFile: function(name: string, text: string) {
-            if(extTs.fileExtensionIs(name, '.map')) {
-                return;
-            }
-            const moduleFileName = (ts as unknown as ExtTs).normalizePath(inputFileName);
-            if(moduleFileName === inputFileName) {
-                outputText = text;
-            }
-        },
-        getDefaultLibFileName: () => 'lib.d.ts',
-        useCaseSensitiveFileNames: () => false,
-        getCanonicalFileName: (fileName: string) => fileName,
-        getCurrentDirectory: () => '',
-        getNewLine: () => newLine,
-        fileExists: (fileName: string) => fileName === inputFileName,
-        readFile: () => "",
-        directoryExists: () => true,
-        getDirectories: () => ([])
+    host.compilerHost.resolveModuleNames = (
+        moduleNames: string[],
+        containingFile: string,
+        reusedNames: string[] | undefined,
+        redirectedReference: ts.ResolvedProjectReference | undefined,
+        options: ts.CompilerOptions): (ts.ResolvedModule | undefined)[] => {
+
+        return moduleNames.map(moduleName => {
+            const result = ts.resolveModuleName(moduleName, containingFile, options, {
+                fileExists(fileName){
+                    return fsMap.has(fileName) || ts.sys.fileExists(fileName);
+                },
+                readFile(fileName) {
+                    return fsMap.get(fileName) || ts.sys.readFile(fileName);
+                }
+            });
+            return result.resolvedModule;
+        }).filter(Boolean);
     };
-    const program = ts.createProgram([inputFileName], options, compilerHost);
+    const program = ts.createProgram({
+        rootNames: ['index.ts'],
+        options,
+        host: host.compilerHost
+    });
+
     const transformers: Array<ts.TransformerFactory<ts.SourceFile>> = [];
     if(transpileOptions.transformers) {
         transformers.push(...transpileOptions.transformers);
@@ -81,8 +74,10 @@ export function transpile(code: string, transpileOptions: TranspileOptions): str
     if(transpileOptions.channelTransformer) {
         transformers.push(transpileOptions.channelTransformer(program));
     }
+    // console.info(program.getSourceFiles());
     program.emit(/*targetSourceFile*/ undefined, /*writeFile*/ undefined, /*cancellationToken*/ undefined, /*emitOnlyDtsFiles*/ undefined, {
         before: transformers
     });
-    return outputText;
+    // console.log(result);
+    return fsMap.get('index.js') || '';
 }
