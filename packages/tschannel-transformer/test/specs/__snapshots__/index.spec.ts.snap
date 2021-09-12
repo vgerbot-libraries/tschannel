@@ -43,6 +43,21 @@ class RemoteAPI {
 "
 `;
 
+exports[`@tschannel/transformer should be able to transform the absrtact class 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+const core_1 = require(\\"@tschannel/core\\");
+const channel = new core_1.Channel();
+channel.rclass(\\"RemoteAPI\\", class RemoteAPIImpl_1 {
+    method() { }
+    method2() { }
+});
+class RemoteAPI {
+    method() { }
+}
+"
+`;
+
 exports[`@tschannel/transformer should run normally with the transformer 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });

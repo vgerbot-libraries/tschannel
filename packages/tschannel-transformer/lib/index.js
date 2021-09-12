@@ -99,19 +99,34 @@ function visitNode(node, program, programCtx, context, options) {
             if (!classIdArg) {
                 classIdArg = factory.createStringLiteral(typeNode.getText());
             }
-            if (typescript_1.default.isClassDeclaration(typeNodeDeclaration)) {
-                return factory.createCallExpression(node.expression, [], [
-                    classIdArg,
-                    factory.createRegularExpressionLiteral(typeNode.getText())
-                ]);
-            }
             const className = factory.createUniqueName(typeNode.getText() + 'Impl');
-            const type = typeChecker.getTypeFromTypeNode(typeNode);
-            const members = typeChecker.getPropertiesOfType(type);
-            const classMembers = members
-                .filter(it => typescript_1.default.isMethodSignature(it.valueDeclaration))
-                .map(it => {
-                return factory.createMethodDeclaration([], [], undefined, it.getName(), undefined, [], [], undefined, factory.createBlock([], false));
+            let memberNames;
+            if (typescript_1.default.isClassDeclaration(typeNodeDeclaration)) {
+                const modifiers = typeNodeDeclaration.modifiers;
+                const isAbstract = !!modifiers && modifiers.some(it => it.kind === typescript_1.default.SyntaxKind.AbstractKeyword);
+                if (!isAbstract) {
+                    return factory.createCallExpression(node.expression, [], [
+                        classIdArg,
+                        factory.createRegularExpressionLiteral(typeNode.getText())
+                    ]);
+                }
+                memberNames = typeNodeDeclaration.members
+                    .filter(it => !!it.name)
+                    .map(it => {
+                    return it.name.getText();
+                });
+            }
+            else {
+                const type = typeChecker.getTypeFromTypeNode(typeNode);
+                const members = typeChecker.getPropertiesOfType(type);
+                memberNames = members
+                    .filter(it => typescript_1.default.isMethodSignature(it.valueDeclaration))
+                    .map(it => {
+                    return it.getName();
+                });
+            }
+            const classMembers = memberNames.map(it => {
+                return factory.createMethodDeclaration([], [], undefined, it, undefined, [], [], undefined, factory.createBlock([], false));
             });
             const classExpression = factory.createClassExpression([], [], className, [], [factory.createHeritageClause(typescript_1.default.SyntaxKind.ImplementsKeyword, [])], classMembers);
             return factory.createCallExpression(node.expression, [], [

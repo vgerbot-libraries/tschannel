@@ -84,4 +84,19 @@ describe('@tschannel/transformer', () => {
         });
         expect(output).toMatchSnapshot();
     });
+    it('should be able to transform the absrtact class', () => {
+        const source = `
+            import { Channel } from '@tschannel/core';
+            const channel = new Channel();
+            channel.rclass<RemoteAPI>();
+            abstract class RemoteAPI {
+                method(){}
+                abstract method2();
+            }
+        `;
+        const output = transpile(source, {
+            channelTransformer: transformer
+        });
+        expect(output).toMatchSnapshot();
+    });
 });

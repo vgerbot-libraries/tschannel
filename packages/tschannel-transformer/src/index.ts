@@ -115,31 +115,46 @@ function visitNode(
             if(!classIdArg) {
                 classIdArg = factory.createStringLiteral(typeNode.getText())
             }
-            if(ts.isClassDeclaration(typeNodeDeclaration)) {
-                return factory.createCallExpression(node.expression, [], [
-                    classIdArg,
-                    factory.createRegularExpressionLiteral(typeNode.getText())
-                ]);
-            }
-            // const classIdentifier = createRemoteClassExpression(typeNode, typeChecker, factory, programCtx);
             const className = factory.createUniqueName(typeNode.getText()+'Impl');
-            const type = typeChecker.getTypeFromTypeNode(typeNode);
-            const members = typeChecker.getPropertiesOfType(type);
-            const classMembers = members
-                .filter(it => ts.isMethodSignature(it.valueDeclaration))
-                .map(it => {
-                    return factory.createMethodDeclaration(
-                        [],
-                        [],
-                        undefined,
-                        it.getName(),
-                        undefined,
-                        [],
-                        [],
-                        undefined,
-                        factory.createBlock([], false)
-                    );
-                });
+            let memberNames: string[];
+            if(ts.isClassDeclaration(typeNodeDeclaration)) {
+                const modifiers = (typeNodeDeclaration as ts.ClassDeclaration).modifiers;
+                const isAbstract = !!modifiers && modifiers.some(it => it.kind === ts.SyntaxKind.AbstractKeyword);
+                if(!isAbstract) {
+                    return factory.createCallExpression(node.expression, [], [
+                        classIdArg,
+                        factory.createRegularExpressionLiteral(typeNode.getText())
+                    ]);
+                }
+                memberNames = typeNodeDeclaration.members
+                    .filter(it => !!it.name)
+                    .map(it => {
+                        return it.name!.getText();
+                    });
+            } else {
+                // const classIdentifier = createRemoteClassExpression(typeNode, typeChecker, factory, programCtx);
+                const type = typeChecker.getTypeFromTypeNode(typeNode);
+                const members = typeChecker.getPropertiesOfType(type);
+                memberNames = members
+                    .filter(it => ts.isMethodSignature(it.valueDeclaration))
+                    .map(it => {
+                        return it.getName();
+                    });
+            }
+
+            const classMembers = memberNames.map(it => {
+                return factory.createMethodDeclaration(
+                    [],
+                    [],
+                    undefined,
+                    it,
+                    undefined,
+                    [],
+                    [],
+                    undefined,
+                    factory.createBlock([], false)
+                );
+            })
 
             const classExpression = factory.createClassExpression(
                 [], [], className, [],
