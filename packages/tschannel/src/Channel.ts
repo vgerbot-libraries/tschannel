@@ -14,6 +14,7 @@ type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<
 // eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface Remote {
     // readonly $namespace;
+    __release__(): Promise<boolean>;
 }
 
 export class Channel {
@@ -63,6 +64,9 @@ export class Channel {
                     this.$namespace.id,
                     args
                 ) as Promise<void>;
+            }
+            __release__() {
+                return channel.release(this);
             }
         }
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype).filter(it => it !== 'constructor');

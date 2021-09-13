@@ -71,6 +71,10 @@ describe('Remote method invocation', () => {
         await expect(remoteDog.getType()).to.be.eventually.become('dog');
 
         await expect(localChannel.release(remoteDog)).to.be.eventually.become(true);
+
+        const remoteDogger = new RemoteDogClass('Dogger');
+
+        await expect(remoteDogger.__release__()).to.be.eventually.become(true);
     });
 
     it('Should raise error when remote class not defined', async () => {
