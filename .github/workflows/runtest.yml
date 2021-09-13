@@ -40,14 +40,14 @@ jobs:
       - name: Upload coverage reports of @tschannel/core to codacy
         uses: codacy/codacy-coverage-reporter-action@master
         with:
-          project-token: ${{ codacy.CODACY_PROJECT_TOKEN }}
+          project-token: ${{ env.CODACY_PROJECT_TOKEN }}
           language: typescript
           coverage-reports: ./packages/tschannel/coverage/cobertura-coverage.xml
           force-coverage-parser: cobertura
       - name: Upload coverage reports of @tschannel/transformer to codacy
         uses: codacy/codacy-coverage-reporter-action@master
         with:
-          project-token: ${{ codacy.CODACY_PROJECT_TOKEN }}
+          project-token: ${{ env.CODACY_PROJECT_TOKEN }}
           language: typescript
           coverage-reports: ./packages/tschannel-transformer/coverage/cobertura-coverage.xml
           force-coverage-parser: cobertura
