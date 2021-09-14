@@ -1,6 +1,7 @@
 name: codacy-coverage-reporter
 
-on: ["push"]
+on:
+  - push
 
 jobs:
   codacy-coverage-reporter:
@@ -13,3 +14,4 @@ jobs:
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
           coverage-reports: ./packages/tschannel/coverage/cobertura-coverage.xml,./packages/tschannel-transformer/coverage/cobertura-coverage.xml
+    needs: ["build"]
