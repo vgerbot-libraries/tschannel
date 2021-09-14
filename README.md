@@ -1,1 +1,2 @@
-# tschannel ![tschannel workflow](https://github.com/y1j2x34/channel-ts/actions/workflows/runtest.yml/badge.svg)
+# tschannel ![tschannel workflow](https://github.com/y1j2x34/channel-ts/actions/workflows/runtest.yml/badge.svg) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/5e4c9e4261aa4e36a7cee82ccf0e7dc5)](https://www.codacy.com/gh/y1j2x34/tschannel/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=y1j2x34/tschannel&amp;utm_campaign=Badge_Grade) [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/5e4c9e4261aa4e36a7cee82ccf0e7dc5)](https://www.codacy.com/gh/y1j2x34/tschannel/dashboard?utm_source=github.com&utm_medium=referral&utm_content=y1j2x34/tschannel&utm_campaign=Badge_Coverage)
+
