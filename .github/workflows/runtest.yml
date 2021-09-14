@@ -37,3 +37,14 @@ jobs:
         run: yarn workspace @tschannel/transformer test
       - name: Collecting coverage data pf @tschannel/transformer
         run: yarn workspace @tschannel/transformer codecov
+  codacy-coverage-reporter:
+      runs-on: ubuntu-latest
+      name: codacy-coverage-reporter
+      steps:
+        - uses: actions/checkout@v2
+        - name: Upload coverage reports to codacy
+          uses: codacy/codacy-coverage-reporter-action@master
+          with:
+            project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+            coverage-reports: ./packages/tschannel/coverage/cobertura-coverage.xml,./packages/tschannel-transformer/coverage/cobertura-coverage.xml
+      needs: ["build"]
