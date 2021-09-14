@@ -23,6 +23,17 @@ jobs:
     steps:
       - name: CHECK-OUT GIT REPOSITORY
         uses: actions/checkout@v2
+      - name: Cache node modules
+        uses: actions/cache@v2
+        env:
+          cache-name: cache-node-modules
+        with:
+          path: ~/.npm
+          key: ${{ runner.os }}-build-${{ env.cache-name }}-${{ hashFiles('**/package-lock.json') }}
+          restore-keys: |
+            ${{ runner.os }}-build-${{ env.cache-name }}-
+            ${{ runner.os }}-build-
+            ${{ runner.os }}-
       - name: INSTALL PROJECT DEPENDENCIES (yarn)
         run: yarn install
       - name: Test
@@ -33,25 +44,12 @@ jobs:
         run: yarn workspace @tschannel/core ci
       - name: Test @tschannel/transformer
         run: yarn workspace @tschannel/transformer test
-  codecov-coverage-reporter:
-    runs-on: ubuntu-latest
-    name: codecov-coverage-reporter
-    steps:
-      - name: Collecting coverage data of @tschannel/core
+      - name: Upload coverage data of @tschannel/core to codecov
         run: yarn workspace @tschannel/core codecov
-      - name: Collecting coverage data pf @tschannel/transformer
+      - name: Upload coverage data pf @tschannel/transformer to codecov
         run: yarn workspace @tschannel/transformer codecov
-    needs: ["build"]
-  codacy-coverage-reporter:
-      runs-on: ubuntu-latest
-      name: codacy-coverage-reporter
-      steps:
-        - uses: actions/checkout@v2
-        - name: list all directories
-          run: ls
-        - name: Upload coverage reports to codacy
-          uses: codacy/codacy-coverage-reporter-action@master
-          with:
-            project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-            coverage-reports: packages/tschannel/coverage/cobertura-coverage.xml,packages/tschannel-transformer/coverage/cobertura-coverage.xml
-      needs: ["build"]
+      - name: Upload coverage reports to codacy
+        uses: codacy/codacy-coverage-reporter-action@master
+        with:
+          project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
+          coverage-reports: packages/tschannel/coverage/cobertura-coverage.xml,packages/tschannel-transformer/coverage/cobertura-coverage.xml
