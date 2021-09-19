@@ -1,11 +1,69 @@
-# `@tschannel/transformer`
+# @tschannel/transformer
 
-> TODO: description
+A typescript transformer that transforms the generic type parameters of the 'rclass' method to method parameters. It is used to simplify the use of tschannel
 
-## Usage
+## Requirement
 
+$\text{Typescript}  \ge 3.2.2$
+
+## Setup
+
+### Webpack(with ts-loader or awesome-typescript-loader)
+
+```js
+// webpack.config.js
+const tschannelTransformer = require('@tschannel/transformer').default;
+module.exports {
+    // ...
+    module: {
+        rules: [{
+            test: /\.tsx?/,
+            loader: 'ts-loader', // or 'awesome-typescript-loader'
+            options: {
+                getCustomTransformers:program => tschannelTransformer(program)
+            }
+        }]
+    }
+}
 ```
-const channelTsTransformer = require('@tschannel/transformer');
 
-// TODO: DEMONSTRATE API
+### Rollup(with rollup-plugin-typescript2)
+
+```js
+// rollup.config.js
+import typescript from "rollup-plugin-typescript2";
+const tschannelTransformer = require('@tschannel/transformer').default;
+export default {
+  // ...
+  plugins: [
+    typescript({
+      transformers: [
+        (languageService) => {
+            const program = languageService.getProgram();
+            return {
+                before: [tschannelTransformer(program)]
+            };
+        }
+      ]
+    })
+  ]
+};
 ```
+
+### ttypescript
+
+```json
+// tsconfig.json
+{
+    "compilerOptions": {
+        // ...
+        "plugins": [{
+            "transform": "@tschannel/transformer"
+        }]
+    }
+}
+```
+
+## License
+
+[![License MIT](https://badgen.net/github/license/y1j2x34/tschannel)](https://github.com/y1j2x34/tschannel/blob/master/LICENSE)
