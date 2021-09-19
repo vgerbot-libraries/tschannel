@@ -4,7 +4,7 @@ A typescript transformer that transforms the generic type parameters of the 'rcl
 
 ## Requirement
 
-$\text{Typescript}  \ge 3.2.2$
+Typescript >= 3.2.2
 
 ## Setup
 
