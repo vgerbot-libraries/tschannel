@@ -8,7 +8,8 @@
         "lint:all": "yarn workspace @tschannel/core lint",
         "transformer": "yarn workspace @tschannel/transformer",
         "transformer:test": "yarn workspace @tschannel/transformer test",
-        "debug:ci": "yarn workspace @tschannel/core debug:ci"
+        "debug:ci": "yarn workspace @tschannel/core debug:ci",
+        "example": "yarn workspace @tschannel/examples start"
     },
     "repository": {
         "type": "git",
