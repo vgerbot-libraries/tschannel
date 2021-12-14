@@ -65,6 +65,7 @@ function visitNode(node, program, programCtx, context, options) {
     }
     else if (typescript_1.default.isCallExpression(node)) {
         const propertyExpression = node.expression;
+
         if (typescript_1.default.isPropertyAccessExpression(propertyExpression)) {
             const propertyName = propertyExpression.name.text;
             if (propertyName !== 'rclass') {
@@ -125,6 +126,7 @@ function visitNode(node, program, programCtx, context, options) {
                     return it.getName();
                 });
             }
+            console.log(memberNames);
             const classMembers = memberNames.map(it => {
                 return factory.createMethodDeclaration([], [], undefined, it, undefined, [], [], undefined, factory.createBlock([], false));
             });
