@@ -25,4 +25,3 @@ describe('WebWorkerCommunicator', () => {
         channel.destroy();
     });
 });
-

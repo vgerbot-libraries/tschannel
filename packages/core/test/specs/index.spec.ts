@@ -204,15 +204,17 @@ describe('Remote method invocation', () => {
             method1(): string;
             method2(): string;
         }
-        localChannel.lclass('RemoteAPI', class implements RemoteAPI {
-            method1() {
-                return 'method1';
+        localChannel.lclass(
+            'RemoteAPI',
+            class implements RemoteAPI {
+                method1() {
+                    return 'method1';
+                }
+                method2() {
+                    return 'method2';
+                }
             }
-            method2() {
-                return 'method2';
-            }
-
-        })
+        );
         const RemoteAPIImpl = remoteChannel.rclass<RemoteAPI>('RemoteAPI', ['method1', 'method2']);
 
         const instance = new RemoteAPIImpl();

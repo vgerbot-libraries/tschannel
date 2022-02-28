@@ -1,5 +1,5 @@
 import LocalCommunicator from 'common/communicator/LocalCommunicator';
-import { Channel/*, ParameterType, rmethod */} from '@tschannel/core';
+import { Channel /*, ParameterType, rmethod */ } from '@tschannel/core';
 import { Adaptor } from '../../../src/Adaptor';
 
 describe('channel adaptor', () => {

@@ -34,13 +34,18 @@ export class Channel {
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.linstance(this.globalNamespace, this.globalInstance);
     }
-    public rclass<T>(remoteClassId?: string, _clazzOrMembers?: Constructor<T> | Array<keyof T>): PromisifyClass<T & Remote> {
+    public rclass<T>(
+        remoteClassId?: string,
+        _clazzOrMembers?: Constructor<T> | Array<keyof T>
+    ): PromisifyClass<T & Remote> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const channel = this;
         let clazz;
-        if(Array.isArray(_clazzOrMembers)) {
+        if (Array.isArray(_clazzOrMembers)) {
             clazz = class {};
-            const abstractMethod = () => { };
+            const abstractMethod = () => {
+                // EMPTY
+            };
             Object.assign(
                 clazz.prototype,
                 _clazzOrMembers.reduce((members, member) => {
@@ -80,7 +85,7 @@ export class Channel {
                 return;
             }
             const metadata = new RMIMethodMetadata(propertyName, method.options);
-            cls.prototype[propertyName] = function (this: cls, ...args) {
+            cls.prototype[propertyName] = function(this: cls, ...args) {
                 return this.$initPromise.then(() => {
                     return this.$namespace.rmethod(metadata).apply(this, args);
                 });

@@ -4,13 +4,11 @@ import { Transferable } from '../types/Transferable';
 import AbstractCommunicator from './AbstractCommunicator';
 
 export interface EventTarget {
-    addEventListener(type: string, callback: (e: MessageEvent) => void)
-    removeEventListener(type: string, callback: (e: MessageEvent) => void)
+    addEventListener(type: string, callback: (e: MessageEvent) => void);
+    removeEventListener(type: string, callback: (e: MessageEvent) => void);
 }
 
-export default abstract class AbstractMessageChannelCommunicator<
-    T extends EventTarget
-> extends AbstractCommunicator {
+export default abstract class AbstractMessageChannelCommunicator<T extends EventTarget> extends AbstractCommunicator {
     protected removeEventListener: () => void;
     constructor(protected target: T) {
         super();
@@ -26,10 +24,7 @@ export default abstract class AbstractMessageChannelCommunicator<
         };
     }
     send(payload: Payload<SerializableValue>): void {
-        this.sendPayload(
-            payload.serialize(),
-            payload.transferables()
-        );
+        this.sendPayload(payload.serialize(), payload.transferables());
     }
     abstract sendPayload(serializable: SerializableValue, transferables: Transferable[]): void;
     close() {

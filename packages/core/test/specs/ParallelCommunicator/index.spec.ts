@@ -3,7 +3,7 @@ import { hex, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';
 
-describe('ParallelCommunicator', function () {
+describe('ParallelCommunicator', function() {
     this.timeout(1000 * 300);
 
     const workerURL = '/base/test/specs/ParallelCommunicator/worker.external.js';
