@@ -2,6 +2,6 @@
     "extends": "../.eslintrc",
     "rules": {
         "no-unused-expressions":"off",
-        "max-len": ["error", 160],
+        "max-len": ["error", 160]
     }
 }
