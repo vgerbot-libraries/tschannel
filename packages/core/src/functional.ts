@@ -29,14 +29,14 @@ class WindowChannelChainGenerator {
         return new WindowChannelChainGenerator(this.channelId, this.win, targetOrigin);
     }
     create() {
-        return createChannel(this.channelId, communicator().windowChannel(this.win, this.targetOrigin));
+        return createChannel(this.channelId, communicators.windowChannel(this.win, this.targetOrigin));
     }
 }
 
 class StorageChannelChainGenerator implements ChannelFactory {
     constructor(private readonly channelId: string, private readonly storage: Storage) {}
     create() {
-        return createChannel(this.channelId, communicator().storage(this.storage, this.channelId));
+        return createChannel(this.channelId, communicators.storage(this.storage, this.channelId));
     }
 }
 
@@ -50,7 +50,7 @@ class WebWorkerChannelChainGenerator implements ChannelFactory {
         return new WebWorkerChannelChainGenerator(this.channelId, this.workerScriptURL, opts);
     }
     create() {
-        return createChannel(this.channelId, communicator().webWorker(this.workerScriptURL, this.workerOptions));
+        return createChannel(this.channelId, communicators.webWorker(this.workerScriptURL, this.workerOptions));
     }
 }
 
@@ -72,7 +72,7 @@ class ParallelChannelChainGenerator_Combiner {
             create: () => {
                 return createChannel(
                     this.channelId,
-                    communicator().parallel(this.communicators, this.distributorFn, combinerFn)
+                    communicators.parallel(this.communicators, this.distributorFn, combinerFn)
                 );
             }
         };
@@ -93,7 +93,7 @@ export function channel(channelId: string) {
         connectToMainThread() {
             return {
                 create() {
-                    return createChannel(channelId, communicator().webWorkerScope());
+                    return createChannel(channelId, communicators.webWorkerScope());
                 }
             };
         },
@@ -103,26 +103,24 @@ export function channel(channelId: string) {
     };
 }
 
-export function communicator() {
-    return {
-        windowChannel(targetWindow: Window, targetOrigin: string = '*') {
-            return new WindowChannelCommunicator(targetWindow, targetOrigin);
-        },
-        storage(targetStorage: Storage, channelId: string) {
-            return new StorageChannelCommunicator(targetStorage, channelId);
-        },
-        webWorker(workerScriptURL: string, options?: WorkerOptions) {
-            return new WebWorkerCommunicator(workerScriptURL, options);
-        },
-        webWorkerScope() {
-            return new WebWorkerScopeCommunicator();
-        },
-        parallel(
-            communicators: Communicator[],
-            distributorFn: ParallelDataDistributor<CommunicationData>,
-            combinerFn: ParallelDataCombiner
-        ) {
-            return new ParallelCommunicator(communicators, distributorFn, combinerFn);
-        }
-    };
+export const communicators = {
+    windowChannel(targetWindow: Window, targetOrigin: string = '*') {
+        return new WindowChannelCommunicator(targetWindow, targetOrigin);
+    },
+    storage(targetStorage: Storage, channelId: string) {
+        return new StorageChannelCommunicator(targetStorage, channelId);
+    },
+    webWorker(workerScriptURL: string, options?: WorkerOptions) {
+        return new WebWorkerCommunicator(workerScriptURL, options);
+    },
+    webWorkerScope() {
+        return new WebWorkerScopeCommunicator();
+    },
+    parallel(
+        communicators: Communicator[],
+        distributorFn: ParallelDataDistributor<CommunicationData>,
+        combinerFn: ParallelDataCombiner
+    ) {
+        return new ParallelCommunicator(communicators, distributorFn, combinerFn);
+    }
 }
