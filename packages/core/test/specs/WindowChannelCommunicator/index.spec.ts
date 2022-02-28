@@ -1,10 +1,10 @@
-import { Channel, WindowChannelCommunicator } from '@tschannel/core';
+import { channel, Channel } from '@tschannel/core';
 import { Animal, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';
 
 describe('WindowsChannelCommunicator', () => {
-    let channel: Channel;
+    let windowChannel: Channel;
     let iframe: HTMLIFrameElement;
 
     before(async () => {
@@ -17,17 +17,17 @@ describe('WindowsChannelCommunicator', () => {
         iframe.src = url;
         document.body.appendChild(iframe);
         await promise;
-        channel = new Channel(
-            CHANNEL_ID,
-            new WindowChannelCommunicator(iframe.contentWindow as Window, location.origin)
-        );
+        windowChannel = channel(CHANNEL_ID)
+            .connectTo(iframe.contentWindow as Window)
+            .origin(location.origin)
+            .create();
     });
 
     it('Should rmethod work correctly', async () => {
-        await expect(channel.rmethod<() => string>('hello')()).to.eventually.become('world');
+        await expect(windowChannel.rmethod<() => string>('hello')()).to.eventually.become('world');
     });
     it('Should create remote instance correctly', async () => {
-        const RemoteDog = channel.rclass<Animal>('Dog');
+        const RemoteDog = windowChannel.rclass<Animal>('Dog');
         const dog = new RemoteDog('Loki');
 
         expect(dog.getType()).to.eventually.become('Loki');
@@ -35,7 +35,7 @@ describe('WindowsChannelCommunicator', () => {
 
     after(async () => {
         if (typeof __coverage__ !== 'undefined') {
-            const coverageData = await channel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
+            const coverageData = await windowChannel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
             await sendCoverageData(coverageData);
         }
         document.body.removeChild(iframe);

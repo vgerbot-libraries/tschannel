@@ -1,11 +1,13 @@
-import { Channel, WebWorkerScopeCommunicator } from '@tschannel/core';
+import { channel } from '@tschannel/core';
 import { Animal, CHANNEL_ID } from './common';
 
-const channel = new Channel(CHANNEL_ID, new WebWorkerScopeCommunicator());
+const workerChannel = channel(CHANNEL_ID)
+    .connectToMainThread()
+    .create();
 
-channel.lmethod('hello', () => 'world');
+workerChannel.lmethod('hello', () => 'world');
 
-channel.lclass(
+workerChannel.lclass(
     'Dog',
     class Dog implements Animal {
         constructor(private type: string) {}
@@ -14,6 +16,6 @@ channel.lclass(
         }
     }
 );
-channel.lmethod('get-coverage', () => {
+workerChannel.lmethod('get-coverage', () => {
     return __coverage__;
 });

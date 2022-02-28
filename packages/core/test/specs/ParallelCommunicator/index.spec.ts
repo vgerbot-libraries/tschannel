@@ -1,4 +1,8 @@
-import { InvokeMethodData, ParallelCommunicator, Channel, WebWorkerCommunicator } from '@tschannel/core';
+import {
+    InvokeMethodData,
+    channel,
+    communicators
+} from '@tschannel/core';
 import { hex, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';
@@ -8,52 +12,50 @@ describe('ParallelCommunicator', function() {
 
     const workerURL = '/base/test/specs/ParallelCommunicator/worker.external.js';
     const parallels = 4;
-    const channel = new Channel(
-        CHANNEL_ID,
-        new ParallelCommunicator(
+    const parallelsChannel = channel(CHANNEL_ID)
+        .parallel(
             Array(parallels)
                 .fill(undefined)
-                .map(() => new WebWorkerCommunicator(workerURL)),
-            (no: number, payload) => {
-                if (payload.getMethodName() === 'get-coverage') {
-                    return payload;
-                }
-                const data = payload.serialize() as InvokeMethodData;
-                const [buffer] = data.parameters as Parameters<typeof hex>;
-                const partSize = buffer.byteLength / parallels;
-
-                return payload.newPayload(
-                    {
-                        ...data,
-                        parameters: [buffer, partSize * no, partSize]
-                    },
-                    []
-                );
-            },
-            data => {
-                const errorData = data.find(it => {
-                    if (!it.success) {
-                        return it;
-                    }
-                });
-                if (errorData) {
-                    return errorData;
-                }
-                let value: string[] = [];
-                data.forEach(it => {
-                    value = value.concat(it.value as string[]);
-                    // const v = it.value as string[];
-                    // for (let i = 0; i < v.length; i++) {
-                    //     value.push(v[i]);
-                    // }
-                });
-                return {
-                    ...data[0],
-                    value
-                };
-            }
+                .map(() => communicators.webWorker(workerURL))
         )
-    );
+        .distributor((no: number, payload) => {
+            if (payload.getMethodName() === 'get-coverage') {
+                return payload;
+            }
+            const data = payload.serialize() as InvokeMethodData;
+            const [buffer] = data.parameters as Parameters<typeof hex>;
+            const partSize = buffer.byteLength / parallels;
+
+            return payload.newPayload(
+                {
+                    ...data,
+                    parameters: [buffer, partSize * no, partSize]
+                },
+                []
+            );
+        })
+        .combiner(data => {
+            const errorData = data.find(it => {
+                if (!it.success) {
+                    return it;
+                }
+            });
+            if (errorData) {
+                return errorData;
+            }
+            let value: string[] = [];
+            data.forEach(it => {
+                value = value.concat(it.value as string[]);
+                // const v = it.value as string[];
+                // for (let i = 0; i < v.length; i++) {
+                //     value.push(v[i]);
+                // }
+            });
+            return {
+                ...data[0],
+                value
+            };
+        }).create();
     const buffer = new SharedArrayBuffer(parallels * 1024 * 8);
     before(async () => {
         const arr = new Uint8Array(buffer);
@@ -64,15 +66,15 @@ describe('ParallelCommunicator', function() {
     });
     after(async () => {
         if (typeof __coverage__ === 'object') {
-            const coverageDatas = await channel.rmethod<() => istanbul.CoverageMapData[]>('get-coverage')();
+            const coverageDatas = await parallelsChannel.rmethod<() => istanbul.CoverageMapData[]>('get-coverage')();
             for (let i = 0; i < coverageDatas.length; i++) {
                 await sendCoverageData(coverageDatas[i]);
             }
         }
-        channel.destroy();
+        parallelsChannel.destroy();
     });
     it('Should parallel worker works correctly', async () => {
-        const remoteHex = channel.rmethod<typeof hex>('bin2hex');
+        const remoteHex = parallelsChannel.rmethod<typeof hex>('bin2hex');
 
         const lstartTime = Date.now();
         const localResult = hex(buffer, 0, buffer.byteLength);
