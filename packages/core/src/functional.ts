@@ -81,7 +81,7 @@ class ParallelChannelChainGenerator_Combiner {
 
 export function channel(channelId: string) {
     return {
-        connectTo(targetWindow: Window) {
+        connectToOtherWindow(targetWindow: Window) {
             return new WindowChannelChainGenerator(channelId, targetWindow);
         },
         connectViaStorage(storage: Storage) {
@@ -97,7 +97,7 @@ export function channel(channelId: string) {
                 }
             };
         },
-        parallel(communicators: Communicator[]) {
+        parallel<T extends Communicator>(communicators: T[]) {
             return new ParallelChannelChainGenerator(channelId, communicators);
         }
     };

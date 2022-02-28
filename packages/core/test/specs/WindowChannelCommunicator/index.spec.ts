@@ -18,7 +18,7 @@ describe('WindowsChannelCommunicator', () => {
         document.body.appendChild(iframe);
         await promise;
         windowChannel = channel(CHANNEL_ID)
-            .connectTo(iframe.contentWindow as Window)
+            .connectToOtherWindow(iframe.contentWindow as Window)
             .origin(location.origin)
             .create();
     });
