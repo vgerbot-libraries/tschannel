@@ -139,7 +139,7 @@ export class Channel {
     public release<T>(rinstance: T): Promise<boolean> {
         const namespace = ((rinstance as unknown) as RMIClass).$namespace;
         if (!namespace) {
-            return Promise.reject(new Error('Inllegal argument: target is not a remote instance!'));
+            return Promise.reject(new Error('Illegal argument: target is not a remote instance!'));
         }
         delete this.namespaces[namespace.id];
         return this.rmethod('release')(namespace.id) as Promise<boolean>;

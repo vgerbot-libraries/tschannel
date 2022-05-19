@@ -41,7 +41,7 @@ export default class MessageAdaptor {
         transferables: Transferable[]
     ): Promise<unknown> {
         if (this.isDestroyed) {
-            throw new Error('Cannot invoke methods after the message channel is destroyed!');
+            throw new Error('The message channel has been destroyed!');
         }
         const callId = uid('call-xxxx');
         const data: InvokeMethodData = {

@@ -64,7 +64,7 @@ describe('StorageChannelCommunicator', function() {
         storageChannel.destroy();
         expect(() => {
             method(mockData, sinon.spy());
-        }).to.throws('Cannot invoke methods after the message storageChannel is destroyed!');
+        }).to.throws('The message channel has been destroyed!');
     });
 
     afterEach(async () => {
