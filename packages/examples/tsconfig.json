@@ -1,27 +1,36 @@
 {
     "compilerOptions": {
-      "module": "esnext",
-      "moduleResolution": "node",
-      "target": "es5",
-      "lib": ["dom", "esnext", "scripthost", "es2015.promise", "WebWorker"],
-      "strict": true,
-      "noImplicitAny": false,
-      "noUnusedLocals": true,
-      "alwaysStrict": true,
-      "preserveConstEnums": true,
-      "removeComments": false,
-      "sourceMap": true,
-      "declaration": true,
-      "importHelpers": true,
-      "listFiles": true,
-      "forceConsistentCasingInFileNames": true,
-      "experimentalDecorators": true,
-      "esModuleInterop": true,
-      "plugins": [
-          {
-              "transform": "@tschannel/transformer"
-          }
-      ]
+        "module": "esnext",
+        "moduleResolution": "node",
+        "target": "es2017",
+        "lib": [
+            "dom",
+            "esnext",
+            "scripthost",
+            "es2015.promise",
+            "WebWorker"
+        ],
+        "strict": true,
+        "noImplicitAny": false,
+        "noUnusedLocals": true,
+        "alwaysStrict": true,
+        "preserveConstEnums": true,
+        "removeComments": false,
+        "sourceMap": true,
+        "declaration": true,
+        "importHelpers": true,
+        "noEmitHelpers": true,
+        "listFiles": true,
+        "forceConsistentCasingInFileNames": true,
+        "experimentalDecorators": true,
+        "esModuleInterop": true,
+        "plugins": [
+            {
+                "transform": "@tschannel/transformer"
+            }
+        ]
     },
-    "include": ["./**/src"]
-  }
+    "include": [
+        "./**/src"
+    ]
+}

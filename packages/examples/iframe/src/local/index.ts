@@ -23,7 +23,7 @@ iframe.onload = async () => {
 
     await remoteInstance.__release__(); // Release the instance cache of the remote service(embed iframe);
 
-    channel.rmethod('clear')(); // Executing remote method.
+    await channel.rmethod('clear')(); // Executing remote method.
 
     channel.destroy();
 };
