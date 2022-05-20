@@ -1,6 +1,6 @@
 # @vgerbot/channel-transformer
 
-A typescript transformer that transforms the generic type parameters of the 'rclass' method to method parameters. It is used to simplify the use of tschannel
+A typescript transformer, used to transform the interface type generic parameter on the `rclass` method to class and use it as a parameter.This greatly simplifies the use of the `@vgerbot/channel` library
 
 ## Requirement
 
@@ -62,6 +62,29 @@ export default {
         }]
     }
 }
+```
+
+## Example
+
+before:
+
+```ts
+import { Channel } from '@vgerbot/channel';
+const channel = new Channel();
+channel.rclass<RemoteAPI>();
+interface RemoteAPI {
+    method(){}
+}
+```
+
+after:
+
+```ts
+import { Channel } from '@vgerbot/channel';
+const channel = new Channel();
+channel.rclass('RemoteAPI1', class {
+    method() { }
+})
 ```
 
 ## License
