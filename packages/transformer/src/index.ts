@@ -7,7 +7,7 @@ class ChannelProgramContext {
     public interfaceImplMap: Map<ts.Symbol, ts.ClassDeclaration> = new Map();
 }
 
-const CHANNEL_MODULE_NAME = '@tschannel/core';
+const CHANNEL_MODULE_NAME = '@vgerbot/channel';
 
 export interface TransformerOptions {
 };

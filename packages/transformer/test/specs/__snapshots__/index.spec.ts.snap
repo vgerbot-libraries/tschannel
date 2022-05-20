@@ -1,6 +1,6 @@
 // Jest Snapshot v1, https://goo.gl/fbAQLP
 
-exports[`@tschannel/transformer should be able to detect the module alias 1`] = `
+exports[`@vgerbot/channel-transformer should be able to detect the module alias 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 const channel = new Channel();
@@ -9,7 +9,7 @@ channel.rclass();
 "
 `;
 
-exports[`@tschannel/transformer should be able to exclude methods calling that has more than 2 arguments 1`] = `
+exports[`@vgerbot/channel-transformer should be able to exclude methods calling that has more than 2 arguments 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 const channel = new Channel();
@@ -20,22 +20,22 @@ channel.rclass('RemoteAPI1', class {
 "
 `;
 
-exports[`@tschannel/transformer should be able to exclude methods without type arguments 1`] = `
+exports[`@vgerbot/channel-transformer should be able to exclude methods without type arguments 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-const core_1 = require(\\"@tschannel/core\\");
-const channel = new core_1.Channel();
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
 channel.rclass('RemoteAPI', class RemoteAPI {
     method() { }
 });
 "
 `;
 
-exports[`@tschannel/transformer should be able to reference the class 1`] = `
+exports[`@vgerbot/channel-transformer should be able to reference the class 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-const core_1 = require(\\"@tschannel/core\\");
-const channel = new core_1.Channel();
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
 channel.rclass(\\"RemoteAPI\\", RemoteAPI);
 class RemoteAPI {
     method() { }
@@ -43,11 +43,11 @@ class RemoteAPI {
 "
 `;
 
-exports[`@tschannel/transformer should be able to transform the absrtact class 1`] = `
+exports[`@vgerbot/channel-transformer should be able to transform the absrtact class 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-const core_1 = require(\\"@tschannel/core\\");
-const channel = new core_1.Channel();
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
 channel.rclass(\\"RemoteAPI\\", class RemoteAPIImpl_1 {
     method() { }
     method2() { }
@@ -58,21 +58,21 @@ class RemoteAPI {
 "
 `;
 
-exports[`@tschannel/transformer should run normally with the transformer 1`] = `
+exports[`@vgerbot/channel-transformer should run normally with the transformer 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 exports.x = void 0;
-const core_1 = require(\\"@tschannel/core\\");
+const channel_1 = require(\\"@vgerbot/channel\\");
 exports.x = 'string';
-console.info(core_1.Channel);
+console.info(channel_1.Channel);
 "
 `;
 
-exports[`@tschannel/transformer should transform the interface parameter correctly 1`] = `
+exports[`@vgerbot/channel-transformer should transform the interface parameter correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-const core_1 = require(\\"@tschannel/core\\");
-const channel = new core_1.Channel();
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
 channel.rclass(\\"RemoteAPI\\", class RemoteAPIImpl_1 {
     method() { }
 });

@@ -5,7 +5,7 @@ const plugins = require('./build/rollup.plugins');
 const rollupPluginIstanbul = require('rollup-plugin-istanbul');
 const baseConfig = require('./karma.base.conf');
 const pkg = require('./package.json');
-const channelTsTransformer = require('@tschannel/transformer').default;
+const channelTsTransformer = require('@vgerbot/channel-transformer').default;
 
 module.exports = function (config) {
     const coverageIstanbulReporter = {

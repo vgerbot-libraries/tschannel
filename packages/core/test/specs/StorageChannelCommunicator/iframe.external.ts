@@ -1,4 +1,4 @@
-import { channel } from '@tschannel/core';
+import { channel } from '@vgerbot/channel';
 import { CHANNEL_ID } from './common';
 
 const storageChannel = channel(CHANNEL_ID)

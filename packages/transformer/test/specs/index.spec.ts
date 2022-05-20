@@ -1,10 +1,10 @@
 import { transpile } from '../common/compiler';
 import transformer from '../../src';
 
-describe('@tschannel/transformer', () => {
+describe('@vgerbot/channel-transformer', () => {
     it('should run normally with the transformer', async () => {
         const source = `
-            import { Channel } from '@tschannel/core';
+            import { Channel } from '@vgerbot/channel';
             export let x: string = 'string';
             console.info(Channel);
         `;
@@ -15,7 +15,7 @@ describe('@tschannel/transformer', () => {
     });
     it('should transform the interface parameter correctly', () => {
         const source = `
-            import { Channel } from '@tschannel/core';
+            import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
             channel.rclass<RemoteAPI>();
             interface RemoteAPI {
@@ -29,7 +29,7 @@ describe('@tschannel/transformer', () => {
     });
     it('should be able to detect the module alias', () => {
         const source = `
-            import { Channel as ChannelAlias } from '@tschannel/core';
+            import { Channel as ChannelAlias } from '@vgerbot/channel';
             const channel = new Channel();
             channel.rclass<RemoteAPI>();
             interface RemoteAPI {
@@ -43,7 +43,7 @@ describe('@tschannel/transformer', () => {
     });
     it('should be able to exclude methods calling that has more than 2 arguments', () => {
         const source = `
-            import { Channel as ChannelAlias } from '@tschannel/core';
+            import { Channel as ChannelAlias } from '@vgerbot/channel';
             const channel = new Channel();
             channel.rclass<RemoteAPI>('RemoteAPI1', class {
                 method(){}
@@ -59,7 +59,7 @@ describe('@tschannel/transformer', () => {
     })
     it('should be able to exclude methods without type arguments', () => {
         const source = `
-            import { Channel } from '@tschannel/core';
+            import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
             channel.rclass('RemoteAPI', class RemoteAPI {
                 method(){}
@@ -72,7 +72,7 @@ describe('@tschannel/transformer', () => {
     });
     it('should be able to reference the class', () => {
         const source = `
-            import { Channel } from '@tschannel/core';
+            import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
             channel.rclass<RemoteAPI>();
             class RemoteAPI {
@@ -86,7 +86,7 @@ describe('@tschannel/transformer', () => {
     });
     it('should be able to transform the absrtact class', () => {
         const source = `
-            import { Channel } from '@tschannel/core';
+            import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
             channel.rclass<RemoteAPI>();
             abstract class RemoteAPI {

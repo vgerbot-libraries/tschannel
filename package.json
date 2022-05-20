@@ -5,11 +5,11 @@
     "description": "",
     "scripts": {
         "commit": "git-cz",
-        "lint:all": "yarn workspace @tschannel/core lint",
-        "transformer": "yarn workspace @tschannel/transformer",
-        "transformer:test": "yarn workspace @tschannel/transformer test",
-        "debug:ci": "yarn workspace @tschannel/core debug:ci",
-        "example": "yarn workspace @tschannel/examples start"
+        "lint:all": "yarn workspace @vgerbot/channel lint",
+        "transformer": "yarn workspace @vgerbot/channel-transformer",
+        "transformer:test": "yarn workspace @vgerbot/channel-transformer test",
+        "debug:ci": "yarn workspace @vgerbot/channel debug:ci",
+        "example": "yarn workspace @vgerbot/channel-example start"
     },
     "repository": {
         "type": "git",
@@ -23,15 +23,16 @@
     },
     "homepage": "https://github.com/y1j2x34/channel-ts#readme",
     "devDependencies": {
-        "lerna": "^3.22.1",
+        "buffer": "^6.0.3",
         "commitizen": "^4.0.3",
         "commitlint": "8.3.4",
         "cz-customizable": "^6.2.0",
-        "lint-staged": "9.5.0",
-        "husky": "4.0.7"
+        "husky": "4.0.7",
+        "lerna": "^3.22.1",
+        "lint-staged": "9.5.0"
     },
     "workspaces": [
-      "./packages/*"
+        "./packages/*"
     ],
     "config": {
         "commitizen": {

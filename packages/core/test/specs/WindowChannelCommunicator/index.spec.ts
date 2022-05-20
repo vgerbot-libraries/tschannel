@@ -1,4 +1,4 @@
-import { channel, Channel } from '@tschannel/core';
+import { channel, Channel } from '@vgerbot/channel';
 import { Animal, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';

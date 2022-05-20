@@ -1,4 +1,4 @@
-import { channel } from '@tschannel/core';
+import { channel } from '@vgerbot/channel';
 import { hex, CHANNEL_ID } from './common';
 
 const workerChannel = channel(CHANNEL_ID)

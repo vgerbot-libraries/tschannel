@@ -1,4 +1,4 @@
-import { ParameterType, rmethod, Channel } from '@tschannel/core';
+import { ParameterType, rmethod, Channel } from '@vgerbot/channel';
 import LocalCommunicator from '../common/communicator/LocalCommunicator';
 
 describe('Remote method invocation', () => {

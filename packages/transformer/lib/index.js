@@ -7,7 +7,7 @@ class ChannelProgramContext {
         this.interfaceImplMap = new Map();
     }
 }
-const CHANNEL_MODULE_NAME = '@tschannel/core';
+const CHANNEL_MODULE_NAME = '@vgerbot/channel';
 ;
 const DEFAULT_TRANSFORMER_OPTIONS = {};
 function transformer(program, options) {
@@ -65,7 +65,6 @@ function visitNode(node, program, programCtx, context, options) {
     }
     else if (typescript_1.default.isCallExpression(node)) {
         const propertyExpression = node.expression;
-
         if (typescript_1.default.isPropertyAccessExpression(propertyExpression)) {
             const propertyName = propertyExpression.name.text;
             if (propertyName !== 'rclass') {
@@ -126,7 +125,6 @@ function visitNode(node, program, programCtx, context, options) {
                     return it.getName();
                 });
             }
-            console.log(memberNames);
             const classMembers = memberNames.map(it => {
                 return factory.createMethodDeclaration([], [], undefined, it, undefined, [], [], undefined, factory.createBlock([], false));
             });

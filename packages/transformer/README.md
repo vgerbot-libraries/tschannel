@@ -1,4 +1,4 @@
-# @tschannel/transformer
+# @vgerbot/channel-transformer
 
 A typescript transformer that transforms the generic type parameters of the 'rclass' method to method parameters. It is used to simplify the use of tschannel
 
@@ -12,7 +12,7 @@ Typescript >= 3.2.2
 
 ```js
 // webpack.config.js
-const tschannelTransformer = require('@tschannel/transformer').default;
+const tschannelTransformer = require('@vgerbot/channel-transformer').default;
 module.exports {
     // ...
     module: {
@@ -32,7 +32,7 @@ module.exports {
 ```js
 // rollup.config.js
 import typescript from "rollup-plugin-typescript2";
-const tschannelTransformer = require('@tschannel/transformer').default;
+const tschannelTransformer = require('@vgerbot/channel-transformer').default;
 export default {
   // ...
   plugins: [
@@ -58,7 +58,7 @@ export default {
     "compilerOptions": {
         // ...
         "plugins": [{
-            "transform": "@tschannel/transformer"
+            "transform": "@vgerbot/channel-transformer"
         }]
     }
 }

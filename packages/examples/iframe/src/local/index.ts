@@ -1,7 +1,7 @@
 import {
     Channel,
     WindowChannelCommunicator
-} from '@tschannel/core';
+} from '@vgerbot/channel';
 import { CrossIframeClassInterface } from '../CrossIframeClassInterface';
 
 const iframe = document.createElement('iframe');

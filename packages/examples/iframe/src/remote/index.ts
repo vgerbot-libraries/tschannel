@@ -1,7 +1,7 @@
 import {
     Channel,
     WindowChannelCommunicator
-} from '@tschannel/core';
+} from '@vgerbot/channel';
 
 const channel = new Channel(
     'embed-iframe',

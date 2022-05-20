@@ -6,7 +6,7 @@ import { createSystem, createVirtualCompilerHost } from '@typescript/vfs';
 
 export type TSChannelTransformerType = (program: ts.Program) => ts.TransformerFactory<ts.SourceFile>;
 
-const TSCHANNEL_CORE_MODULE_NAME = '@tschannel/core';
+const TSCHANNEL_CORE_MODULE_NAME = '@vgerbot/channel';
 const TSCHANNEL_PATH = path.resolve(__dirname, '../mock/Channel.ts');
 
 const compilerOptions: ts.CompilerOptions = {

@@ -19,7 +19,7 @@
         ],
         "experimentalDecorators": true,
         "paths": {
-            "@tschannel/core": ["../src/index.ts"]
+            "@vgerbot/channel": ["../src/index.ts"]
         }
     },
     "include": [
