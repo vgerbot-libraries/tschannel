@@ -22,7 +22,7 @@ describe('StorageChannelCommunicator', function() {
     });
 
     it('Should rmethod work correctly', async () => {
-        await expect(storageChannel.rmethod<() => string>('hello')()).to.be.eventually.become('world');
+        await expect(storageChannel.get_method<() => string>('hello')()).to.be.eventually.become('world');
     });
 
     it('Should buffer data be transmitted correctly', async () => {
@@ -30,12 +30,12 @@ describe('StorageChannelCommunicator', function() {
         for (let i = 0; i < 16; i++) {
             u8ia[i] = 0xf0;
         }
-        await expect(storageChannel.rmethod('receive-buffer')(u8ia)).to.be.eventually.become(true);
+        await expect(storageChannel.get_method('receive-buffer')(u8ia)).to.be.eventually.become(true);
     });
     it('should handle callbacks correctly', async () => {
         const mockData = 'hello world';
         type DataType = typeof mockData;
-        const method = storageChannel.rmethod('callback') as (
+        const method = storageChannel.get_method('callback') as (
             data: DataType,
             callback: (data: DataType) => void
         ) => Promise<void>;
@@ -47,7 +47,7 @@ describe('StorageChannelCommunicator', function() {
     it('Should be destroyed correctly', async () => {
         const mockData = 'hello world';
         type DataType = typeof mockData;
-        const method = storageChannel.rmethod('callback') as (
+        const method = storageChannel.get_method('callback') as (
             data: DataType,
             callback: (data: DataType) => void
         ) => Promise<void>;
@@ -57,7 +57,7 @@ describe('StorageChannelCommunicator', function() {
         expect(spyCallback).to.be.calledOnceWith(mockData);
 
         if (typeof __coverage__ !== 'undefined' && !storageChannel.isDestroyed) {
-            const coverageData = await storageChannel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
+            const coverageData = await storageChannel.get_method<() => istanbul.CoverageMapData>('get-coverage')();
             await sendCoverageData(coverageData);
         }
 
@@ -69,7 +69,7 @@ describe('StorageChannelCommunicator', function() {
 
     afterEach(async () => {
         if (typeof __coverage__ !== 'undefined' && !storageChannel.isDestroyed) {
-            const coverageData = await storageChannel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
+            const coverageData = await storageChannel.get_method<() => istanbul.CoverageMapData>('get-coverage')();
             await sendCoverageData(coverageData);
         }
         document.body.removeChild(iframe);

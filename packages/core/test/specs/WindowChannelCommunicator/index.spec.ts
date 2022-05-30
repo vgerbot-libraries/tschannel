@@ -24,10 +24,10 @@ describe('WindowsChannelCommunicator', () => {
     });
 
     it('Should rmethod work correctly', async () => {
-        await expect(windowChannel.rmethod<() => string>('hello')()).to.eventually.become('world');
+        await expect(windowChannel.get_method<() => string>('hello')()).to.eventually.become('world');
     });
     it('Should create remote instance correctly', async () => {
-        const RemoteDog = windowChannel.rclass<Animal>('Dog');
+        const RemoteDog = windowChannel.get_class<Animal>('Dog');
         const dog = new RemoteDog('Loki');
 
         expect(dog.getType()).to.eventually.become('Loki');
@@ -35,7 +35,7 @@ describe('WindowsChannelCommunicator', () => {
 
     after(async () => {
         if (typeof __coverage__ !== 'undefined') {
-            const coverageData = await windowChannel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
+            const coverageData = await windowChannel.get_method<() => istanbul.CoverageMapData>('get-coverage')();
             await sendCoverageData(coverageData);
         }
         document.body.removeChild(iframe);

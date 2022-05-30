@@ -2,8 +2,7 @@ import ts from 'typescript';
 
 class ChannelProgramContext {
     public channelClassSymbol?: ts.Symbol;
-    public rclassSymbol?: ts.Symbol;
-    public sourceFileNode!: ts.SourceFile;
+    public remoteClassSymbol?: ts.Symbol;
     public interfaceImplMap: Map<ts.Symbol, ts.ClassDeclaration> = new Map();
 }
 
@@ -76,13 +75,13 @@ function visitNode(
             const channelClassType = typeChecker.getTypeAtLocation(channelClassDeclaration);
             const channelClassSymbol = channelClassType.getSymbol();
             programCtx.channelClassSymbol = channelClassSymbol;
-            programCtx.rclassSymbol = channelClassSymbol?.members?.get('rclass' as ts.__String);
+            programCtx.remoteClassSymbol = channelClassSymbol?.members?.get('get_class' as ts.__String);
         }
     } else if (ts.isCallExpression(node)) {
         const propertyExpression = node.expression;
         if(ts.isPropertyAccessExpression(propertyExpression)) {
             const propertyName = propertyExpression.name.text;
-            if(propertyName !== 'rclass') {
+            if(propertyName !== 'get_class') {
                 return;
             }
             const propertyType = typeChecker.getTypeAtLocation(propertyExpression);
@@ -90,7 +89,7 @@ function visitNode(
                 return;
             }
             const propertySymbol = propertyType.getSymbol();
-            if(!propertySymbol || propertySymbol !== programCtx.rclassSymbol) {
+            if(!propertySymbol || propertySymbol !== programCtx.remoteClassSymbol) {
                 return;
             }
             const typeArgs = node.typeArguments;
@@ -169,43 +168,3 @@ function visitNode(
         }
     }
 }
-// function createRemoteClassExpression(typeNode: ts.TypeNode, typeChecker: ts.TypeChecker, factory: ts.NodeFactory, programCtx: ChannelProgramContext): ts.Identifier | undefined {
-//     const type = typeChecker.getTypeFromTypeNode(typeNode);
-//     const symbol = type.getSymbol();
-//     if(!symbol) {
-//         return;
-//     }
-//     const typeDeclarations = symbol.declarations;
-//     if(typeDeclarations.length === 0) {
-//         return;
-//     }
-//     let classDeclaration: ts.ClassDeclaration;
-//     if(programCtx.interfaceImplMap.has(symbol)) {
-//         classDeclaration = programCtx.interfaceImplMap.get(symbol) as ts.ClassDeclaration;
-//     } else {
-//         const members = typeChecker.getPropertiesOfType(type);
-//         const classMembers = members
-//             .filter(it => ts.isMethodSignature(it.valueDeclaration))
-//             .map(it => {
-//                 return factory.createMethodDeclaration(
-//                     [],
-//                     [],
-//                     undefined,
-//                     it.getName(),
-//                     undefined,
-//                     [],
-//                     [],
-//                     undefined,
-//                     factory.createBlock([], false)
-//                 );
-//             });
-//         const className = factory.createUniqueName(typeNode.getText()+'Impl');
-//         classDeclaration = factory.createClassDeclaration(
-//             [], [], className, [],
-//             [factory.createHeritageClause(ts.SyntaxKind.ImplementsKeyword, [])],
-//             classMembers
-//         );
-//         programCtx.interfaceImplMap.set(symbol, classDeclaration);
-//     }
-//     return classDeclaration.name;
-// }

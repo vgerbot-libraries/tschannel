@@ -60,14 +60,14 @@ function visitNode(node, program, programCtx, context, options) {
             const channelClassType = typeChecker.getTypeAtLocation(channelClassDeclaration);
             const channelClassSymbol = channelClassType.getSymbol();
             programCtx.channelClassSymbol = channelClassSymbol;
-            programCtx.rclassSymbol = (_b = channelClassSymbol === null || channelClassSymbol === void 0 ? void 0 : channelClassSymbol.members) === null || _b === void 0 ? void 0 : _b.get('rclass');
+            programCtx.remoteClassSymbol = (_b = channelClassSymbol === null || channelClassSymbol === void 0 ? void 0 : channelClassSymbol.members) === null || _b === void 0 ? void 0 : _b.get('get_class');
         }
     }
     else if (typescript_1.default.isCallExpression(node)) {
         const propertyExpression = node.expression;
         if (typescript_1.default.isPropertyAccessExpression(propertyExpression)) {
             const propertyName = propertyExpression.name.text;
-            if (propertyName !== 'rclass') {
+            if (propertyName !== 'get_class') {
                 return;
             }
             const propertyType = typeChecker.getTypeAtLocation(propertyExpression);
@@ -75,7 +75,7 @@ function visitNode(node, program, programCtx, context, options) {
                 return;
             }
             const propertySymbol = propertyType.getSymbol();
-            if (!propertySymbol || propertySymbol !== programCtx.rclassSymbol) {
+            if (!propertySymbol || propertySymbol !== programCtx.remoteClassSymbol) {
                 return;
             }
             const typeArgs = node.typeArguments;

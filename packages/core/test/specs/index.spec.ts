@@ -18,33 +18,33 @@ describe('Remote method invocation', () => {
     });
     it('Should be called correctly in the Channel object with the same method name and the same Channel id', async () => {
         const method = sinon.spy();
-        remoteChannel.lmethod('method', method);
+        remoteChannel.def_method('method', method);
 
-        await localChannel.rmethod('method')();
+        await localChannel.get_method('method')();
 
         expect(method).to.be.calledOnce;
 
         const method2 = sinon.spy();
 
-        remoteChannel.lmethod('method2', method2);
+        remoteChannel.def_method('method2', method2);
 
-        await localChannel.rmethod('method2')(1);
+        await localChannel.get_method('method2')(1);
 
         expect(method2).to.be.calledWith(1);
 
         const method3 = sinon.spy(sinon.fake.returns('hello'));
 
-        remoteChannel.lmethod('method3', method3);
+        remoteChannel.def_method('method3', method3);
 
-        const ret = await localChannel.rmethod('method3')();
+        const ret = await localChannel.get_method('method3')();
 
         expect(ret).to.be.eq('hello');
 
         const fakeMethod4 = sinon.fake.throws('error-message');
         const method4 = sinon.spy(fakeMethod4);
 
-        remoteChannel.lmethod('method4', method4);
-        const promise = localChannel.rmethod('method4')();
+        remoteChannel.def_method('method4', method4);
+        const promise = localChannel.get_method('method4')();
         await promise.catch((reason: Error) => {
             const remoteError = fakeMethod4.exceptions[0] as Error;
             expect(method4).to.been.thrown(remoteError);
@@ -62,9 +62,9 @@ describe('Remote method invocation', () => {
                 return this.type;
             }
         }
-        remoteChannel.lclass('Animal', DogImpl);
+        remoteChannel.def_class('Animal', DogImpl);
 
-        const RemoteDogClass = localChannel.rclass<Animal>();
+        const RemoteDogClass = localChannel.get_class<Animal>();
 
         const remoteDog = new RemoteDogClass('dog');
 
@@ -82,14 +82,14 @@ describe('Remote method invocation', () => {
             method();
         }
 
-        const RemoteDef = localChannel.rclass<Def>();
+        const RemoteDef = localChannel.get_class<Def>();
         const instance = new RemoteDef();
         const promise = instance.method();
         await expect(promise).to.be.eventually.rejected;
     });
 
     it('Should raise error when remote method not exist', async () => {
-        await expect(localChannel.rmethod('unexistent-method')()).to.be.eventually.rejected;
+        await expect(localChannel.get_method('unexistent-method')()).to.be.eventually.rejected;
     });
 
     it('Should handle callbacks correctly', async () => {
@@ -103,9 +103,9 @@ describe('Remote method invocation', () => {
                 }
             }
         }
-        remoteChannel.lclass('MediaProcessor', MediaProcessorImpl);
+        remoteChannel.def_class('MediaProcessor', MediaProcessorImpl);
 
-        const RemoteMediaProcessorImpl = localChannel.rclass<MediaProcessor>();
+        const RemoteMediaProcessorImpl = localChannel.get_class<MediaProcessor>();
 
         const processor = new RemoteMediaProcessorImpl();
 
@@ -131,9 +131,9 @@ describe('Remote method invocation', () => {
         );
         const receiver = sinon.spy();
         remoteCommunicator.addReceiveMessageListener(receiver);
-        remoteChannel.lmethod('method', method);
+        remoteChannel.def_method('method', method);
         const callback = sinon.spy();
-        await localChannel.rmethod('method', method)('data', callback);
+        await localChannel.get_method('method', method)('data', callback);
 
         expect(callback).to.be.calledOnce;
         expect(typeof receiver.args[0][0]).not.to.be.eql('function');
@@ -141,9 +141,9 @@ describe('Remote method invocation', () => {
     });
 
     it('Should raise an error when register multiple local classes with same id', () => {
-        remoteChannel.lclass('computer', class Computer {});
+        remoteChannel.def_class('computer', class Computer {});
         const callback = sinon.spy(() => {
-            remoteChannel.lclass('computer', class Computer {});
+            remoteChannel.def_class('computer', class Computer {});
         });
         expect(callback).to.throw();
     });
@@ -165,12 +165,12 @@ describe('Remote method invocation', () => {
                 });
             }
         }
-        remoteChannel.lclass('FileStorage', FileStorageImpl);
+        remoteChannel.def_class('FileStorage', FileStorageImpl);
         // ========================== remote end ==========================
 
         // ========================== local ==========================
 
-        const RemoteFileStorage = localChannel.rclass<FileStorage>('FileStorage');
+        const RemoteFileStorage = localChannel.get_class<FileStorage>('FileStorage');
 
         const storage = new RemoteFileStorage();
 
@@ -187,11 +187,11 @@ describe('Remote method invocation', () => {
                 return a instanceof A;
             }
         }
-        remoteChannel.lclass('A', A);
-        remoteChannel.lclass('B', B);
+        remoteChannel.def_class('A', A);
+        remoteChannel.def_class('B', B);
 
-        const RemoteA = localChannel.rclass<A>();
-        const RemoteB = localChannel.rclass<B>();
+        const RemoteA = localChannel.get_class<A>();
+        const RemoteB = localChannel.get_class<B>();
 
         const remoteA = new RemoteA();
         const remoteB = new RemoteB();
@@ -204,7 +204,7 @@ describe('Remote method invocation', () => {
             method1(): string;
             method2(): string;
         }
-        localChannel.lclass(
+        localChannel.def_class(
             'RemoteAPI',
             class implements RemoteAPI {
                 method1() {
@@ -215,7 +215,7 @@ describe('Remote method invocation', () => {
                 }
             }
         );
-        const RemoteAPIImpl = remoteChannel.rclass<RemoteAPI>('RemoteAPI', ['method1', 'method2']);
+        const RemoteAPIImpl = remoteChannel.get_class<RemoteAPI>('RemoteAPI', ['method1', 'method2']);
 
         const instance = new RemoteAPIImpl();
         await expect(instance.method1()).to.become('method1');

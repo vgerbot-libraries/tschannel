@@ -66,7 +66,7 @@ describe('ParallelCommunicator', function() {
     });
     after(async () => {
         if (typeof __coverage__ === 'object') {
-            const coverageDatas = await parallelsChannel.rmethod<() => istanbul.CoverageMapData[]>('get-coverage')();
+            const coverageDatas = await parallelsChannel.get_method<() => istanbul.CoverageMapData[]>('get-coverage')();
             for (let i = 0; i < coverageDatas.length; i++) {
                 await sendCoverageData(coverageDatas[i]);
             }
@@ -74,7 +74,7 @@ describe('ParallelCommunicator', function() {
         parallelsChannel.destroy();
     });
     it('Should parallel worker works correctly', async () => {
-        const remoteHex = parallelsChannel.rmethod<typeof hex>('bin2hex');
+        const remoteHex = parallelsChannel.get_method<typeof hex>('bin2hex');
 
         const lstartTime = Date.now();
         const localResult = hex(buffer, 0, buffer.byteLength);

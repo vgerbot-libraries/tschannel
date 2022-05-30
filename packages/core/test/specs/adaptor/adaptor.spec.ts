@@ -51,8 +51,8 @@ describe('channel adaptor', () => {
                 return a instanceof A;
             }
         }
-        remoteChannel.lclass('A', A);
-        remoteChannel.lclass('B', B);
+        remoteChannel.def_class('A', A);
+        remoteChannel.def_class('B', B);
 
         // class BDef {
         //     @rmethod({
@@ -64,8 +64,8 @@ describe('channel adaptor', () => {
         //     }
         // }
 
-        const RemoteA = localChannel.rclass<A>();
-        const RemoteB = localChannel.rclass<B>();
+        const RemoteA = localChannel.get_class<A>();
+        const RemoteB = localChannel.get_class<B>();
 
         const remoteA = new RemoteA();
         const remoteB = new RemoteB();

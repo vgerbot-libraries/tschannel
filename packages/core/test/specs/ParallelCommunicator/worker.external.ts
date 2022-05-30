@@ -5,7 +5,7 @@ const workerChannel = channel(CHANNEL_ID)
     .connectToMainThread()
     .create();
 
-workerChannel.lmethod('bin2hex', hex);
-workerChannel.lmethod('get-coverage', () => {
+workerChannel.def_method('bin2hex', hex);
+workerChannel.def_method('get-coverage', () => {
     return __coverage__;
 });

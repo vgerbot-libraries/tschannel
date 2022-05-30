@@ -9,17 +9,17 @@ describe('WebWorkerCommunicator', () => {
         new WebWorkerCommunicator('/base/test/specs/WebWorkerCommunicator/worker.external.js')
     );
     it('Should rmethod work correctly', () => {
-        return expect(channel.rmethod<() => string>('hello')()).to.eventually.become('world');
+        return expect(channel.get_method<() => string>('hello')()).to.eventually.become('world');
     });
     it('Should create remote instance correctly', async () => {
-        const RemoteDog = channel.rclass<Animal>('Dog');
+        const RemoteDog = channel.get_class<Animal>('Dog');
         const dog = new RemoteDog('Loki');
 
         expect(dog.getType()).to.eventually.become('Loki');
     });
     after(async () => {
         if (typeof __coverage__ !== 'undefined') {
-            const coverageData = await channel.rmethod<() => istanbul.CoverageMapData>('get-coverage')();
+            const coverageData = await channel.get_method<() => istanbul.CoverageMapData>('get-coverage')();
             await sendCoverageData(coverageData);
         }
         channel.destroy();

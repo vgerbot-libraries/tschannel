@@ -32,9 +32,9 @@ export class Channel {
         this.adaptor = new MessageAdaptor(id, communicator, this.namespaces);
         this.globalNamespace = new RMINamespace('global', this.adaptor, this.globalInstance);
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
-        this.linstance(this.globalNamespace, this.globalInstance);
+        this.def_instance(this.globalNamespace, this.globalInstance);
     }
-    public rclass<T>(
+    public get_class<T>(
         remoteClassId?: string,
         _clazzOrMembers?: Constructor<T> | Array<keyof T>
     ): PromisifyClass<T & Remote> {
@@ -65,7 +65,7 @@ export class Channel {
             constructor(...args) {
                 super(...args);
                 channel.namespaces[this.$namespace.id] = this.$namespace;
-                this.$initPromise = channel.rmethod(remoteClassId + '-new-instance')(
+                this.$initPromise = channel.get_method(remoteClassId + '-new-instance')(
                     this.$namespace.id,
                     args
                 ) as Promise<void>;
@@ -93,7 +93,7 @@ export class Channel {
         });
         return (cls as unknown) as PromisifyClass<T & Remote>;
     }
-    public lclass(id: string, clazz: AnyConstructor) {
+    public def_class(id: string, clazz: AnyConstructor) {
         const constructorMethodName = id + '-new-instance';
         if (this.globalNamespace.containsMethod(constructorMethodName)) {
             throw new Error(`Duplicate local class id: ${id}`);
@@ -102,17 +102,17 @@ export class Channel {
         const methodNames = propertyNames.filter(propertyName => {
             return propertyName !== 'constructor' && typeof clazz.prototype[propertyName] === 'function';
         });
-        this.lmethod(constructorMethodName, (instanceNamespaceId, args: unknown[]) => {
+        this.def_method(constructorMethodName, (instanceNamespaceId, args: unknown[]) => {
             const instance = new clazz(...args);
             const namespace = (this.namespaces[instanceNamespaceId] = new RMINamespace(
                 instanceNamespaceId,
                 this.adaptor,
                 instance
             ));
-            this.linstance(namespace, instance, methodNames);
+            this.def_instance(namespace, instance, methodNames);
         });
     }
-    public linstance(id: string | RMINamespace, instance: Object, methodNames: string[] = Object.keys(instance)) {
+    public def_instance(id: string | RMINamespace, instance: Object, methodNames: string[] = Object.keys(instance)) {
         const namespace = id instanceof RMINamespace ? id : new RMINamespace(id, this.adaptor, instance);
         methodNames.forEach(name => {
             const value = instance[name];
@@ -123,7 +123,7 @@ export class Channel {
         });
         this.namespaces[namespace.id] = namespace;
     }
-    public rmethod<F extends AnyFunction, T = void>(
+    public get_method<F extends AnyFunction, T = void>(
         metadata: string | RMIMethodMetadata,
         func?: F,
         context?: T
@@ -133,16 +133,16 @@ export class Channel {
         }
         return this.globalNamespace.rmethod(metadata).bind(context) as Promisify<F, T>;
     }
-    public lmethod(name: string, func?: AnyFunction) {
+    public def_method(name: string, func?: AnyFunction) {
         return this.globalNamespace.lmethod(name, func);
     }
-    public release<T>(rinstance: T): Promise<boolean> {
-        const namespace = ((rinstance as unknown) as RMIClass).$namespace;
+    public release<T>(remote_instance: T): Promise<boolean> {
+        const namespace = ((remote_instance as unknown) as RMIClass).$namespace;
         if (!namespace) {
             return Promise.reject(new Error('Illegal argument: target is not a remote instance!'));
         }
         delete this.namespaces[namespace.id];
-        return this.rmethod('release')(namespace.id) as Promise<boolean>;
+        return this.get_method('release')(namespace.id) as Promise<boolean>;
     }
     public get isDestroyed() {
         return this._isDestroyed;

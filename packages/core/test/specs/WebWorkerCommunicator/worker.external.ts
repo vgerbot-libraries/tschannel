@@ -5,9 +5,9 @@ const workerChannel = channel(CHANNEL_ID)
     .connectToMainThread()
     .create();
 
-workerChannel.lmethod('hello', () => 'world');
+workerChannel.def_method('hello', () => 'world');
 
-workerChannel.lclass(
+workerChannel.def_class(
     'Dog',
     class Dog implements Animal {
         constructor(private type: string) {}
@@ -16,6 +16,6 @@ workerChannel.lclass(
         }
     }
 );
-workerChannel.lmethod('get-coverage', () => {
+workerChannel.def_method('get-coverage', () => {
     return __coverage__;
 });

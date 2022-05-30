@@ -3,9 +3,9 @@ import { CHANNEL_ID, Animal } from './common';
 
 const channel = new Channel(CHANNEL_ID, new WindowChannelCommunicator(window.parent, window.parent.location.origin));
 
-channel.lmethod('hello', () => 'world');
+channel.def_method('hello', () => 'world');
 
-channel.lclass(
+channel.def_class(
     'Dog',
     class Dog implements Animal {
         constructor(private type: string) {}
@@ -14,6 +14,6 @@ channel.lclass(
         }
     }
 );
-channel.lmethod('get-coverage', () => {
+channel.def_method('get-coverage', () => {
     return __coverage__;
 });
