@@ -1,10 +1,10 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 const tslib_1 = require("tslib");
-const typescript_1 = tslib_1.__importDefault(require("typescript"));
+const typescript_1 = tslib_1.__importStar(require("typescript"));
 class ChannelProgramContext {
     constructor() {
-        this.interfaceImplMap = new Map();
+        this.variablesMap = new Map();
     }
 }
 const CHANNEL_MODULE_NAME = '@vgerbot/channel';
@@ -16,9 +16,11 @@ function transformer(program, options) {
         return (file) => {
             const programCtx = new ChannelProgramContext();
             const sourceFileNode = typescript_1.default.visitEachChild(file, visitor, context);
+            programCtx.variablesMap.values();
+            const variables = typescript_1.factory.createVariableStatement([], Array.from(programCtx.variablesMap.values()));
             return typescript_1.default.factory.updateSourceFile(sourceFileNode, [
-                ...sourceFileNode.statements,
-                ...programCtx.interfaceImplMap.values()
+                variables,
+                ...sourceFileNode.statements
             ]);
             function visitor(node) {
                 const ret = visitNode(node, program, programCtx, context, resolvedOptions);
@@ -35,6 +37,7 @@ function transformer(program, options) {
 exports.default = transformer;
 function visitNode(node, program, programCtx, context, options) {
     var _a, _b, _c;
+    const variablesMap = programCtx.variablesMap;
     const typeChecker = program.getTypeChecker();
     const factory = context.factory;
     if (typescript_1.default.isImportDeclaration(node)) {
@@ -99,7 +102,7 @@ function visitNode(node, program, programCtx, context, options) {
             if (!classIdArg) {
                 classIdArg = factory.createStringLiteral(typeNode.getText());
             }
-            const className = factory.createUniqueName(typeNode.getText() + 'Impl');
+            let interfaceNode;
             let memberNames;
             if (typescript_1.default.isClassDeclaration(typeNodeDeclaration)) {
                 const modifiers = typeNodeDeclaration.modifiers;
@@ -110,28 +113,38 @@ function visitNode(node, program, programCtx, context, options) {
                         factory.createRegularExpressionLiteral(typeNode.getText())
                     ]);
                 }
+                interfaceNode = typeChecker.getTypeAtLocation(typeNodeDeclaration);
                 memberNames = typeNodeDeclaration.members
                     .filter(it => !!it.name)
-                    .map(it => {
-                    return it.name.getText();
-                });
+                    .map(it => it.name.getText());
             }
             else {
-                const type = typeChecker.getTypeFromTypeNode(typeNode);
-                const members = typeChecker.getPropertiesOfType(type);
-                memberNames = members
-                    .filter(it => typescript_1.default.isMethodSignature(it.valueDeclaration))
-                    .map(it => {
-                    return it.getName();
-                });
+                interfaceNode = typeChecker.getTypeFromTypeNode(typeNode);
             }
-            const classMembers = memberNames.map(it => {
-                return factory.createMethodDeclaration([], [], undefined, it, undefined, [], [], undefined, factory.createBlock([], false));
-            });
-            const classExpression = factory.createClassExpression([], [], className, [], [factory.createHeritageClause(typescript_1.default.SyntaxKind.ImplementsKeyword, [])], classMembers);
+            if (!interfaceNode) {
+                return;
+            }
+            let variable = variablesMap.get(interfaceNode);
+            if (!variable) {
+                const members = typeChecker.getPropertiesOfType(interfaceNode);
+                if (!memberNames || memberNames.length === 0) {
+                    memberNames = members
+                        .filter(it => typescript_1.default.isMethodSignature(it.valueDeclaration))
+                        .map(it => {
+                        return it.getName();
+                    });
+                }
+                const memberNameLiterals = memberNames.map(it => {
+                    return factory.createStringLiteral(it);
+                });
+                const membersArrayExpression = factory.createArrayLiteralExpression(memberNameLiterals);
+                const membersVariableName = factory.createUniqueName(typeNode.getText() + 'Members');
+                variable = factory.createVariableDeclaration(membersVariableName, undefined, undefined, membersArrayExpression);
+                variablesMap.set(interfaceNode, variable);
+            }
             return factory.createCallExpression(node.expression, [], [
                 classIdArg,
-                classExpression
+                variable.name
             ]);
         }
     }

@@ -17,7 +17,7 @@ describe('@vgerbot/channel-transformer', () => {
         const source = `
             import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
-            channel.rclass<RemoteAPI>();
+            channel.get_class<RemoteAPI>();
             interface RemoteAPI {
                 method(){}
             }
@@ -30,8 +30,8 @@ describe('@vgerbot/channel-transformer', () => {
     it('should be able to detect the module alias', () => {
         const source = `
             import { Channel as ChannelAlias } from '@vgerbot/channel';
-            const channel = new Channel();
-            channel.rclass<RemoteAPI>();
+            const channel = new ChannelAlias();
+            channel.get_class<RemoteAPI>();
             interface RemoteAPI {
                 method(){}
             }
@@ -44,8 +44,8 @@ describe('@vgerbot/channel-transformer', () => {
     it('should be able to exclude methods calling that has more than 2 arguments', () => {
         const source = `
             import { Channel as ChannelAlias } from '@vgerbot/channel';
-            const channel = new Channel();
-            channel.rclass<RemoteAPI>('RemoteAPI1', class {
+            const channel = new ChannelAlias();
+            channel.get_class<RemoteAPI>('RemoteAPI1', class {
                 method(){}
             });
             interface RemoteAPI {
@@ -61,7 +61,7 @@ describe('@vgerbot/channel-transformer', () => {
         const source = `
             import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
-            channel.rclass('RemoteAPI', class RemoteAPI {
+            channel.get_class('RemoteAPI', class RemoteAPI {
                 method(){}
             });
         `;
@@ -74,7 +74,7 @@ describe('@vgerbot/channel-transformer', () => {
         const source = `
             import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
-            channel.rclass<RemoteAPI>();
+            channel.get_class<RemoteAPI>();
             class RemoteAPI {
                 method(){}
             }
@@ -88,7 +88,7 @@ describe('@vgerbot/channel-transformer', () => {
         const source = `
             import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
-            channel.rclass<RemoteAPI>();
+            channel.get_class<RemoteAPI>();
             abstract class RemoteAPI {
                 method(){}
                 abstract method2();
@@ -99,4 +99,34 @@ describe('@vgerbot/channel-transformer', () => {
         });
         expect(output).toMatchSnapshot();
     });
+    it('should correctly reuse converted member name array variables', () => {
+        const source = `
+            import { Channel } from '@vgerbot/channel';
+            const channel = new Channel();
+            channel.get_class<RemoteAPI>();
+            channel.get_class<RemoteAPI>();
+            abstract class RemoteAPI {
+                method(){}
+                abstract method2();
+            }
+            function scope_a() {
+                channel.get_class<RemoteAPI>();
+                channel.get_class<RemoteAPI>();
+                interface RemoteAPI {
+                    method();
+                }
+                function scope_inner_a() {
+                    channel.get_class<InnerRemoteAPI>();
+                    channel.get_class<RemoteAPI>();
+                    interface InnerRemoteAPI {
+                        method();
+                    }
+                }
+            }
+        `;
+        const output = transpile(source, {
+            channelTransformer: transformer
+        });
+        expect(output).toMatchSnapshot();
+    })
 });

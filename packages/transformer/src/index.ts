@@ -1,9 +1,9 @@
-import ts from 'typescript';
+import ts, { factory } from 'typescript';
 
 class ChannelProgramContext {
     public channelClassSymbol?: ts.Symbol;
     public remoteClassSymbol?: ts.Symbol;
-    public interfaceImplMap: Map<ts.Symbol, ts.ClassDeclaration> = new Map();
+    public variablesMap = new Map<ts.Type, ts.VariableDeclaration>();
 }
 
 const CHANNEL_MODULE_NAME = '@vgerbot/channel';
@@ -23,10 +23,14 @@ export default function transformer(program: ts.Program, options?: Partial<Trans
         return (file: ts.Node) => {
             const programCtx = new ChannelProgramContext();
             const sourceFileNode = ts.visitEachChild(file, visitor, context) as ts.SourceFile;
+            programCtx.variablesMap.values();
+
+            const variables = factory.createVariableStatement([], Array.from(programCtx.variablesMap.values()));
+
             return ts.factory.updateSourceFile(
                 sourceFileNode, [
-                    ...sourceFileNode.statements,
-                    ...programCtx.interfaceImplMap.values()
+                    variables,
+                    ...sourceFileNode.statements
                 ]
             );
 
@@ -50,6 +54,7 @@ function visitNode(
     context: ts.TransformationContext,
     options: TransformerOptions
 ): undefined | ts.Node | Array<ts.Node> {
+    const variablesMap = programCtx.variablesMap;
     const typeChecker = program.getTypeChecker();
     const factory = context.factory;
     if (ts.isImportDeclaration(node)) {
@@ -114,8 +119,8 @@ function visitNode(
             if(!classIdArg) {
                 classIdArg = factory.createStringLiteral(typeNode.getText())
             }
-            const className = factory.createUniqueName(typeNode.getText()+'Impl');
-            let memberNames: string[];
+            let interfaceNode: ts.Type;
+            let memberNames: undefined | string[];
             if(ts.isClassDeclaration(typeNodeDeclaration)) {
                 const modifiers = (typeNodeDeclaration as ts.ClassDeclaration).modifiers;
                 const isAbstract = !!modifiers && modifiers.some(it => it.kind === ts.SyntaxKind.AbstractKeyword);
@@ -125,45 +130,48 @@ function visitNode(
                         factory.createRegularExpressionLiteral(typeNode.getText())
                     ]);
                 }
+                interfaceNode = typeChecker.getTypeAtLocation(typeNodeDeclaration);
                 memberNames = typeNodeDeclaration.members
                     .filter(it => !!it.name)
-                    .map(it => {
-                        return it.name!.getText();
-                    });
+                    .map(it => it.name!.getText());
             } else {
-                // const classIdentifier = createRemoteClassExpression(typeNode, typeChecker, factory, programCtx);
-                const type = typeChecker.getTypeFromTypeNode(typeNode);
-                const members = typeChecker.getPropertiesOfType(type);
-                memberNames = members
-                    .filter(it => ts.isMethodSignature(it.valueDeclaration))
-                    .map(it => {
-                        return it.getName();
-                    });
+                interfaceNode = typeChecker.getTypeFromTypeNode(typeNode);
             }
+            if(!interfaceNode) {
+                return;
+            }
+            let variable = variablesMap.get(interfaceNode);
+            if(!variable) {
+                const members = typeChecker.getPropertiesOfType(interfaceNode);
+                if(!memberNames || memberNames.length === 0) {
+                    memberNames = members
+                        .filter(it => ts.isMethodSignature(it.valueDeclaration))
+                        .map(it => {
+                            return it.getName();
+                        });
+                }
 
-            const classMembers = memberNames.map(it => {
-                return factory.createMethodDeclaration(
-                    [],
-                    [],
+                const memberNameLiterals = memberNames.map(it => {
+                    return factory.createStringLiteral(it);
+                });
+
+
+                const membersArrayExpression = factory.createArrayLiteralExpression(memberNameLiterals);
+
+                const membersVariableName = factory.createUniqueName(typeNode.getText()+'Members');
+
+                variable = factory.createVariableDeclaration(
+                    membersVariableName,
                     undefined,
-                    it,
                     undefined,
-                    [],
-                    [],
-                    undefined,
-                    factory.createBlock([], false)
+                    membersArrayExpression
                 );
-            })
-
-            const classExpression = factory.createClassExpression(
-                [], [], className, [],
-                [factory.createHeritageClause(ts.SyntaxKind.ImplementsKeyword, [])],
-                classMembers
-            );
+                variablesMap.set(interfaceNode, variable);
+            }
 
             return factory.createCallExpression(node.expression, [], [
                 classIdArg,
-                classExpression
+                variable.name as ts.Identifier
             ]);
         }
     }

@@ -4,5 +4,5 @@ export interface Constructor<T> {
 }
 
 export class Channel {
-    rclass<T>(remoteClassId?: string, _clazzOrMembers?: Constructor<T> | Array<keyof T>) {}
+    get_class<T>(remoteClassId?: string, _clazzOrMembers?: Constructor<T> | Array<keyof T>) {}
 }
