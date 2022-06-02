@@ -81,10 +81,9 @@ after:
 
 ```ts
 import { Channel } from '@vgerbot/channel';
+var RemoteAPIMembers_1 = ['method'];
 const channel = new Channel();
-channel.rclass('RemoteAPI1', class {
-    method() { }
-})
+channel.rclass('RemoteAPI1', RemoteAPIMembers_1);
 ```
 
 ## License
