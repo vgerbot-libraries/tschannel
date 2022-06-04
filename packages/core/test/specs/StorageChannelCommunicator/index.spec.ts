@@ -18,7 +18,9 @@ describe('StorageChannelCommunicator', function() {
         iframe.src = url;
         document.body.appendChild(iframe);
         await promise;
-        storageChannel = channel(CHANNEL_ID).connectViaStorage(localStorage).create();
+        storageChannel = channel(CHANNEL_ID)
+            .connectViaStorage(localStorage)
+            .create();
     });
 
     it('Should rmethod work correctly', async () => {

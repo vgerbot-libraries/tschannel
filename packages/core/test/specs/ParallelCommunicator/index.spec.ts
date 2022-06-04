@@ -1,8 +1,4 @@
-import {
-    InvokeMethodData,
-    channel,
-    communicators
-} from '@vgerbot/channel';
+import { InvokeMethodData, channel, communicators } from '@vgerbot/channel';
 import { hex, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';
@@ -55,7 +51,8 @@ describe('ParallelCommunicator', function() {
                 ...data[0],
                 value
             };
-        }).create();
+        })
+        .create();
     const buffer = new SharedArrayBuffer(parallels * 1024 * 8);
     before(async () => {
         const arr = new Uint8Array(buffer);

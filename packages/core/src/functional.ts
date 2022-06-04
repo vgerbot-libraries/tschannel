@@ -123,4 +123,4 @@ export const communicators = {
     ) {
         return new ParallelCommunicator(communicators, distributorFn, combinerFn);
     }
-}
+};
