@@ -2,6 +2,7 @@ export { rmethod } from './annotations/rmethod';
 // export { rclass } from './annotations/rclass';
 export { Channel, Remote } from './Channel';
 export { ParameterType } from './types/ParameterType';
+export { RMIMethodMetadata } from './metadata/RMIMethodMetadata';
 export {
     ParallelDataDistributor,
     ParallelDataCombiner,
