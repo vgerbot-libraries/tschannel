@@ -1,6 +1,8 @@
 import {
     Channel,
-    WindowChannelCommunicator
+    ParameterType,
+    WindowChannelCommunicator,
+    RMIMethodMetadata
 } from '@vgerbot/channel';
 import { CrossIframeClassInterface } from '../CrossIframeClassInterface';
 
@@ -17,14 +19,19 @@ iframe.onload = async () => {
         'embed-iframe',
         new WindowChannelCommunicator(iframe.contentWindow)
     );
-    const RemoteClass = channel.rclass<CrossIframeClassInterface>('ClassDefinedInIframe', ['hello']);
+    const RemoteClass = channel.get_class<CrossIframeClassInterface>('ClassDefinedInIframe', ['hello']);
     const remoteInstance = new RemoteClass();
     await remoteInstance.hello();
 
+    await channel.get_method(new RMIMethodMetadata('say_hello', {
+        paramTypes: [
+            ParameterType.remoteObject
+        ]
+    }))(remoteInstance);
+
+    await channel.get_method('clear')(); // Executing remote method.
+
     await remoteInstance.__release__(); // Release the instance cache of the remote service(embed iframe);
-
-    await channel.rmethod('clear')(); // Executing remote method.
-
     channel.destroy();
 };
 

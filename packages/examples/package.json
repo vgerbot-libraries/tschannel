@@ -3,7 +3,8 @@
     "version": "1.0.0",
     "description": "",
     "scripts": {
-        "start": "node --unhandled-rejections=strict run.js"
+        "start": "node --unhandled-rejections=strict run.js",
+        "start:iframe": "npm start iframe"
     },
     "keywords": [],
     "author": "",
