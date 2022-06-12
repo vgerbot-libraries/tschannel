@@ -8,13 +8,19 @@ class ChannelProgramContext {
 
 const CHANNEL_MODULE_NAME = '@vgerbot/channel';
 
+// eslint-disable-next-line @typescript-eslint/no-empty-interface
 export interface TransformerOptions {
-};
+    // EMPTY
+}
 
 const DEFAULT_TRANSFORMER_OPTIONS = {
+    // EMPTY
 };
 
-export default function transformer(program: ts.Program, options?: Partial<TransformerOptions>): ts.TransformerFactory<ts.SourceFile> {
+export default function transformer(
+    program: ts.Program,
+    options?: Partial<TransformerOptions>
+): ts.TransformerFactory<ts.SourceFile> {
     const resolvedOptions = {
         ...DEFAULT_TRANSFORMER_OPTIONS,
         ...(options || {})
@@ -23,20 +29,15 @@ export default function transformer(program: ts.Program, options?: Partial<Trans
         return (file: ts.Node) => {
             const programCtx = new ChannelProgramContext();
             const sourceFileNode = ts.visitEachChild(file, visitor, context) as ts.SourceFile;
-            programCtx.variablesMap.values();
 
-            const variables = factory.createVariableStatement([], Array.from(programCtx.variablesMap.values()));
-
-            return ts.factory.updateSourceFile(
-                sourceFileNode, [
-                    variables,
-                    ...sourceFileNode.statements
-                ]
-            );
+            const variableDeclarations = Array.from(programCtx.variablesMap.values());
+            const variableStatements =
+                variableDeclarations.length > 0 ? [factory.createVariableStatement([], variableDeclarations)] : [];
+            return ts.factory.updateSourceFile(sourceFileNode, [...variableStatements, ...sourceFileNode.statements]);
 
             function visitor(node: ts.Node): ts.Node | Array<ts.Node> {
                 const ret = visitNode(node, program, programCtx, context, resolvedOptions);
-                if(!ret) {
+                if (!ret) {
                     return ts.visitEachChild(node, visitor, context);
                 } else {
                     return ret;
@@ -45,7 +46,6 @@ export default function transformer(program: ts.Program, options?: Partial<Trans
         };
     };
 }
-
 
 function visitNode(
     node: ts.Node,
@@ -67,12 +67,12 @@ function visitNode(
         }
         const namedImports = node.importClause?.namedBindings;
         if (namedImports && ts.isNamedImports(namedImports)) {
-            const channelClassDeclaration = namedImports.elements.find((it) => {
+            const channelClassDeclaration = namedImports.elements.find(it => {
                 const propertyName = it.propertyName;
-                if(propertyName) {
+                if (propertyName) {
                     return propertyName.text === 'Channel';
                 }
-                return it.name.text === 'Channel'
+                return it.name.text === 'Channel';
             }) as ts.ImportSpecifier;
             if (!channelClassDeclaration) {
                 return;
@@ -84,17 +84,17 @@ function visitNode(
         }
     } else if (ts.isCallExpression(node)) {
         const propertyExpression = node.expression;
-        if(ts.isPropertyAccessExpression(propertyExpression)) {
+        if (ts.isPropertyAccessExpression(propertyExpression)) {
             const propertyName = propertyExpression.name.text;
-            if(propertyName !== 'get_class') {
+            if (propertyName !== 'get_class') {
                 return;
             }
             const propertyType = typeChecker.getTypeAtLocation(propertyExpression);
-            if(!propertyType) {
+            if (!propertyType) {
                 return;
             }
             const propertySymbol = propertyType.getSymbol();
-            if(!propertySymbol || propertySymbol !== programCtx.remoteClassSymbol) {
+            if (!propertySymbol || propertySymbol !== programCtx.remoteClassSymbol) {
                 return;
             }
             const typeArgs = node.typeArguments;
@@ -105,45 +105,44 @@ function visitNode(
             const typeNode = typeArgs[0];
             const typeNodeObj = typeChecker.getTypeFromTypeNode(typeNode);
             const declarations = typeNodeObj.getSymbol()?.getDeclarations();
-            if(!declarations || declarations.length < 1) {
+            if (!declarations || declarations.length < 1) {
                 return;
             }
             const typeNodeDeclaration = declarations[0];
-            if(!typeNodeDeclaration) {
+            if (!typeNodeDeclaration) {
                 return;
             }
-            if(node.arguments.length > 1) {
+            if (node.arguments.length > 1) {
                 return;
             }
             let classIdArg = node.arguments[0];
-            if(!classIdArg) {
-                classIdArg = factory.createStringLiteral(typeNode.getText())
+            if (!classIdArg) {
+                classIdArg = factory.createStringLiteral(typeNode.getText());
             }
             let interfaceNode: ts.Type;
             let memberNames: undefined | string[];
-            if(ts.isClassDeclaration(typeNodeDeclaration)) {
+            if (ts.isClassDeclaration(typeNodeDeclaration)) {
                 const modifiers = (typeNodeDeclaration as ts.ClassDeclaration).modifiers;
                 const isAbstract = !!modifiers && modifiers.some(it => it.kind === ts.SyntaxKind.AbstractKeyword);
-                if(!isAbstract) {
-                    return factory.createCallExpression(node.expression, [], [
-                        classIdArg,
-                        factory.createRegularExpressionLiteral(typeNode.getText())
-                    ]);
+                if (!isAbstract) {
+                    return factory.createCallExpression(
+                        node.expression,
+                        [],
+                        [classIdArg, factory.createRegularExpressionLiteral(typeNode.getText())]
+                    );
                 }
                 interfaceNode = typeChecker.getTypeAtLocation(typeNodeDeclaration);
-                memberNames = typeNodeDeclaration.members
-                    .filter(it => !!it.name)
-                    .map(it => it.name!.getText());
+                memberNames = typeNodeDeclaration.members.filter(it => !!it.name).map(it => it.name!.getText());
             } else {
                 interfaceNode = typeChecker.getTypeFromTypeNode(typeNode);
             }
-            if(!interfaceNode) {
+            if (!interfaceNode) {
                 return;
             }
             let variable = variablesMap.get(interfaceNode);
-            if(!variable) {
+            if (!variable) {
                 const members = typeChecker.getPropertiesOfType(interfaceNode);
-                if(!memberNames || memberNames.length === 0) {
+                if (!memberNames || memberNames.length === 0) {
                     memberNames = members
                         .filter(it => ts.isMethodSignature(it.valueDeclaration))
                         .map(it => {
@@ -155,10 +154,9 @@ function visitNode(
                     return factory.createStringLiteral(it);
                 });
 
-
                 const membersArrayExpression = factory.createArrayLiteralExpression(memberNameLiterals);
 
-                const membersVariableName = factory.createUniqueName(typeNode.getText()+'Members');
+                const membersVariableName = factory.createUniqueName(typeNode.getText() + 'Members');
 
                 variable = factory.createVariableDeclaration(
                     membersVariableName,
@@ -169,10 +167,7 @@ function visitNode(
                 variablesMap.set(interfaceNode, variable);
             }
 
-            return factory.createCallExpression(node.expression, [], [
-                classIdArg,
-                variable.name as ts.Identifier
-            ]);
+            return factory.createCallExpression(node.expression, [], [classIdArg, variable.name as ts.Identifier]);
         }
     }
 }

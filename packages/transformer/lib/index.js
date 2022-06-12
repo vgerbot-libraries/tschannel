@@ -8,7 +8,6 @@ class ChannelProgramContext {
     }
 }
 const CHANNEL_MODULE_NAME = '@vgerbot/channel';
-;
 const DEFAULT_TRANSFORMER_OPTIONS = {};
 function transformer(program, options) {
     const resolvedOptions = Object.assign(Object.assign({}, DEFAULT_TRANSFORMER_OPTIONS), (options || {}));
@@ -16,12 +15,9 @@ function transformer(program, options) {
         return (file) => {
             const programCtx = new ChannelProgramContext();
             const sourceFileNode = typescript_1.default.visitEachChild(file, visitor, context);
-            programCtx.variablesMap.values();
-            const variables = typescript_1.factory.createVariableStatement([], Array.from(programCtx.variablesMap.values()));
-            return typescript_1.default.factory.updateSourceFile(sourceFileNode, [
-                variables,
-                ...sourceFileNode.statements
-            ]);
+            const variableDeclarations = Array.from(programCtx.variablesMap.values());
+            const variableStatements = variableDeclarations.length > 0 ? [typescript_1.factory.createVariableStatement([], variableDeclarations)] : [];
+            return typescript_1.default.factory.updateSourceFile(sourceFileNode, [...variableStatements, ...sourceFileNode.statements]);
             function visitor(node) {
                 const ret = visitNode(node, program, programCtx, context, resolvedOptions);
                 if (!ret) {
@@ -50,7 +46,7 @@ function visitNode(node, program, programCtx, context, options) {
         }
         const namedImports = (_a = node.importClause) === null || _a === void 0 ? void 0 : _a.namedBindings;
         if (namedImports && typescript_1.default.isNamedImports(namedImports)) {
-            const channelClassDeclaration = namedImports.elements.find((it) => {
+            const channelClassDeclaration = namedImports.elements.find(it => {
                 const propertyName = it.propertyName;
                 if (propertyName) {
                     return propertyName.text === 'Channel';
@@ -108,15 +104,10 @@ function visitNode(node, program, programCtx, context, options) {
                 const modifiers = typeNodeDeclaration.modifiers;
                 const isAbstract = !!modifiers && modifiers.some(it => it.kind === typescript_1.default.SyntaxKind.AbstractKeyword);
                 if (!isAbstract) {
-                    return factory.createCallExpression(node.expression, [], [
-                        classIdArg,
-                        factory.createRegularExpressionLiteral(typeNode.getText())
-                    ]);
+                    return factory.createCallExpression(node.expression, [], [classIdArg, factory.createRegularExpressionLiteral(typeNode.getText())]);
                 }
                 interfaceNode = typeChecker.getTypeAtLocation(typeNodeDeclaration);
-                memberNames = typeNodeDeclaration.members
-                    .filter(it => !!it.name)
-                    .map(it => it.name.getText());
+                memberNames = typeNodeDeclaration.members.filter(it => !!it.name).map(it => it.name.getText());
             }
             else {
                 interfaceNode = typeChecker.getTypeFromTypeNode(typeNode);
@@ -142,10 +133,7 @@ function visitNode(node, program, programCtx, context, options) {
                 variable = factory.createVariableDeclaration(membersVariableName, undefined, undefined, membersArrayExpression);
                 variablesMap.set(interfaceNode, variable);
             }
-            return factory.createCallExpression(node.expression, [], [
-                classIdArg,
-                variable.name
-            ]);
+            return factory.createCallExpression(node.expression, [], [classIdArg, variable.name]);
         }
     }
 }
