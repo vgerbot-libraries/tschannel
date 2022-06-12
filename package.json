@@ -9,7 +9,9 @@
         "transformer": "yarn workspace @vgerbot/channel-transformer",
         "transformer:test": "yarn workspace @vgerbot/channel-transformer test",
         "debug:ci": "yarn workspace @vgerbot/channel debug:ci",
-        "example": "yarn workspace @vgerbot/channel-example start"
+        "example": "yarn workspace @vgerbot/channel-examples start",
+        "build": "zx ./scripts/build.mjs",
+        "test": "zx ./scripts/run.mjs test"
     },
     "repository": {
         "type": "git",
@@ -29,7 +31,8 @@
         "cz-customizable": "^6.2.0",
         "husky": "4.0.7",
         "lerna": "^3.22.1",
-        "lint-staged": "9.5.0"
+        "lint-staged": "9.5.0",
+        "zx": "^4.3.0"
     },
     "workspaces": [
         "./packages/*"
