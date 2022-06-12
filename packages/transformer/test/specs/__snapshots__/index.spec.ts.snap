@@ -14,7 +14,6 @@ channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 exports[`@vgerbot/channel-transformer should be able to exclude methods calling that has more than 2 arguments 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-var ;
 const channel_1 = require(\\"@vgerbot/channel\\");
 const channel = new channel_1.Channel();
 channel.get_class('RemoteAPI1', class {
@@ -27,7 +26,6 @@ channel.get_class('RemoteAPI1', class {
 exports[`@vgerbot/channel-transformer should be able to exclude methods without type arguments 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-var ;
 const channel_1 = require(\\"@vgerbot/channel\\");
 const channel = new channel_1.Channel();
 channel.get_class('RemoteAPI', class RemoteAPI {
@@ -39,7 +37,6 @@ channel.get_class('RemoteAPI', class RemoteAPI {
 exports[`@vgerbot/channel-transformer should be able to reference the class 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-var ;
 const channel_1 = require(\\"@vgerbot/channel\\");
 const channel = new channel_1.Channel();
 channel.get_class(\\"RemoteAPI\\", RemoteAPI);
@@ -88,7 +85,6 @@ exports[`@vgerbot/channel-transformer should run normally with the transformer 1
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 exports.x = void 0;
-var ;
 const channel_1 = require(\\"@vgerbot/channel\\");
 exports.x = 'string';
 console.info(channel_1.Channel);
