@@ -125,13 +125,12 @@ export class Channel {
     }
     public get_method<F extends AnyFunction, T = void>(
         metadata: string | RMIMethodMetadata,
-        func?: F,
-        context?: T
+        func?: F
     ): (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>> {
         if (typeof metadata === 'string') {
             metadata = new RMIMethodMetadata(metadata, ((func as unknown) as RMIMethod)?.options || {});
         }
-        return this.globalNamespace.rmethod(metadata).bind(context) as Promisify<F, T>;
+        return this.globalNamespace.rmethod(metadata) as Promisify<F, T>;
     }
     public def_method(name: string, func?: AnyFunction) {
         return this.globalNamespace.lmethod(name, func);
