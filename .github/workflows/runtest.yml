@@ -41,7 +41,7 @@ jobs:
         with:
           node-version: ${{ matrix.node-version }}
       - name: Test @vgerbot/channel
-        run: yarn workspace @vgerbot/channel ci
+        run: yarn workspace @vgerbot/channel test
       - name: Test @vgerbot/channel-transformer
         run: yarn workspace @vgerbot/channel-transformer test
       - name: Upload coverage data of @vgerbot/channel to codecov
