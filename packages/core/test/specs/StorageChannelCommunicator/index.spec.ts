@@ -23,7 +23,7 @@ describe('StorageChannelCommunicator', function() {
             .create();
     });
 
-    it('Should rmethod work correctly', async () => {
+    it('Should get_method work correctly', async () => {
         await expect(storageChannel.get_method<() => string>('hello')()).to.be.eventually.become('world');
     });
 

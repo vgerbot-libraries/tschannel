@@ -23,7 +23,7 @@ describe('WindowsChannelCommunicator', () => {
             .create();
     });
 
-    it('Should rmethod work correctly', async () => {
+    it('Should get_method work correctly', async () => {
         await expect(windowChannel.get_method<() => string>('hello')()).to.eventually.become('world');
     });
     it('Should create remote instance correctly', async () => {

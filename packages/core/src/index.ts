@@ -1,5 +1,5 @@
 export { rmethod } from './annotations/rmethod';
-// export { rclass } from './annotations/rclass';
+// export { get_class } from './annotations/get_class';
 export { Channel, Remote } from './Channel';
 export { ParameterType } from './types/ParameterType';
 export { RMIMethodMetadata } from './metadata/RMIMethodMetadata';

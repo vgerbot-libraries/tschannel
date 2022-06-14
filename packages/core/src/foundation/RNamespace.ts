@@ -3,17 +3,17 @@ import { AnyFunction } from '../types/AnyFunction';
 import MessageAdaptor from './MessageAdaptor';
 
 export class RMINamespace {
-    private readonly rmethods: Record<string, AnyFunction> = {};
-    private readonly lmethods: Record<string, AnyFunction> = {};
+    private readonly remote_methods: Record<string, AnyFunction> = {};
+    private readonly local_methods: Record<string, AnyFunction> = {};
     constructor(public readonly id: string, private readonly adaptor: MessageAdaptor, private origin: Object) {}
-    public rmethod(nameOrMetadata: string | RMIMethodMetadata) {
+    public get_method(nameOrMetadata: string | RMIMethodMetadata) {
         if (typeof nameOrMetadata === 'string') {
-            return this.rmethods[nameOrMetadata];
+            return this.remote_methods[nameOrMetadata];
         } else {
             const metadata = nameOrMetadata;
             const name = metadata.getName();
-            if (!(name in this.rmethods)) {
-                this.rmethods[name] = (...args) => {
+            if (!(name in this.remote_methods)) {
+                this.remote_methods[name] = (...args) => {
                     return this.adaptor.invoke(
                         this.id,
                         name,
@@ -22,29 +22,29 @@ export class RMINamespace {
                     );
                 };
             }
-            return this.rmethods[name];
+            return this.remote_methods[name];
         }
     }
     public getOriginObject() {
         return this.origin;
     }
-    public lmethod<T extends AnyFunction = AnyFunction>(name: string, func?: T): T {
+    public def_method<T extends AnyFunction = AnyFunction>(name: string, func?: T): T {
         if (typeof func === 'function') {
             if (this.containsMethod(name)) {
                 throw new Error(
                     `Duplicate local method name in namespace, namespace: ${this.id}, method name: ${name}`
                 );
             }
-            this.lmethods[name] = func;
+            this.local_methods[name] = func;
         }
-        return this.lmethods[name] as T;
+        return this.local_methods[name] as T;
     }
     public containsMethod(name: string): boolean {
-        return typeof this.lmethods[name] === 'function';
+        return typeof this.local_methods[name] === 'function';
     }
     public clear() {
-        clearObject(this.lmethods);
-        clearObject(this.rmethods);
+        clearObject(this.local_methods);
+        clearObject(this.remote_methods);
     }
 }
 

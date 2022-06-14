@@ -8,7 +8,7 @@ describe('WebWorkerCommunicator', () => {
         CHANNEL_ID,
         new WebWorkerCommunicator('/base/test/specs/WebWorkerCommunicator/worker.external.js')
     );
-    it('Should rmethod work correctly', () => {
+    it('Should get_method work correctly', () => {
         return expect(channel.get_method<() => string>('hello')()).to.eventually.become('world');
     });
     it('Should create remote instance correctly', async () => {

@@ -122,7 +122,7 @@ export default class MessageAdaptor {
         if (!namespace) {
             return this.throwError(callId, new Error(`namespace not exist: ${ns}`), ns, methodName);
         }
-        const method = namespace.lmethod(methodName);
+        const method = namespace.def_method(methodName);
         if (typeof method !== 'function') {
             return this.throwError(
                 callId,
@@ -166,6 +166,6 @@ export default class MessageAdaptor {
     }
     private createCallback(ns: string, id: string) {
         const namespace = this.namespaces[ns];
-        return namespace.rmethod(new RMIMethodMetadata(id, {}));
+        return namespace.get_method(new RMIMethodMetadata(id, {}));
     }
 }

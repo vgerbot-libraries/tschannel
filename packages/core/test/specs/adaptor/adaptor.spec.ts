@@ -1,5 +1,5 @@
 import LocalCommunicator from 'common/communicator/LocalCommunicator';
-import { Channel /*, ParameterType, rmethod */ } from '@vgerbot/channel';
+import { Channel /*, ParameterType, get_method */ } from '@vgerbot/channel';
 import { Adaptor } from '../../../src/Adaptor';
 
 describe('channel adaptor', () => {
@@ -55,7 +55,7 @@ describe('channel adaptor', () => {
         remoteChannel.def_class('B', B);
 
         // class BDef {
-        //     @rmethod({
+        //     @get_method({
         //         paramTypes: [ParameterType.remoteObject]
         //     })
         //     // eslint-disable-next-line @typescript-eslint/no-unused-vars

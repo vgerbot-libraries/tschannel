@@ -23,7 +23,7 @@ export class RMIMethodMetadata {
                 switch (it) {
                     case ParameterType.callback:
                         const id = uid('cb-xxxxxxxx');
-                        namespace.lmethod(id, args[index]);
+                        namespace.def_method(id, args[index]);
                         return new CallbackParameter(namespace.id, id);
                     case ParameterType.remoteObject:
                         return new RemoteInstance(args[index]);
@@ -34,7 +34,7 @@ export class RMIMethodMetadata {
             return args.map(it => {
                 if (typeof it === 'function') {
                     const id = uid('cb-xxxxxxxx');
-                    namespace.lmethod(id, it);
+                    namespace.def_method(id, it);
                     return new CallbackParameter(namespace.id, id);
                 }
                 return it;

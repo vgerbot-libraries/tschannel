@@ -87,7 +87,7 @@ export class Channel {
             const metadata = new RMIMethodMetadata(propertyName, method.options);
             cls.prototype[propertyName] = function(this: cls, ...args) {
                 return this.$initPromise.then(() => {
-                    return this.$namespace.rmethod(metadata).apply(this, args);
+                    return this.$namespace.get_method(metadata).apply(this, args);
                 });
             };
         });
@@ -119,7 +119,7 @@ export class Channel {
             if (typeof value !== 'function') {
                 return;
             }
-            namespace.lmethod(name, value.bind(instance));
+            namespace.def_method(name, value.bind(instance));
         });
         this.namespaces[namespace.id] = namespace;
     }
@@ -130,10 +130,10 @@ export class Channel {
         if (typeof metadata === 'string') {
             metadata = new RMIMethodMetadata(metadata, ((func as unknown) as RMIMethod)?.options || {});
         }
-        return this.globalNamespace.rmethod(metadata) as Promisify<F, T>;
+        return this.globalNamespace.get_method(metadata) as Promisify<F, T>;
     }
     public def_method(name: string, func?: AnyFunction) {
-        return this.globalNamespace.lmethod(name, func);
+        return this.globalNamespace.def_method(name, func);
     }
     public release<T>(remote_instance: T): Promise<boolean> {
         const namespace = ((remote_instance as unknown) as RMIClass).$namespace;

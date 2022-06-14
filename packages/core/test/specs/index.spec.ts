@@ -199,7 +199,7 @@ describe('Remote method invocation', () => {
         await expect(remoteB.method(remoteA)).to.become(true);
     });
 
-    it('Should rclass() work correctly using the member name array', async () => {
+    it('Should get_class() work correctly using the member name array', async () => {
         interface RemoteAPI {
             method1(): string;
             method2(): string;
