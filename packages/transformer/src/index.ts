@@ -144,7 +144,7 @@ function visitNode(
                 const members = typeChecker.getPropertiesOfType(interfaceNode);
                 if (!memberNames || memberNames.length === 0) {
                     memberNames = members
-                        .filter(it => ts.isMethodSignature(it.valueDeclaration))
+                        .filter(it => it.valueDeclaration !== undefined && ts.isMethodSignature(it.valueDeclaration))
                         .map(it => {
                             return it.getName();
                         });

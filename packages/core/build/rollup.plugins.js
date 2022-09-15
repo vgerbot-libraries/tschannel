@@ -1,10 +1,10 @@
 const typescript = require('rollup-plugin-typescript2');
-const nodeResolve = require('@rollup/plugin-node-resolve');
+const { nodeResolve } = require('@rollup/plugin-node-resolve');
 const nodeBuiltins = require('rollup-plugin-node-builtins');
 const commonjs = require('@rollup/plugin-commonjs');
-const strip = require('@rollup/plugin-strip');
-const json = require('@rollup/plugin-json');
-const uglify = require('rollup-plugin-uglify');
+const { strip } = require('@rollup/plugin-strip');
+const { json } = require('@rollup/plugin-json');
+const { uglify } = require('rollup-plugin-uglify');
 
 function ext(opt1, opt2) {
     if(opt2 && opt1) {

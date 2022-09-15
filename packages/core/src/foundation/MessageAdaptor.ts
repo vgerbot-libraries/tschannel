@@ -151,7 +151,7 @@ export default class MessageAdaptor {
                 this.returnValue(callId, retValue as SerializableValue, ns, methodName);
             }
         } catch (error) {
-            this.throwError(callId, error, ns, methodName);
+            this.throwError(callId, error as Error, ns, methodName);
         }
     }
     private normalizeArguments(parameters: SerializableValue[]) {
