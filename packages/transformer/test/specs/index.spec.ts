@@ -128,5 +128,60 @@ describe('@vgerbot/channel-transformer', () => {
             channelTransformer: transformer
         });
         expect(output).toMatchSnapshot();
-    })
+    });
+    it('the type should work properly as an interface', () => {
+        const source = `
+          import { Channel } from '@vgerbot/channel';
+            type RemoteAPI = {
+                method(){}
+            };
+            const channel = new Channel();
+            channel.get_class<RemoteAPI>();
+        `;
+        const output = transpile(source, {
+            channelTransformer: transformer
+        });
+        expect(output).toMatchSnapshot();
+    });
+    it('the union type should work correctly', () => {
+        const source = `
+            import { Channel } from '@vgerbot/channel';
+            interface RemoteAPI1 {
+                method1(): void;
+            }
+            interface RemoteAPI1 {
+                method1x(): void;
+            }
+            interface RemoteAPI2  {
+                method2(): void;
+                method3(): void;
+            }
+            type RemoteAPI = RemoteAPI1 & RemoteAPI2;
+            const channel = new Channel();
+            channel.get_class<RemoteAPI>();
+        `;
+        const output = transpile(source, {
+            channelTransformer: transformer
+        });
+        expect(output).toMatchSnapshot();
+    });
+    it('the union type should work correctly 2', () => {
+        const source = `
+            import { Channel } from '@vgerbot/channel';
+            type RemoteAPI1 = {
+                method1(): void;
+            };
+            type RemoteAPI2 =  {
+                method2(): void;
+                method3(): void;
+            };
+            type RemoteAPI = RemoteAPI1 & RemoteAPI2;
+            const channel = new Channel();
+            channel.get_class<RemoteAPI>();
+        `;
+        const output = transpile(source, {
+            channelTransformer: transformer
+        });
+        expect(output).toMatchSnapshot();
+    });
 });
