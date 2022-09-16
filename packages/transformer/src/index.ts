@@ -104,7 +104,14 @@ function visitNode(
 
             const typeNode = typeArgs[0];
             const typeNodeObj = typeChecker.getTypeFromTypeNode(typeNode);
-            const declarations = typeNodeObj.getSymbol()?.getDeclarations();
+
+            let declarations;
+            if(!!typeNodeObj.aliasSymbol) {
+                declarations = typeNodeObj.aliasSymbol.getDeclarations();
+            } else {
+                declarations = typeNodeObj.getSymbol()?.getDeclarations();
+            }
+
             if (!declarations || declarations.length < 1) {
                 return;
             }
