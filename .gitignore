@@ -12,3 +12,4 @@ yarn.lock
 **/*.log
 .cache
 .parcel-cache
+.idea
