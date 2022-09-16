@@ -22,6 +22,7 @@
     },
     "scripts": {
         "test": "jest --coverage",
+        "debug": "node --inspect-brk node_modules/.bin/jest",
         "lint": "eslint {src,test}/**/*.{ts,tsc}",
         "format": "eslint --fix {src,test}/**/*.{ts,tsc}",
         "build": "ttsc --project ./tsconfig.json",
@@ -38,7 +39,7 @@
         "@typescript-eslint/parser": "^5.37.0",
         "@typescript/vfs": "^1.4.0",
         "codecov": "*",
-        "eslint": "^8.23.1",
+        "eslint": "8.22.0",
         "eslint-config-prettier": "^8.5.0",
         "eslint-plugin-prettier": "^4.2.1",
         "husky": "8.0.1",
