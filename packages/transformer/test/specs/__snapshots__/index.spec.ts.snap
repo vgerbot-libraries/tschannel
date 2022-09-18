@@ -7,7 +7,6 @@ var RemoteAPIMembers_1 = [\\"method\\"];
 const channel_1 = require(\\"@vgerbot/channel\\");
 const channel = new channel_1.Channel();
 channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
-{ }
 "
 `;
 
@@ -15,11 +14,10 @@ exports[`@vgerbot/channel-transformer should be able to exclude methods calling 
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 const channel_1 = require(\\"@vgerbot/channel\\");
-const channel = new channel_1.Channel();
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
 channel.get_class('RemoteAPI1', class {
     method() { }
 });
-{ }
 "
 `;
 
@@ -27,7 +25,7 @@ exports[`@vgerbot/channel-transformer should be able to exclude methods without 
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 const channel_1 = require(\\"@vgerbot/channel\\");
-const channel = new channel_1.Channel();
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
 channel.get_class('RemoteAPI', class RemoteAPI {
     method() { }
 });
@@ -38,21 +36,8 @@ exports[`@vgerbot/channel-transformer should be able to reference the class 1`] 
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 const channel_1 = require(\\"@vgerbot/channel\\");
-const channel = new channel_1.Channel();
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
 channel.get_class(\\"RemoteAPI\\", RemoteAPI);
-class RemoteAPI {
-    method() { }
-}
-"
-`;
-
-exports[`@vgerbot/channel-transformer should be able to transform the absrtact class 1`] = `
-"\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: true });
-var RemoteAPIMembers_1 = [\\"method\\", \\"method2\\"];
-const channel_1 = require(\\"@vgerbot/channel\\");
-const channel = new channel_1.Channel();
-channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 class RemoteAPI {
     method() { }
 }
@@ -64,11 +49,12 @@ exports[`@vgerbot/channel-transformer should reuse converted variables 1`] = `
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 var RemoteAPIMembers_1 = [\\"method\\", \\"method2\\"], RemoteAPIMembers_2 = [\\"method\\"], InnerRemoteAPIMembers_1 = [\\"method\\"];
 const channel_1 = require(\\"@vgerbot/channel\\");
-const channel = new channel_1.Channel();
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
 channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 class RemoteAPI {
     method() { }
+    ;
 }
 function scope_a() {
     channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_2);
@@ -91,7 +77,20 @@ console.info(channel_1.Channel);
 "
 `;
 
-exports[`@vgerbot/channel-transformer should transform the functional APIs correctly 1`] = `
+exports[`@vgerbot/channel-transformer should transform "fixtures/abstract class.ts" correctly 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method\\", \\"method2\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+class RemoteAPI {
+    method() { }
+}
+"
+`;
+
+exports[`@vgerbot/channel-transformer should transform "fixtures/functional APIs.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 var RemoteAPIMembers_1 = [\\"method\\"];
@@ -103,45 +102,44 @@ c.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 "
 `;
 
-exports[`@vgerbot/channel-transformer should transform the interface parameter correctly 1`] = `
+exports[`@vgerbot/channel-transformer should transform "fixtures/interface parameter.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 var RemoteAPIMembers_1 = [\\"method\\"];
 const channel_1 = require(\\"@vgerbot/channel\\");
-const channel = new channel_1.Channel();
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
 channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
-{ }
 "
 `;
 
-exports[`@vgerbot/channel-transformer should transform the type statements correctly 1`] = `
+exports[`@vgerbot/channel-transformer should transform "fixtures/intersection type.ts" correctly 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method1\\", \\"method2\\", \\"method3\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+"
+`;
+
+exports[`@vgerbot/channel-transformer should transform "fixtures/type statement.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 var RemoteAPIMembers_1 = [\\"method\\"];
 const channel_1 = require(\\"@vgerbot/channel\\");
 { }
 ;
-const channel = new channel_1.Channel();
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
 channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 "
 `;
 
-exports[`@vgerbot/channel-transformer should transform the union type correctly 1`] = `
+exports[`@vgerbot/channel-transformer should transform "fixtures/union type.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 var RemoteAPIMembers_1 = [\\"method1\\", \\"method1x\\", \\"method2\\", \\"method3\\"];
 const channel_1 = require(\\"@vgerbot/channel\\");
-const channel = new channel_1.Channel();
-channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
-"
-`;
-
-exports[`@vgerbot/channel-transformer should transform the union type correctly 2 1`] = `
-"\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: true });
-var RemoteAPIMembers_1 = [\\"method1\\", \\"method2\\", \\"method3\\"];
-const channel_1 = require(\\"@vgerbot/channel\\");
-const channel = new channel_1.Channel();
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
 channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 "
 `;
