@@ -99,7 +99,7 @@ describe('@vgerbot/channel-transformer', () => {
         });
         expect(output).toMatchSnapshot();
     });
-    it('should correctly reuse converted member name array variables', () => {
+    it('should reuse converted variables', () => {
         const source = `
             import { Channel } from '@vgerbot/channel';
             const channel = new Channel();
@@ -129,7 +129,7 @@ describe('@vgerbot/channel-transformer', () => {
         });
         expect(output).toMatchSnapshot();
     });
-    it('the type should work properly as an interface', () => {
+    it('should transform the type statements correctly', () => {
         const source = `
           import { Channel } from '@vgerbot/channel';
             type RemoteAPI = {
@@ -143,7 +143,7 @@ describe('@vgerbot/channel-transformer', () => {
         });
         expect(output).toMatchSnapshot();
     });
-    it('the union type should work correctly', () => {
+    it('should transform the union type correctly', () => {
         const source = `
             import { Channel } from '@vgerbot/channel';
             interface RemoteAPI1 {
@@ -165,7 +165,7 @@ describe('@vgerbot/channel-transformer', () => {
         });
         expect(output).toMatchSnapshot();
     });
-    it('the union type should work correctly 2', () => {
+    it('should transform the union type correctly 2', () => {
         const source = `
             import { Channel } from '@vgerbot/channel';
             type RemoteAPI1 = {
@@ -179,6 +179,25 @@ describe('@vgerbot/channel-transformer', () => {
             const channel = new Channel();
             channel.get_class<RemoteAPI>();
         `;
+        const output = transpile(source, {
+            channelTransformer: transformer
+        });
+        expect(output).toMatchSnapshot();
+    });
+    it('should transform the functional APIs correctly', () => {
+        const source = `
+            import { channel } from '@vgerbot/channel';
+            let channelBuilder = channel("channel-id");
+            let generator = channelBuilder.connectToMainThread();
+            const c = generator.create();
+
+            interface RemoteAPI {
+                method();
+            }
+
+            c.get_class<RemoteAPI>();
+        `;
+
         const output = transpile(source, {
             channelTransformer: transformer
         });

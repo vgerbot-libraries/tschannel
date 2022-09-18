@@ -1,0 +1,147 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`@vgerbot/channel-transformer should be able to detect the module alias 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+{ }
+"
+`;
+
+exports[`@vgerbot/channel-transformer should be able to exclude methods calling that has more than 2 arguments 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class('RemoteAPI1', class {
+    method() { }
+});
+{ }
+"
+`;
+
+exports[`@vgerbot/channel-transformer should be able to exclude methods without type arguments 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class('RemoteAPI', class RemoteAPI {
+    method() { }
+});
+"
+`;
+
+exports[`@vgerbot/channel-transformer should be able to reference the class 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class(\\"RemoteAPI\\", RemoteAPI);
+class RemoteAPI {
+    method() { }
+}
+"
+`;
+
+exports[`@vgerbot/channel-transformer should be able to transform the absrtact class 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method\\", \\"method2\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+class RemoteAPI {
+    method() { }
+}
+"
+`;
+
+exports[`@vgerbot/channel-transformer should reuse converted variables 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method\\", \\"method2\\"], RemoteAPIMembers_2 = [\\"method\\"], InnerRemoteAPIMembers_1 = [\\"method\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+class RemoteAPI {
+    method() { }
+}
+function scope_a() {
+    channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_2);
+    channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_2);
+    function scope_inner_a() {
+        channel.get_class(\\"InnerRemoteAPI\\", InnerRemoteAPIMembers_1);
+        channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_2);
+    }
+}
+"
+`;
+
+exports[`@vgerbot/channel-transformer should run normally with the transformer 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+exports.x = void 0;
+const channel_1 = require(\\"@vgerbot/channel\\");
+exports.x = 'string';
+console.info(channel_1.Channel);
+"
+`;
+
+exports[`@vgerbot/channel-transformer should transform the functional APIs correctly 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
+let generator = channelBuilder.connectToMainThread();
+const c = generator.create();
+c.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+"
+`;
+
+exports[`@vgerbot/channel-transformer should transform the interface parameter correctly 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+{ }
+"
+`;
+
+exports[`@vgerbot/channel-transformer should transform the type statements correctly 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+{ }
+;
+const channel = new channel_1.Channel();
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+"
+`;
+
+exports[`@vgerbot/channel-transformer should transform the union type correctly 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method1\\", \\"method1x\\", \\"method2\\", \\"method3\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+"
+`;
+
+exports[`@vgerbot/channel-transformer should transform the union type correctly 2 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method1\\", \\"method2\\", \\"method3\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel();
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+"
+`;
