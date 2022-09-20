@@ -20,6 +20,10 @@ export interface Remote {
 export class Channel {
     private globalInstance = {
         release: (namespace: string) => {
+            const namespaceInstance = this.namespaces[namespace];
+            if (namespaceInstance) {
+                namespaceInstance.__destroy__();
+            }
             delete this.namespaces[namespace];
             return true;
         }
@@ -151,9 +155,9 @@ export class Channel {
             return;
         }
         this.adaptor.destroy();
-        this.globalNamespace.clear();
+        this.globalNamespace.__destroy__();
         Object.keys(this.namespaces).forEach(id => {
-            this.namespaces[id].clear();
+            this.namespaces[id].__destroy__();
         });
         this._isDestroyed = true;
     }

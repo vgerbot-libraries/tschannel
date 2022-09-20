@@ -1,8 +1,9 @@
 import { RMIMethodMetadata } from '../metadata/RMIMethodMetadata';
 import { AnyFunction } from '../types/AnyFunction';
+import { Destructible } from './Destructible';
 import MessageAdaptor from './MessageAdaptor';
 
-export class RMINamespace {
+export class RMINamespace implements Destructible{
     private readonly remote_methods: Record<string, AnyFunction> = {};
     private readonly local_methods: Record<string, AnyFunction> = {};
     constructor(public readonly id: string, private readonly adaptor: MessageAdaptor, private origin: Object) {}
@@ -41,6 +42,13 @@ export class RMINamespace {
     }
     public containsMethod(name: string): boolean {
         return typeof this.local_methods[name] === 'function';
+    }
+    public __destroy__() {
+        this.clear();
+        const destructible = this.origin as Destructible;
+        if(typeof destructible.__destroy__ === 'function') {
+            destructible.__destroy__();
+        }
     }
     public clear() {
         clearObject(this.local_methods);

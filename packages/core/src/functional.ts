@@ -19,7 +19,7 @@ function createChannel(channelId: string, communicator: Communicator) {
     return new Channel(channelId, communicator);
 }
 
-class WindowChannelChainGenerator {
+class WindowChannelChainGenerator implements ChannelFactory {
     constructor(
         private readonly channelId: string,
         private readonly win: Window,
@@ -67,7 +67,7 @@ class ParallelChannelChainGenerator_Combiner {
         private readonly communicators: Communicator[],
         private readonly distributorFn: ParallelDataDistributor<CommunicationData>
     ) {}
-    combiner(combinerFn: ParallelDataCombiner) {
+    combiner(combinerFn: ParallelDataCombiner): ChannelFactory {
         return {
             create: () => {
                 return createChannel(
@@ -90,7 +90,7 @@ export function channel(channelId: string) {
         connectToWorker(workerScriptURL: string) {
             return new WebWorkerChannelChainGenerator(channelId, workerScriptURL);
         },
-        connectToMainThread() {
+        connectToMainThread(): ChannelFactory {
             return {
                 create() {
                     return createChannel(channelId, communicators.webWorkerScope());
