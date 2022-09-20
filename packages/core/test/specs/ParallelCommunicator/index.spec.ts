@@ -38,14 +38,7 @@ describe('ParallelCommunicator', function() {
             if (errorData) {
                 return errorData;
             }
-            let value: string[] = [];
-            data.forEach(it => {
-                value = value.concat(it.value as string[]);
-                // const v = it.value as string[];
-                // for (let i = 0; i < v.length; i++) {
-                //     value.push(v[i]);
-                // }
-            });
+            const value = data.flatMap(it => it.value as string[]);
             return {
                 ...data[0],
                 value
