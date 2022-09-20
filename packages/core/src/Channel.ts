@@ -1,6 +1,7 @@
 import { RMIClass, RMIClassConstructor } from './annotations/types/RMIClass';
 import { RMIMethod } from './annotations/types/RMIMethod';
 import uid from './common/uid';
+import { Destructible } from './foundation/Destructible';
 import MessageAdaptor from './foundation/MessageAdaptor';
 import { RMINamespace } from './foundation/RNamespace';
 import { RMIMethodMetadata } from './metadata/RMIMethodMetadata';
@@ -11,21 +12,21 @@ import { PromisifyClass } from './types/PromisifyType';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
 
-// eslint-disable-next-line @typescript-eslint/no-empty-interface
-export interface Remote {
-    // readonly $namespace;
-    __release__(): Promise<boolean>;
+export interface Remote extends Destructible {
+    __destroy__(): Promise<void>;
 }
 
 export class Channel {
     private globalInstance = {
-        release: (namespace: string) => {
-            const namespaceInstance = this.namespaces[namespace];
-            if (namespaceInstance) {
-                namespaceInstance.__destroy__();
+        __destroy__: (namespace: string) => {
+            try {
+                const namespaceInstance = this.namespaces[namespace];
+                if (namespaceInstance) {
+                    return namespaceInstance.__destroy__();
+                }
+            } finally {
+                delete this.namespaces[namespace];
             }
-            delete this.namespaces[namespace];
-            return true;
         }
     };
     private readonly globalNamespace: RMINamespace;
@@ -74,8 +75,8 @@ export class Channel {
                     args
                 ) as Promise<void>;
             }
-            __release__() {
-                return channel.release(this);
+            __destroy__() {
+                return channel.destroyThat(this);
             }
         }
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype).filter(it => it !== 'constructor');
@@ -139,26 +140,28 @@ export class Channel {
     public def_method(name: string, func?: AnyFunction) {
         return this.globalNamespace.def_method(name, func);
     }
-    public release<T>(remote_instance: T): Promise<boolean> {
+    public destroyThat<T>(remote_instance: T): Promise<void> {
         const namespace = ((remote_instance as unknown) as RMIClass).$namespace;
         if (!namespace) {
             return Promise.reject(new Error('Illegal argument: target is not a remote instance!'));
         }
         delete this.namespaces[namespace.id];
-        return this.get_method('release')(namespace.id) as Promise<boolean>;
+        return this.get_method('__destroy__')(namespace.id) as Promise<void>;
     }
     public get isDestroyed() {
         return this._isDestroyed;
     }
-    public destroy() {
+    public async destroy() {
         if (this._isDestroyed) {
             return;
         }
-        this.adaptor.destroy();
         this.globalNamespace.__destroy__();
-        Object.keys(this.namespaces).forEach(id => {
-            this.namespaces[id].__destroy__();
-        });
+        await Promise.all(
+            Object.keys(this.namespaces).map(id => {
+                return this.namespaces[id].__destroy__();
+            }
+        ));
+        this.adaptor.destroy();
         this._isDestroyed = true;
     }
 }

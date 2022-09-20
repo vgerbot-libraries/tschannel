@@ -10,9 +10,8 @@ describe('ParallelCommunicator', function() {
     const parallels = 4;
     const parallelsChannel = channel(CHANNEL_ID)
         .parallel(
-            Array(parallels)
-                .fill(undefined)
-                .map(() => communicators.webWorker(workerURL))
+            parallels,
+            () => communicators.webWorker(workerURL)
         )
         .distributor((no: number, payload) => {
             if (payload.getMethodName() === 'get-coverage') {
@@ -68,7 +67,7 @@ describe('ParallelCommunicator', function() {
                 await sendCoverageData(coverageDatas[i]);
             }
         }
-        parallelsChannel.destroy();
+        await parallelsChannel.destroy();
     });
     it('Should parallel worker works correctly', async () => {
         const remoteHex = parallelsChannel.get_method<typeof hex>('bin2hex');

@@ -70,11 +70,11 @@ describe('Remote method invocation', () => {
 
         await expect(remoteDog.getType()).to.be.eventually.become('dog');
 
-        await expect(localChannel.release(remoteDog)).to.be.eventually.become(true);
+        await expect(localChannel.destroyThat(remoteDog)).to.be.eventually.fulfilled;
 
         const remoteDogger = new RemoteDogClass('Dogger');
 
-        await expect(remoteDogger.__release__()).to.be.eventually.become(true);
+        await expect(remoteDogger.__destroy__()).to.be.eventually.to.fulfilled;
     });
 
     it('Should raise error when remote class not defined', async () => {
@@ -148,9 +148,9 @@ describe('Remote method invocation', () => {
         expect(callback).to.throw();
     });
     it('Should raise an error when release an illegal remote instance', async () => {
-        await expect(localChannel.release({})).to.be.eventually.rejected;
+        await expect(localChannel.destroyThat({})).to.be.eventually.rejected;
     });
-    it('Should handle the asynchrounous methods correctly', async () => {
+    it('Should handle the asynchronous methods correctly', async () => {
         interface FileStorage {
             read(): Promise<ArrayBuffer>;
         }

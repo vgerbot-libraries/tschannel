@@ -63,7 +63,7 @@ describe('StorageChannelCommunicator', function() {
             await sendCoverageData(coverageData);
         }
 
-        storageChannel.destroy();
+        await storageChannel.destroy();
         expect(() => {
             method(mockData, sinon.spy());
         }).to.throws('The message channel has been destroyed!');
@@ -75,7 +75,7 @@ describe('StorageChannelCommunicator', function() {
             await sendCoverageData(coverageData);
         }
         document.body.removeChild(iframe);
-        storageChannel.destroy();
+        await storageChannel.destroy();
         expect(localStorage.length).to.be.eql(0);
     });
 });
