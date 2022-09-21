@@ -12,7 +12,7 @@ if(!fs.existsSync(exampleDir)) {
     raiseError('Example not exists: ' + exampleName);
 }
 
-child_process.execSync(`parcel serve ./${exampleName}/src/**/*.html -p 8888`, {
+child_process.execSync(`parcel serve --no-cache ./${exampleName}/src/**/*.html -p 8888`, {
     stdio: [0,1,2]
 });
 
