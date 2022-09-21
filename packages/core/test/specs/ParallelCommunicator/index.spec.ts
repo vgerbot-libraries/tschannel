@@ -69,6 +69,8 @@ describe('ParallelCommunicator', function() {
         const localResult = hex(buffer, 0, buffer.byteLength);
         const lendTime = Date.now();
 
+        await remoteHex(buffer, 0, buffer.byteLength)
+
         const startTime = Date.now();
         const remoteResult = await remoteHex(buffer, 0, buffer.byteLength);
         const endTime = Date.now();
