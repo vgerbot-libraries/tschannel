@@ -19,7 +19,7 @@ iframe.onload = async () => {
         'embed-iframe',
         new WindowChannelCommunicator(iframe.contentWindow)
     );
-    const RemoteClass = channel.get_class<CrossIframeClassInterface>('ClassDefinedInIframe', ['hello']);
+    const RemoteClass = channel.get_class<CrossIframeClassInterface>('ClassDefinedInIframe');
     const remoteInstance = new RemoteClass();
     await remoteInstance.hello();
 
@@ -31,7 +31,7 @@ iframe.onload = async () => {
 
     await channel.get_method('clear')(); // Executing remote method.
 
-    await remoteInstance.__release__(); // Release the instance cache of the remote service(embed iframe);
+    await remoteInstance.__destroy__(); // Release the instance cache of the remote service(embed iframe);
     channel.destroy();
 };
 
