@@ -6,7 +6,7 @@ import { InvokeMethodData } from '../types/InvokeMethodData';
 import { Returning } from '../types/Returning';
 import { SerializableValue } from '../types/Serializable';
 import { Transferable } from '../types/Transferable';
-import { CallbackParameter } from './CallbackParameter';
+import { isCallback } from './CallbackParameter';
 import InvokeMethodPayload from './InvokeMethodPayload';
 import MethodReturningPayload from './MethodReturningPayload';
 import { RemoteError } from './RemoteError';
@@ -162,7 +162,7 @@ export default class MessageAdaptor {
     }
     private normalizeArguments(parameters: SerializableValue[]) {
         return parameters.map(it => {
-            if (CallbackParameter.isCallback(it)) {
+            if (isCallback(it)) {
                 return this.createCallback(it.namespace, it.id);
             } else if (isRemoteInstance(it)) {
                 return this.namespaces[it.id]?.getOriginObject();
