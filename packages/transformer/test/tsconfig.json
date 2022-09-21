@@ -5,7 +5,7 @@
         "sourceMap": true,
         "outDir": "../test_dist",
         "paths": {
-            "@vgerbot/channel": ["./mock/Channel.ts"],
+            "@vgerbot/channel": ["./mock/Channel.js"],
             "transformer": ["../src/index.ts"]
         }
     },

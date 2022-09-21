@@ -1,5 +1,5 @@
 import ts, { factory } from 'typescript';
-import { getSymbolFromChannel, getTypeNodeDecration, getMethodMembersFrom, createMemberNamesvariable } from './utils';
+import { getTypeNodeDecration, getMethodMembersFrom, createMemberNamesvariable } from './utils';
 import { CHANNEL_MODULE_NAME, DEFAULT_TRANSFORMER_OPTIONS } from './consts';
 import { ChannelProgramContext } from './ChannelProgramContext';
 import { TransformerOptions } from './TransformerOptions';
@@ -8,12 +8,6 @@ export default function transformer(
     program: ts.Program,
     options?: Partial<TransformerOptions>
 ): ts.TransformerFactory<ts.SourceFile> {
-    const get_classMethodSymbol = getSymbolFromChannel(program, 'get_class');
-    if (!get_classMethodSymbol) {
-        return () => {
-            return (file: ts.Node) => file.getSourceFile();
-        };
-    }
     const resolvedOptions = {
         ...DEFAULT_TRANSFORMER_OPTIONS,
         ...(options || {}),
@@ -21,7 +15,7 @@ export default function transformer(
     return (context: ts.TransformationContext) => {
         return (file: ts.Node) => {
             const programCtx = new ChannelProgramContext(program.getTypeChecker());
-            programCtx.get_classMethodSymbol = get_classMethodSymbol;
+
 
             const sourceFileNode = ts.visitEachChild(file, visitor, context) as ts.SourceFile;
 
@@ -57,7 +51,7 @@ function visitNode(
         if(moduleName !== CHANNEL_MODULE_NAME) {
             return;
         }
-        programCtx.recordChannelMethodSymbolIfPossible(node);
+        programCtx.recordChannelSymbolIfPossible(node);
     } else if (ts.isVariableDeclaration(node)) {
         programCtx.recordChannelVariableIfPossible(node);
     } else if (ts.isCallExpression(node)) {

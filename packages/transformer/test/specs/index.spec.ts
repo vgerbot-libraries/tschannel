@@ -2,9 +2,23 @@ import { transpile } from '../common/compiler';
 import transformer from '../../src';
 import { loadFixtures, loadSpecialFixtures } from '../common/load-fixture';
 
+interface TestCase {
+    source: string;
+    name: string;
+    only?: boolean;
+    skip?: boolean;
+}
+
+interface SpecialFixture {
+    file: string;
+    name: string;
+    only?: boolean;
+    skip?: boolean
+}
+
 describe('@vgerbot/channel-transformer', () => {
 
-    const specialFixtures = [{
+    const specialFixtures: SpecialFixture[] = [{
         file: 'normal',
         name: 'should run normally with the transformer'
     }, {
@@ -27,22 +41,33 @@ describe('@vgerbot/channel-transformer', () => {
     specialFixtures.map(it => {
         return {
             source: loadSpecialFixtures(it.file).source,
-            name: it.name
-        };
+            name: it.name,
+            only: it.only,
+            skip: it.skip
+        } as TestCase;
     }).concat(
         loadFixtures().map(it => {
             return {
                 source: it.source,
-                name: `should transform "${it.filepath}" correctly`
+                name: `should transform "${it.filepath}" correctly`,
+                only: false,
+                skip: false
             };
         })
-    ).forEach(({source, name}) => {
-        it(name, () => {
+    ).forEach(({source, name, only, skip}) => {
+        const callback: jest.ProvidesCallback = () => {
             const output = transpile(source, {
                 channelTransformer: transformer
             });
             expect(output).toMatchSnapshot();
-        })
+        };
+        if(only) {
+            it.only(name, callback);
+        } else if(skip) {
+            it.skip(name, callback);
+        } else {
+            it(name, callback);
+        }
     })
 
 });
