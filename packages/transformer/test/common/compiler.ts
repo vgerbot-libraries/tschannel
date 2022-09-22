@@ -28,14 +28,14 @@ export type TranspileOptions = {
     transformers?: Array<ts.TransformerFactory<ts.SourceFile>>;
 };
 
-export function transpile(code: string, transpileOptions: TranspileOptions): string {
+export function transpile(filepath: string, code: string, transpileOptions: TranspileOptions): string {
     const options = Object.assign({}, compilerOptions, transpileOptions.options || {});
     options.suppressOutputPathCheck = true;
     options.allowNonTsExtensions = true;
     const mockTSChannelCode = fs.readFileSync(TSCHANNEL_PATH).toString('utf-8');
 
     const fsMap = new Map<string, string>();
-    fsMap.set('index.ts', code);
+    fsMap.set(filepath, code);
     fsMap.set('/'+TSCHANNEL_CORE_MODULE_NAME+'.ts', mockTSChannelCode);
     fsMap.set('/lib.esnext.full.d.ts', ' ');
 
@@ -62,7 +62,7 @@ export function transpile(code: string, transpileOptions: TranspileOptions): str
         }).filter(Boolean);
     };
     const program = ts.createProgram({
-        rootNames: ['index.ts'],
+        rootNames: [filepath],
         options,
         host: host.compilerHost
     });
@@ -78,6 +78,5 @@ export function transpile(code: string, transpileOptions: TranspileOptions): str
     program.emit(/*targetSourceFile*/ undefined, /*writeFile*/ undefined, /*cancellationToken*/ undefined, /*emitOnlyDtsFiles*/ undefined, {
         before: transformers
     });
-    // console.log(result);
-    return fsMap.get('index.js') || '';
+    return fsMap.get(filepath.replace(/\.ts$/, '.js')) || '';
 }

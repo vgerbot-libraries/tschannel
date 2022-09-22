@@ -93,12 +93,10 @@ class RemoteAPI {
 exports[`@vgerbot/channel-transformer should transform "fixtures/functional APIs.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-var RemoteAPIMembers_1 = [\\"method\\"];
-const channel_1 = require(\\"@vgerbot/channel\\");
-let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
+let channelBuilder = channel(\\"channel-id\\");
 let generator = channelBuilder.connectToMainThread();
 const c = generator.create();
-c.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+c.get_class();
 "
 `;
 

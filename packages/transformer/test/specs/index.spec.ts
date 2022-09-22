@@ -4,6 +4,7 @@ import { loadFixtures, loadSpecialFixtures } from '../common/load-fixture';
 
 interface TestCase {
     source: string;
+    filepath: string;
     name: string;
     only?: boolean;
     skip?: boolean;
@@ -41,6 +42,7 @@ describe('@vgerbot/channel-transformer', () => {
     specialFixtures.map(it => {
         return {
             source: loadSpecialFixtures(it.file).source,
+            filepath: `fixtures/special/${it.file}.ts`,
             name: it.name,
             only: it.only,
             skip: it.skip
@@ -49,14 +51,15 @@ describe('@vgerbot/channel-transformer', () => {
         loadFixtures().map(it => {
             return {
                 source: it.source,
+                filepath: it.filepath,
                 name: `should transform "${it.filepath}" correctly`,
                 only: false,
                 skip: false
             };
         })
-    ).forEach(({source, name, only, skip}) => {
+    ).forEach(({filepath, source, name, only, skip}) => {
         const callback: jest.ProvidesCallback = () => {
-            const output = transpile(source, {
+            const output = transpile(filepath, source, {
                 channelTransformer: transformer
             });
             expect(output).toMatchSnapshot();
