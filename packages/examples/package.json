@@ -13,7 +13,7 @@
     "devDependencies": {
         "@parcel/ts-utils": "^2.7.0",
         "parcel": "^2.7.0",
-        "parcel-transformer-ttypescript": "^1.0.2",
+        "@vgerbot/parcel-transformer-ttypescript": "^1.0.1",
         "@vgerbot/channel-transformer": "1.0.0"
     },
     "dependencies": {

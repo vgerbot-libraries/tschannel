@@ -24,11 +24,9 @@
         "forceConsistentCasingInFileNames": true,
         "experimentalDecorators": true,
         "esModuleInterop": true,
-        "plugins": [
-            {
-                "transform": "@vgerbot/channel-transformer"
-            }
-        ]
+        "plugins": [{
+            "transform": "@vgerbot/channel-transformer"
+        }]
     },
     "include": [
         "./**/src"
