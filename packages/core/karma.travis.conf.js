@@ -14,7 +14,7 @@ module.exports = function (config) {
         skipFilesWithNoCoverage: true
     };
 
-    const rollupPlugins = [,
+    const rollupPlugins = [
         plugins.typescript({
             tsconfig: 'test/tsconfig.json',
             transformers: [
