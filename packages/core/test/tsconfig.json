@@ -3,6 +3,7 @@
     "compilerOptions": {
         "baseUrl": "./",
         "inlineSourceMap": false,
+        "target": "ESNext",
         "sourceMap": true,
         "typeRoots": [
             "../src/typings",
