@@ -1,6 +1,6 @@
 import { Channel, WebWorkerScopeCommunicator } from '@vgerbot/channel';
 type RemoteAPI = {
-    method(){}
+    method();
 };
 const channel = new Channel('', new WebWorkerScopeCommunicator());
 channel.get_class<RemoteAPI>();
