@@ -90,6 +90,16 @@ class RemoteAPI {
 "
 `;
 
+exports[`@vgerbot/channel-transformer should transform "fixtures/autofill parameters.ts" correctly 1`] = `
+"\\"use strict\\";
+Object.defineProperty(exports, \\"__esModule\\", { value: true });
+var RemoteAPIMembers_1 = [\\"method\\"];
+const channel_1 = require(\\"@vgerbot/channel\\");
+const channel = new channel_1.Channel('', new channel_1.WebWorkerScopeCommunicator());
+channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
+"
+`;
+
 exports[`@vgerbot/channel-transformer should transform "fixtures/functional APIs.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
