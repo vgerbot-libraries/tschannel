@@ -7,7 +7,7 @@ class ChannelProgramContext {
     constructor(typeChecker) {
         this.typeChecker = typeChecker;
         this.variablesMap = new Map();
-        this.functional_channel_rel_variables = new Set();
+        this.channel_variables = new Set();
     }
     is_accessing_get_class_method(callExpression, propertyExpression) {
         var _a;
@@ -18,12 +18,27 @@ class ChannelProgramContext {
         if (((_a = callExpression.typeArguments) === null || _a === void 0 ? void 0 : _a.length) !== 1) {
             return false;
         }
+        const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);
+        if (expressionType && expressionType.getSymbol() === this.channelClassSymbol) {
+            return true;
+        }
         const LeftHandSideExpressionSymbol = this.typeChecker.getSymbolAtLocation(propertyExpression.expression);
-        return !!LeftHandSideExpressionSymbol && this.functional_channel_rel_variables.has(LeftHandSideExpressionSymbol);
+        return !!LeftHandSideExpressionSymbol && this.channel_variables.has(LeftHandSideExpressionSymbol);
+    }
+    recordChannelVariableByBinaryExpression(node) {
+        const typeChecker = this.typeChecker;
+        const variables = this.channel_variables;
+        const variableSymbol = typeChecker.getSymbolAtLocation(node.left);
+        if (!variableSymbol) {
+            return;
+        }
+        if (this.isChannelInstanceInitializerExpression(node.right)) {
+            variables.add(variableSymbol);
+        }
     }
     recordChannelVariableIfPossible(node) {
         const typeChecker = this.typeChecker;
-        const variables = this.functional_channel_rel_variables;
+        const variables = this.channel_variables;
         const initializer = node.initializer;
         if (!initializer) {
             return;
@@ -32,31 +47,42 @@ class ChannelProgramContext {
         if (!variableSymbol) {
             return;
         }
+        if (this.isChannelInstanceInitializerExpression(initializer)) {
+            variables.add(variableSymbol);
+        }
+    }
+    isChannelInstanceInitializerExpression(initializer) {
+        const typeChecker = this.typeChecker;
         if (typescript_1.default.isNewExpression(initializer)) {
             const classSymbol = typeChecker.getSymbolAtLocation(initializer.expression);
             if (classSymbol === this.channelClassSymbol) {
-                variables.add(variableSymbol);
+                return true;
             }
         }
         else if (typescript_1.default.isCallExpression(initializer)) {
-            const expression = initializer.expression;
-            if (typescript_1.default.isPropertyAccessExpression(expression)) {
-                const LeftHandSideExpression = expression.expression;
-                const LeftHandSideExpressionSymbol = typeChecker.getSymbolAtLocation(LeftHandSideExpression);
-                if (!LeftHandSideExpressionSymbol) {
-                    return;
+            let expression = initializer.expression;
+            while (true) {
+                if (typescript_1.default.isCallExpression(expression)) {
+                    expression = expression.expression;
                 }
-                if (variables.has(LeftHandSideExpressionSymbol)) {
-                    variables.add(variableSymbol);
+                else if (typescript_1.default.isPropertyAccessExpression(expression)) {
+                    expression = expression.expression;
+                }
+                else {
+                    break;
                 }
             }
-            else if (typescript_1.default.isIdentifier(expression)) {
-                const methodSymbol = typeChecker.getSymbolAtLocation(expression);
-                if (!!this.channelMethodSymbol && methodSymbol === this.channelMethodSymbol) {
-                    variables.add(variableSymbol);
+            if (typescript_1.default.isIdentifier(expression)) {
+                const symbol = typeChecker.getSymbolAtLocation(expression);
+                if (!!this.channelMethodSymbol && this.channelMethodSymbol === symbol) {
+                    return true;
+                }
+                if (symbol) {
+                    return this.channel_variables.has(symbol);
                 }
             }
         }
+        return false;
     }
     recordChannelSymbolIfPossible(node) {
         var _a;

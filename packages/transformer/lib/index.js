@@ -41,6 +41,9 @@ function visitNode(node, program, programCtx, context, options) {
     else if (typescript_1.default.isVariableDeclaration(node)) {
         programCtx.recordChannelVariableIfPossible(node);
     }
+    else if (typescript_1.default.isBinaryExpression(node)) {
+        programCtx.recordChannelVariableByBinaryExpression(node);
+    }
     else if (typescript_1.default.isCallExpression(node)) {
         const propertyExpression = node.expression;
         if (typescript_1.default.isPropertyAccessExpression(propertyExpression)) {

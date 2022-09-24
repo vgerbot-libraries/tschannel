@@ -16,7 +16,6 @@ export default function transformer(
         return (file: ts.Node) => {
             const programCtx = new ChannelProgramContext(program.getTypeChecker());
 
-
             const sourceFileNode = ts.visitEachChild(file, visitor, context) as ts.SourceFile;
 
             const variableDeclarations = Array.from(programCtx.variablesMap.values());
@@ -54,6 +53,8 @@ function visitNode(
         programCtx.recordChannelSymbolIfPossible(node);
     } else if (ts.isVariableDeclaration(node)) {
         programCtx.recordChannelVariableIfPossible(node);
+    } else if(ts.isBinaryExpression(node)) {
+        programCtx.recordChannelVariableByBinaryExpression(node);
     } else if (ts.isCallExpression(node)) {
         const propertyExpression = node.expression;
         if (ts.isPropertyAccessExpression(propertyExpression)) {
