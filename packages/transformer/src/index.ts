@@ -59,7 +59,7 @@ function visitNode(
         const propertyExpression = node.expression;
         if (ts.isPropertyAccessExpression(propertyExpression)) {
 
-            if(!programCtx.is_accessing_get_class_method(node, propertyExpression)) {
+            if(!programCtx.isAccessingTheGetClassMethod(node, propertyExpression)) {
                 return;
             }
 

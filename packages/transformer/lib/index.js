@@ -47,7 +47,7 @@ function visitNode(node, program, programCtx, context, options) {
     else if (typescript_1.default.isCallExpression(node)) {
         const propertyExpression = node.expression;
         if (typescript_1.default.isPropertyAccessExpression(propertyExpression)) {
-            if (!programCtx.is_accessing_get_class_method(node, propertyExpression)) {
+            if (!programCtx.isAccessingTheGetClassMethod(node, propertyExpression)) {
                 return;
             }
             const typeArgs = node.typeArguments;

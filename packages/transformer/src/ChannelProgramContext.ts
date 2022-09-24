@@ -7,7 +7,7 @@ export class ChannelProgramContext {
     public variablesMap = new Map<ts.Type, ts.VariableDeclaration>();
     public channel_variables = new Set<ts.Symbol>();
 
-    is_accessing_get_class_method(callExpression: ts.CallExpression, propertyExpression: ts.PropertyAccessExpression) {
+    isAccessingTheGetClassMethod(callExpression: ts.CallExpression, propertyExpression: ts.PropertyAccessExpression) {
         const propertyName = propertyExpression.name.text;
         if (propertyName !== 'get_class') {
             return false;

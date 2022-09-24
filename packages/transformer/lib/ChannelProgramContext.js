@@ -9,7 +9,7 @@ class ChannelProgramContext {
         this.variablesMap = new Map();
         this.channel_variables = new Set();
     }
-    is_accessing_get_class_method(callExpression, propertyExpression) {
+    isAccessingTheGetClassMethod(callExpression, propertyExpression) {
         var _a;
         const propertyName = propertyExpression.name.text;
         if (propertyName !== 'get_class') {
