@@ -1,1 +1,2 @@
-# @vgerbot/channel [![Build Status](https://travis-ci.com/y1j2x34/channel-ts.svg?branch=master)](https://travis-ci.com/y1j2x34/channel-ts) [![codecov](https://codecov.io/gh/y1j2x34/channel-ts/branch/master/graph/badge.svg?token=fPomBmOknB)](https://codecov.io/gh/y1j2x34/channel-ts)
+# @vgerbot/channel ![tschannel workflow](https://github.com/y1j2x34/channel-ts/actions/workflows/runtest.yml/badge.svg) [![codecov](https://codecov.io/gh/vgerbot-libraries/tschannel/branch/master/graph/badge.svg?token=fPomBmOknB)](https://codecov.io/gh/vgerbot-libraries/tschannel)
+
