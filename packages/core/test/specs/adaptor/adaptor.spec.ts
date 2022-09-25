@@ -1,6 +1,5 @@
 import LocalCommunicator from 'common/communicator/LocalCommunicator';
-import { Channel /*, ParameterType, get_method */ } from '@vgerbot/channel';
-import { Adaptor } from '../../../src/Adaptor';
+import { Adaptor, Channel /*, ParameterType, get_method */ } from '@vgerbot/channel';
 
 describe('channel adaptor', () => {
     let localCommunicator: LocalCommunicator;
