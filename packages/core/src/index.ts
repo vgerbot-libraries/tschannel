@@ -20,4 +20,4 @@ export { StorageChannelCommunicator } from './communicators/StorageChannelCommun
 export { Adaptor } from './Adaptor';
 export { Destructible } from './foundation/Destructible';
 
-export * from './functional';
+export * from './builder';
