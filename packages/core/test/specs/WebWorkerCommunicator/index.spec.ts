@@ -1,13 +1,15 @@
-import { Channel, WebWorkerCommunicator } from '@vgerbot/channel';
+import { channel as fchannel } from '@vgerbot/channel';
 import { Animal, CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 import { sendCoverageData } from '../../common/sendCoverageData';
 
 describe('WebWorkerCommunicator', () => {
-    const channel = new Channel(
-        CHANNEL_ID,
-        new WebWorkerCommunicator('/base/test/specs/WebWorkerCommunicator/worker.external.js')
-    );
+    const channel = fchannel(CHANNEL_ID)
+        .connectToWorker('/base/test/specs/WebWorkerCommunicator/worker.external.js')
+        .options({
+            credentials: 'same-origin'
+        })
+        .create();
     it('Should get_method work correctly', () => {
         return expect(channel.get_method<() => string>('hello')()).to.eventually.become('world');
     });
