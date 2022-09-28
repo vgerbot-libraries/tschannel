@@ -125,7 +125,7 @@ export default class MessageAdaptor {
         if (!namespace) {
             return this.throwError(callId, new Error(`namespace not exist: ${ns}`), ns, methodName);
         }
-        const method = namespace.def_method(methodName);
+        const method = namespace.get_local_method(methodName);
         if (typeof method !== 'function') {
             return this.throwError(
                 callId,

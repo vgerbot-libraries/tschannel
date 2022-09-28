@@ -29,7 +29,7 @@ export class RMINamespace implements Destructible {
     public getOriginObject() {
         return this.origin;
     }
-    public def_method<T extends AnyFunction = AnyFunction>(name: string, func?: T): T {
+    public def_method<T extends AnyFunction = AnyFunction>(name: string, func?: T) {
         if (typeof func === 'function') {
             if (this.containsMethod(name)) {
                 throw new Error(
@@ -38,7 +38,9 @@ export class RMINamespace implements Destructible {
             }
             this.local_methods[name] = func;
         }
-        return this.local_methods[name] as T;
+    }
+    public get_local_method<T extends AnyFunction = AnyFunction>(name: string) {
+        return this.local_methods[name] as T | undefined;
     }
     public containsMethod(name: string): boolean {
         return typeof this.local_methods[name] === 'function';

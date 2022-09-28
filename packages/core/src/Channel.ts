@@ -33,12 +33,14 @@ export class Channel {
     private readonly adaptor: MessageAdaptor;
     private readonly namespaces: Record<string, RMINamespace> = {};
     private _isDestroyed = false;
+
     constructor(id: string, communicator: Communicator) {
         this.adaptor = new MessageAdaptor(id, communicator, this.namespaces);
         this.globalNamespace = new RMINamespace('global', this.adaptor, this.globalInstance);
         this.namespaces[this.globalNamespace.id] = this.globalNamespace;
         this.def_instance(this.globalNamespace, this.globalInstance);
     }
+
     public get_class<T>(
         remoteClassId?: string,
         _clazzOrMembers?: Constructor<T> | Array<keyof T>
@@ -64,9 +66,11 @@ export class Channel {
         if (typeof remoteClassId !== 'string' || remoteClassId.length < 1) {
             throw new Error(`Incorrect classId: ${remoteClassId}`);
         }
+
         class cls extends clazz implements Remote {
             public readonly $namespace = new RMINamespace(uid(), channel.adaptor, this);
             public readonly $initPromise: Promise<void>;
+
             constructor(...args) {
                 super(...args);
                 channel.namespaces[this.$namespace.id] = this.$namespace;
@@ -75,10 +79,12 @@ export class Channel {
                     args
                 ) as Promise<void>;
             }
+
             __destroy__() {
                 return channel.destroyThat(this);
             }
         }
+
         const propertyNames = Object.getOwnPropertyNames(clazz.prototype).filter(it => it !== 'constructor');
         propertyNames.forEach(propertyName => {
             const propertyValue = clazz.prototype[propertyName];
@@ -98,7 +104,12 @@ export class Channel {
         });
         return cls as unknown as PromisifyClass<T & Remote>;
     }
-    public def_class(id: string, clazz: AnyConstructor) {
+    public def_class(id: string, clazz: AnyConstructor);
+    public def_class(clazz: AnyConstructor);
+    public def_class(...args) {
+        const id = args[0] as string;
+        const clazz = args[1] as AnyConstructor;
+
         const constructorMethodName = id + '-new-instance';
         if (this.globalNamespace.containsMethod(constructorMethodName)) {
             throw new Error(`Duplicate local class id: ${id}`);
@@ -117,6 +128,7 @@ export class Channel {
             this.def_instance(namespace, instance, methodNames);
         });
     }
+
     public def_instance(id: string | RMINamespace, instance: Object, methodNames: string[] = Object.keys(instance)) {
         const namespace = id instanceof RMINamespace ? id : new RMINamespace(id, this.adaptor, instance);
         methodNames.forEach(name => {
@@ -128,6 +140,7 @@ export class Channel {
         });
         this.namespaces[namespace.id] = namespace;
     }
+
     public get_method<F extends AnyFunction, T = void>(
         metadata: string | RMIMethodMetadata,
         func?: F
@@ -137,9 +150,18 @@ export class Channel {
         }
         return this.globalNamespace.get_method(metadata) as Promisify<F, T>;
     }
-    public def_method(name: string, func?: AnyFunction) {
-        return this.globalNamespace.def_method(name, func);
+
+    public def_method(name: string, func: AnyFunction);
+    public def_method(func: AnyFunction);
+    public def_method(...args) {
+        const name = args[0] as string;
+        const func = args[1] as AnyFunction;
+        if (typeof name !== 'string') {
+            throw new Error('Illegal argument: name is not a string!');
+        }
+        this.globalNamespace.def_method(name, func);
     }
+
     public destroyThat<T>(remote_instance: T): Promise<void> {
         const namespace = (remote_instance as unknown as RMIClass).$namespace;
         if (!namespace) {
@@ -148,9 +170,11 @@ export class Channel {
         delete this.namespaces[namespace.id];
         return this.get_method('__destroy__')(namespace.id) as Promise<void>;
     }
+
     public get isDestroyed() {
         return this._isDestroyed;
     }
+
     public async destroy() {
         if (this._isDestroyed) {
             return;
