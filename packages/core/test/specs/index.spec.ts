@@ -62,7 +62,7 @@ describe('Remote method invocation', () => {
                 return this.type;
             }
         }
-        remoteChannel.def_class('Animal', DogImpl);
+        remoteChannel.def_class(DogImpl, 'Animal');
 
         const RemoteDogClass = localChannel.get_class<Animal>();
 
@@ -103,7 +103,7 @@ describe('Remote method invocation', () => {
                 }
             }
         }
-        remoteChannel.def_class('MediaProcessor', MediaProcessorImpl);
+        remoteChannel.def_class(MediaProcessorImpl, 'MediaProcessor');
 
         const RemoteMediaProcessorImpl = localChannel.get_class<MediaProcessor>();
 
@@ -141,9 +141,9 @@ describe('Remote method invocation', () => {
     });
 
     it('Should raise an error when register multiple local classes with same id', () => {
-        remoteChannel.def_class('computer', class Computer {});
+        remoteChannel.def_class(class Computer {}, 'computer');
         const callback = sinon.spy(() => {
-            remoteChannel.def_class('computer', class Computer {});
+            remoteChannel.def_class(class Computer {}, 'computer');
         });
         expect(callback).to.throw();
     });
@@ -165,7 +165,7 @@ describe('Remote method invocation', () => {
                 });
             }
         }
-        remoteChannel.def_class('FileStorage', FileStorageImpl);
+        remoteChannel.def_class(FileStorageImpl, 'FileStorage');
         // ========================== remote end ==========================
 
         // ========================== local ==========================
@@ -187,8 +187,8 @@ describe('Remote method invocation', () => {
                 return a instanceof A;
             }
         }
-        remoteChannel.def_class('A', A);
-        remoteChannel.def_class('B', B);
+        remoteChannel.def_class(A, 'A');
+        remoteChannel.def_class(B, 'B');
 
         const RemoteA = localChannel.get_class<A>();
         const RemoteB = localChannel.get_class<B>();
@@ -205,7 +205,6 @@ describe('Remote method invocation', () => {
             method2(): string;
         }
         localChannel.def_class(
-            'RemoteAPI',
             class implements RemoteAPI {
                 method1() {
                     return 'method1';
@@ -213,7 +212,8 @@ describe('Remote method invocation', () => {
                 method2() {
                     return 'method2';
                 }
-            }
+            },
+            'RemoteAPI'
         );
         const RemoteAPIImpl = remoteChannel.get_class<RemoteAPI>('RemoteAPI', ['method1', 'method2']);
 

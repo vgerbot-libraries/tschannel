@@ -10,9 +10,12 @@ export default function uid(template = 'xxxxxxxx') {
 }
 const u = new Uint32Array(1);
 function random() {
-    if(!crypto) {
+    if (!crypto) {
         return Math.random();
     }
-    const value = crypto.getRandomValues(u).at(0)!;
-    return value / 0xFFFFFFFF;
+    const value = crypto.getRandomValues(u).at(0);
+    if (value === undefined) {
+        return Math.random();
+    }
+    return value / 0xffffffff;
 }

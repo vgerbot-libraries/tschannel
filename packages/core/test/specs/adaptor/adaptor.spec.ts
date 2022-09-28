@@ -50,8 +50,8 @@ describe('channel adaptor', () => {
                 return a instanceof A;
             }
         }
-        remoteChannel.def_class('A', A);
-        remoteChannel.def_class('B', B);
+        remoteChannel.def_class(A, 'A');
+        remoteChannel.def_class(B, 'B');
 
         // class BDef {
         //     @get_method({

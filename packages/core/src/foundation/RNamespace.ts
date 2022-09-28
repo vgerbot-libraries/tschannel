@@ -3,7 +3,7 @@ import { AnyFunction } from '../types/AnyFunction';
 import { Destructible } from './Destructible';
 import MessageAdaptor from './MessageAdaptor';
 
-export class RMINamespace implements Destructible{
+export class RMINamespace implements Destructible {
     private readonly remote_methods: Record<string, AnyFunction> = {};
     private readonly local_methods: Record<string, AnyFunction> = {};
     constructor(public readonly id: string, private readonly adaptor: MessageAdaptor, private origin: Object) {}
@@ -46,7 +46,7 @@ export class RMINamespace implements Destructible{
     public __destroy__() {
         this.clear();
         const destructible = this.origin as Destructible;
-        if(typeof destructible.__destroy__ === 'function') {
+        if (typeof destructible.__destroy__ === 'function') {
             destructible.__destroy__();
         }
     }

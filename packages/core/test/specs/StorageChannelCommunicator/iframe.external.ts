@@ -1,9 +1,7 @@
 import { channel } from '@vgerbot/channel';
 import { CHANNEL_ID } from './common';
 
-const storageChannel = channel(CHANNEL_ID)
-    .connectViaStorage(localStorage)
-    .create();
+const storageChannel = channel(CHANNEL_ID).connectViaStorage(localStorage).create();
 
 storageChannel.def_method('hello', () => 'world');
 

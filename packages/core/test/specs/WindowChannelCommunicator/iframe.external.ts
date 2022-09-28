@@ -6,13 +6,13 @@ const channel = new Channel(CHANNEL_ID, new WindowChannelCommunicator(window.par
 channel.def_method('hello', () => 'world');
 
 channel.def_class(
-    'Dog',
     class Dog implements Animal {
         constructor(private type: string) {}
         public getType(): string {
             return this.type;
         }
-    }
+    },
+    'Dog'
 );
 channel.def_method('get-coverage', () => {
     return __coverage__;
