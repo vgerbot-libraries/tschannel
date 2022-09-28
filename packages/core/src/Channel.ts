@@ -59,7 +59,7 @@ export class Channel {
                 }, {} as Record<string | symbol, typeof abstractMethod>)
             );
         } else {
-            clazz = (_clazzOrMembers as unknown) as RMIClassConstructor;
+            clazz = _clazzOrMembers as unknown as RMIClassConstructor;
         }
         if (typeof remoteClassId !== 'string' || remoteClassId.length < 1) {
             throw new Error(`Incorrect classId: ${remoteClassId}`);
@@ -90,13 +90,13 @@ export class Channel {
                 return;
             }
             const metadata = new RMIMethodMetadata(propertyName, method.options);
-            cls.prototype[propertyName] = function(this: cls, ...args) {
+            cls.prototype[propertyName] = function (this: cls, ...args) {
                 return this.$initPromise.then(() => {
                     return this.$namespace.get_method(metadata).apply(this, args);
                 });
             };
         });
-        return (cls as unknown) as PromisifyClass<T & Remote>;
+        return cls as unknown as PromisifyClass<T & Remote>;
     }
     public def_class(id: string, clazz: AnyConstructor) {
         const constructorMethodName = id + '-new-instance';
@@ -133,7 +133,7 @@ export class Channel {
         func?: F
     ): (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>> {
         if (typeof metadata === 'string') {
-            metadata = new RMIMethodMetadata(metadata, ((func as unknown) as RMIMethod)?.options || {});
+            metadata = new RMIMethodMetadata(metadata, (func as unknown as RMIMethod)?.options || {});
         }
         return this.globalNamespace.get_method(metadata) as Promisify<F, T>;
     }
@@ -141,7 +141,7 @@ export class Channel {
         return this.globalNamespace.def_method(name, func);
     }
     public destroyThat<T>(remote_instance: T): Promise<void> {
-        const namespace = ((remote_instance as unknown) as RMIClass).$namespace;
+        const namespace = (remote_instance as unknown as RMIClass).$namespace;
         if (!namespace) {
             return Promise.reject(new Error('Illegal argument: target is not a remote instance!'));
         }
@@ -159,8 +159,8 @@ export class Channel {
         await Promise.all(
             Object.keys(this.namespaces).map(id => {
                 return this.namespaces[id].__destroy__();
-            }
-        ));
+            })
+        );
         this.adaptor.destroy();
         this._isDestroyed = true;
     }

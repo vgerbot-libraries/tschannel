@@ -1,9 +1,7 @@
 import { channel } from '@vgerbot/channel';
 import { Animal, CHANNEL_ID } from './common';
 
-const workerChannel = channel(CHANNEL_ID)
-    .connectToMainThread()
-    .create();
+const workerChannel = channel(CHANNEL_ID).connectToMainThread().create();
 
 workerChannel.def_method('hello', () => 'world');
 
