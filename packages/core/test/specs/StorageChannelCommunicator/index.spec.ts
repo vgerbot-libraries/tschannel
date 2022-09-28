@@ -3,7 +3,7 @@ import { sendCoverageData } from '../../common/sendCoverageData';
 import { CHANNEL_ID } from './common';
 import istanbul from 'istanbul-lib-coverage';
 
-describe('StorageChannelCommunicator', function () {
+describe('StorageChannelCommunicator', function() {
     this.timeout(1000 * 20000);
     let storageChannel: Channel;
     let iframe: HTMLIFrameElement;
@@ -18,7 +18,9 @@ describe('StorageChannelCommunicator', function () {
         iframe.src = url;
         document.body.appendChild(iframe);
         await promise;
-        storageChannel = channel(CHANNEL_ID).connectViaStorage(localStorage).create();
+        storageChannel = channel(CHANNEL_ID)
+            .connectViaStorage(localStorage)
+            .create();
     });
 
     it('Should get_method work correctly', async () => {

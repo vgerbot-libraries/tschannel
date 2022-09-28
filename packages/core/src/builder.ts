@@ -98,9 +98,7 @@ export function channel(channelId: string) {
             };
         },
         parallel<T extends Communicator>(parallels: number, generator: (index: number) => T) {
-            const communicators = Array(parallels)
-                .fill(undefined)
-                .map((_, index) => generator(index));
+            const communicators = Array(parallels).fill(undefined).map((_, index) => generator(index));
             return new ParallelChannelChainGenerator(channelId, communicators);
         }
     };

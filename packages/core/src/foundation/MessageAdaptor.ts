@@ -92,7 +92,10 @@ export default class MessageAdaptor {
         this.communicator.send(payload);
     }
     public waitForAllReturn() {
-        return Promise.all(Object.keys(this.deferes).map(key => this.deferes[key].promise));
+        return Promise.all(
+            Object.keys(this.deferes)
+                .map(key => this.deferes[key].promise)
+        );
     }
     public destroy() {
         this.removeMessageReceiver();

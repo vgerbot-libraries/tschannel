@@ -49,10 +49,20 @@ const channelInstance = channel(CHANNEL_ID)
 
 // 注册一个本地方法
 channelInstance.def_method(REMOTE_UPLOAD_METHOD, (file: ArrayBuffer, onprogress: (ratio: number) => void) => {
+    let resolve;
+    let promise = new Promise(resolve_ => resolve = resolve_)
+    let ratio = 0;
     // 模拟文件上传
-    for(let i=0;i<=100; i++) {
-       onprogress(i / 100);
-    }
+    let timmerId = setInterval(() => {
+        ratio = Math.min(1, ratio + Math.random() / 100);
+        if(ratio === 1) {
+            resolve();
+            clearInterval(ratio);
+        } else {
+            onprogress(ratio);
+        }
+    }, 10);
+    return promise;
 })
 ```
 

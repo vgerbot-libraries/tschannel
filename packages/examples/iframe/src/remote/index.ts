@@ -20,7 +20,7 @@ class ClassDefinedInIframe implements CrossIframeClassInterface {
         console.log('hello world');
     }
 }
-channel.def_class(ClassDefinedInIframe, 'ClassDefinedInIframe');
+channel.def_class('ClassDefinedInIframe', ClassDefinedInIframe);
 channel.def_method('say_hello', (a: ClassDefinedInIframe) => {
     a.hello();
 })
