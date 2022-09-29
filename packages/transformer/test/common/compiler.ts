@@ -1,8 +1,8 @@
 /* istanbul ignore file */
-import ts from 'typescript';
-import path from 'path';
-import fs from 'fs';
 import { createSystem, createVirtualCompilerHost } from '@typescript/vfs';
+import fs from 'fs';
+import path from 'path';
+import ts from 'typescript';
 
 export type TSChannelTransformerType = (program: ts.Program) => ts.TransformerFactory<ts.SourceFile>;
 
@@ -24,7 +24,7 @@ const compilerOptions: ts.CompilerOptions = {
 
 export type TranspileOptions = {
     options?: ts.CompilerOptions;
-    channelTransformer?: TSChannelTransformerType,
+    channelTransformer?: TSChannelTransformerType;
     transformers?: Array<ts.TransformerFactory<ts.SourceFile>>;
 };
 
@@ -36,7 +36,7 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
 
     const fsMap = new Map<string, string>();
     fsMap.set(filepath, code);
-    fsMap.set('/'+TSCHANNEL_CORE_MODULE_NAME+'.ts', mockTSChannelCode);
+    fsMap.set('/' + TSCHANNEL_CORE_MODULE_NAME + '.ts', mockTSChannelCode);
     fsMap.set('/lib.esnext.full.d.ts', ' ');
 
     const system = createSystem(fsMap);
@@ -47,19 +47,21 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
         containingFile: string,
         reusedNames: string[] | undefined,
         redirectedReference: ts.ResolvedProjectReference | undefined,
-        options: ts.CompilerOptions): (ts.ResolvedModule | undefined)[] => {
-
-        return moduleNames.map(moduleName => {
-            const result = ts.resolveModuleName(moduleName, containingFile, options, {
-                fileExists(fileName){
-                    return fsMap.has(fileName) || ts.sys.fileExists(fileName);
-                },
-                readFile(fileName) {
-                    return fsMap.get(fileName) || ts.sys.readFile(fileName);
-                }
-            });
-            return result.resolvedModule;
-        }).filter(Boolean);
+        options: ts.CompilerOptions
+    ): (ts.ResolvedModule | undefined)[] => {
+        return moduleNames
+            .map(moduleName => {
+                const result = ts.resolveModuleName(moduleName, containingFile, options, {
+                    fileExists(fileName) {
+                        return fsMap.has(fileName) || ts.sys.fileExists(fileName);
+                    },
+                    readFile(fileName) {
+                        return fsMap.get(fileName) || ts.sys.readFile(fileName);
+                    }
+                });
+                return result.resolvedModule;
+            })
+            .filter(Boolean);
     };
     const program = ts.createProgram({
         rootNames: [filepath],
@@ -68,15 +70,21 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
     });
 
     const transformers: Array<ts.TransformerFactory<ts.SourceFile>> = [];
-    if(transpileOptions.transformers) {
+    if (transpileOptions.transformers) {
         transformers.push(...transpileOptions.transformers);
     }
-    if(transpileOptions.channelTransformer) {
+    if (transpileOptions.channelTransformer) {
         transformers.push(transpileOptions.channelTransformer(program));
     }
     // console.info(program.getSourceFiles());
-    program.emit(/*targetSourceFile*/ undefined, /*writeFile*/ undefined, /*cancellationToken*/ undefined, /*emitOnlyDtsFiles*/ undefined, {
-        before: transformers
-    });
+    program.emit(
+        /*targetSourceFile*/ undefined,
+        /*writeFile*/ undefined,
+        /*cancellationToken*/ undefined,
+        /*emitOnlyDtsFiles*/ undefined,
+        {
+            before: transformers
+        }
+    );
     return fsMap.get(filepath.replace(/\.ts$/, '.js')) || '';
 }

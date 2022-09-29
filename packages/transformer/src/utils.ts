@@ -12,7 +12,7 @@ export function getTypeNodeDecration(typeNodeObj: ts.Type) {
 }
 
 export function createMemberNamesvariable(variableName: string, memberNames: string[], factory: ts.NodeFactory) {
-    const memberNameLiterals = memberNames.map((it) => {
+    const memberNameLiterals = memberNames.map(it => {
         return factory.createStringLiteral(it);
     });
 
@@ -20,16 +20,10 @@ export function createMemberNamesvariable(variableName: string, memberNames: str
 
     const membersVariableName = factory.createUniqueName(variableName);
 
-    return factory.createVariableDeclaration(
-        membersVariableName,
-        undefined,
-        undefined,
-        membersArrayExpression
-    );
+    return factory.createVariableDeclaration(membersVariableName, undefined, undefined, membersArrayExpression);
 }
 
 export function getMethodMembersFrom(typeChecker: ts.TypeChecker, typeNode: ts.Type) {
     const members = typeChecker.getPropertiesOfType(typeNode);
-    return members.filter((it) => it.valueDeclaration !== undefined && ts.isMethodSignature(it.valueDeclaration));
+    return members.filter(it => it.valueDeclaration !== undefined && ts.isMethodSignature(it.valueDeclaration));
 }
-

@@ -2,6 +2,7 @@ import ts from 'typescript';
 
 export class ChannelProgramContext {
     constructor(private readonly typeChecker: ts.TypeChecker) {}
+
     public channelMethodSymbol?: ts.Symbol;
     public channelClassSymbol?: ts.Symbol;
     public variablesMap = new Map<ts.Type, ts.VariableDeclaration>();
@@ -12,11 +13,11 @@ export class ChannelProgramContext {
         if (propertyName !== 'get_class') {
             return false;
         }
-        if(callExpression.typeArguments?.length !== 1) {
+        if (callExpression.typeArguments?.length !== 1) {
             return false;
         }
         const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);
-        if(expressionType && expressionType.getSymbol() === this.channelClassSymbol) {
+        if (expressionType && expressionType.getSymbol() === this.channelClassSymbol) {
             return true;
         }
         const LeftHandSideExpressionSymbol = this.typeChecker.getSymbolAtLocation(propertyExpression.expression);
@@ -28,71 +29,74 @@ export class ChannelProgramContext {
         const variables = this.channel_variables;
 
         const variableSymbol = typeChecker.getSymbolAtLocation(node.left);
-        if(!variableSymbol) {
+        if (!variableSymbol) {
             return;
         }
-        if(this.isChannelInstanceInitializerExpression(node.right)) {
+        if (this.isChannelInstanceInitializerExpression(node.right)) {
             variables.add(variableSymbol);
         }
     }
+
     recordChannelVariableIfPossible(node: ts.VariableDeclaration) {
         const typeChecker = this.typeChecker;
         const variables = this.channel_variables;
         const initializer = node.initializer;
-        if(!initializer) {
+        if (!initializer) {
             return;
         }
         const variableSymbol = typeChecker.getSymbolAtLocation(node.name);
-        if(!variableSymbol) {
+        if (!variableSymbol) {
             return;
         }
-        if(this.isChannelInstanceInitializerExpression(initializer)) {
+        if (this.isChannelInstanceInitializerExpression(initializer)) {
             variables.add(variableSymbol);
         }
     }
+
     private isChannelInstanceInitializerExpression(initializer: ts.Expression) {
         const typeChecker = this.typeChecker;
-        if(ts.isNewExpression(initializer)) {
+        if (ts.isNewExpression(initializer)) {
             const classSymbol = typeChecker.getSymbolAtLocation(initializer.expression);
-            if(classSymbol === this.channelClassSymbol) {
+            if (classSymbol === this.channelClassSymbol) {
                 return true;
             }
-        } else if(ts.isCallExpression(initializer)) {
+        } else if (ts.isCallExpression(initializer)) {
             let expression = initializer.expression;
-            while(true) {
-                if(ts.isCallExpression(expression)) {
+            while (true) {
+                if (ts.isCallExpression(expression)) {
                     expression = expression.expression;
-                } else if(ts.isPropertyAccessExpression(expression)) {
+                } else if (ts.isPropertyAccessExpression(expression)) {
                     expression = expression.expression;
                 } else {
                     break;
                 }
             }
-            if(ts.isIdentifier(expression)) {
+            if (ts.isIdentifier(expression)) {
                 const symbol = typeChecker.getSymbolAtLocation(expression);
-                if(!!this.channelMethodSymbol && this.channelMethodSymbol === symbol) {
+                if (!!this.channelMethodSymbol && this.channelMethodSymbol === symbol) {
                     return true;
                 }
-                if(symbol) {
+                if (symbol) {
                     return this.channel_variables.has(symbol);
                 }
             }
         }
         return false;
     }
+
     recordChannelSymbolIfPossible(node: ts.ImportDeclaration) {
         const namedBindings = node.importClause?.namedBindings;
-        if(namedBindings && ts.isNamedImports(namedBindings)) {
+        if (namedBindings && ts.isNamedImports(namedBindings)) {
             const importElementsArray = namedBindings.elements.map(it => {
                 const name = it.propertyName ? it.propertyName.text : it.name.text;
                 return { name, importSpecifier: it, symbol: this.typeChecker.getSymbolAtLocation(it.name) };
-            })
+            });
             const { symbol: channelMethodSymbol } = importElementsArray.find(it => it.name === 'channel') || {};
-            if(channelMethodSymbol) {
+            if (channelMethodSymbol) {
                 this.channelMethodSymbol = channelMethodSymbol;
             }
             const { symbol: channelClassSymbol } = importElementsArray.find(it => it.name === 'Channel') || {};
-            if(channelClassSymbol) {
+            if (channelClassSymbol) {
                 this.channelClassSymbol = channelClassSymbol;
             }
         }

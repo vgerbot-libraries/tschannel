@@ -1,6 +1,6 @@
-import ts, { factory } from 'typescript';
-import { getTypeNodeDecration, getMethodMembersFrom, createMemberNamesvariable } from './utils';
 import { CHANNEL_MODULE_NAME, DEFAULT_TRANSFORMER_OPTIONS } from './consts';
+import { createMemberNamesvariable, getMethodMembersFrom, getTypeNodeDecration } from './utils';
+import ts, { factory } from 'typescript';
 import { ChannelProgramContext } from './ChannelProgramContext';
 import { TransformerOptions } from './TransformerOptions';
 
@@ -10,7 +10,7 @@ export default function transformer(
 ): ts.TransformerFactory<ts.SourceFile> {
     const resolvedOptions = {
         ...DEFAULT_TRANSFORMER_OPTIONS,
-        ...(options || {}),
+        ...(options || {})
     };
     return (context: ts.TransformationContext) => {
         return (file: ts.Node) => {
@@ -40,6 +40,7 @@ function visitNode(
     program: ts.Program,
     programCtx: ChannelProgramContext,
     context: ts.TransformationContext,
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     options: TransformerOptions
 ): undefined | ts.Node | Array<ts.Node> {
     const variablesMap = programCtx.variablesMap;
@@ -47,19 +48,18 @@ function visitNode(
     const factory = context.factory;
     if (ts.isImportDeclaration(node) && ts.isStringLiteralLike(node.moduleSpecifier)) {
         const moduleName = node.moduleSpecifier.text;
-        if(moduleName !== CHANNEL_MODULE_NAME) {
+        if (moduleName !== CHANNEL_MODULE_NAME) {
             return;
         }
         programCtx.recordChannelSymbolIfPossible(node);
     } else if (ts.isVariableDeclaration(node)) {
         programCtx.recordChannelVariableIfPossible(node);
-    } else if(ts.isBinaryExpression(node)) {
+    } else if (ts.isBinaryExpression(node)) {
         programCtx.recordChannelVariableByBinaryExpression(node);
     } else if (ts.isCallExpression(node)) {
         const propertyExpression = node.expression;
         if (ts.isPropertyAccessExpression(propertyExpression)) {
-
-            if(!programCtx.isAccessingTheGetClassMethod(node, propertyExpression)) {
+            if (!programCtx.isAccessingTheGetClassMethod(node, propertyExpression)) {
                 return;
             }
 
@@ -85,7 +85,7 @@ function visitNode(
             let memberNames: undefined | string[];
             if (ts.isClassDeclaration(typeNodeDeclaration)) {
                 const modifiers = (typeNodeDeclaration as ts.ClassDeclaration).modifiers;
-                const isAbstract = !!modifiers && modifiers.some((it) => it.kind === ts.SyntaxKind.AbstractKeyword);
+                const isAbstract = !!modifiers && modifiers.some(it => it.kind === ts.SyntaxKind.AbstractKeyword);
                 if (!isAbstract) {
                     return factory.createCallExpression(
                         node.expression,
@@ -94,7 +94,10 @@ function visitNode(
                     );
                 }
                 interfaceNode = typeChecker.getTypeAtLocation(typeNodeDeclaration);
-                memberNames = typeNodeDeclaration.members.filter((it) => !!it.name).map((it) => it.name!.getText());
+                memberNames = typeNodeDeclaration.members
+                    .filter(it => !!it.name)
+                    .map(it => it.name?.getText())
+                    .filter(Boolean) as string[];
             } else {
                 interfaceNode = typeChecker.getTypeFromTypeNode(typeNode);
             }
