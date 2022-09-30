@@ -16,7 +16,7 @@ function getTypeNodeDecration(typeNodeObj) {
 }
 exports.getTypeNodeDecration = getTypeNodeDecration;
 function createMemberNamesvariable(variableName, memberNames, factory) {
-    const memberNameLiterals = memberNames.map((it) => {
+    const memberNameLiterals = memberNames.map(it => {
         return factory.createStringLiteral(it);
     });
     const membersArrayExpression = factory.createArrayLiteralExpression(memberNameLiterals);
@@ -26,7 +26,7 @@ function createMemberNamesvariable(variableName, memberNames, factory) {
 exports.createMemberNamesvariable = createMemberNamesvariable;
 function getMethodMembersFrom(typeChecker, typeNode) {
     const members = typeChecker.getPropertiesOfType(typeNode);
-    return members.filter((it) => it.valueDeclaration !== undefined && typescript_1.default.isMethodSignature(it.valueDeclaration));
+    return members.filter(it => it.valueDeclaration !== undefined && typescript_1.default.isMethodSignature(it.valueDeclaration));
 }
 exports.getMethodMembersFrom = getMethodMembersFrom;
 //# sourceMappingURL=utils.js.map

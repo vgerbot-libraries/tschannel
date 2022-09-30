@@ -9,6 +9,53 @@ class ChannelProgramContext {
         this.variablesMap = new Map();
         this.channel_variables = new Set();
     }
+    isAccessingDefClassMethod(callExpression, propertyExpression) {
+        const propertyName = propertyExpression.name.text;
+        if (propertyName !== 'def_class') {
+            return false;
+        }
+        const args = callExpression.arguments;
+        if (args.length !== 1) {
+            return false;
+        }
+        const argSymbol = this.typeChecker.getSymbolAtLocation(args[0]);
+        const declaration = argSymbol === null || argSymbol === void 0 ? void 0 : argSymbol.valueDeclaration;
+        return !!declaration && typescript_1.default.isClassDeclaration(declaration);
+    }
+    isAccessingDefMethodMethod(callExpression, propertyExpression) {
+        const propertyName = propertyExpression.name.text;
+        if (propertyName !== 'def_method') {
+            return false;
+        }
+        const args = callExpression.arguments;
+        if (args.length !== 1) {
+            return false;
+        }
+        const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);
+        if (expressionType && expressionType.getSymbol() !== this.channelClassSymbol) {
+            return false;
+        }
+        if (typescript_1.default.isArrowFunction(args[0])) {
+            throw new Error('The first function parameter of Channel.def_method cannot be anonymous');
+        }
+        if (typescript_1.default.isFunctionExpression(args[0])) {
+            const functionName = args[0].name;
+            if (!functionName) {
+                throw new Error('The first function parameter of Channel.def_method cannot be anonymous');
+            }
+            return true;
+        }
+        else if (typescript_1.default.isIdentifier(args[0])) {
+            const symbol = this.typeChecker.getSymbolAtLocation(args[0]);
+            if (symbol) {
+                const declaration = symbol.declarations ? symbol.declarations[0] : undefined;
+                if (declaration && typescript_1.default.isFunctionDeclaration(declaration)) {
+                    return true;
+                }
+            }
+        }
+        return false;
+    }
     isAccessingTheGetClassMethod(callExpression, propertyExpression) {
         var _a;
         const propertyName = propertyExpression.name.text;
@@ -88,15 +135,15 @@ class ChannelProgramContext {
         var _a;
         const namedBindings = (_a = node.importClause) === null || _a === void 0 ? void 0 : _a.namedBindings;
         if (namedBindings && typescript_1.default.isNamedImports(namedBindings)) {
-            const importElementsArray = namedBindings.elements.map(it => {
+            const importElementsArray = namedBindings.elements.map((it) => {
                 const name = it.propertyName ? it.propertyName.text : it.name.text;
                 return { name, importSpecifier: it, symbol: this.typeChecker.getSymbolAtLocation(it.name) };
             });
-            const { symbol: channelMethodSymbol } = importElementsArray.find(it => it.name === 'channel') || {};
+            const { symbol: channelMethodSymbol } = importElementsArray.find((it) => it.name === 'channel') || {};
             if (channelMethodSymbol) {
                 this.channelMethodSymbol = channelMethodSymbol;
             }
-            const { symbol: channelClassSymbol } = importElementsArray.find(it => it.name === 'Channel') || {};
+            const { symbol: channelClassSymbol } = importElementsArray.find((it) => it.name === 'Channel') || {};
             if (channelClassSymbol) {
                 this.channelClassSymbol = channelClassSymbol;
             }
