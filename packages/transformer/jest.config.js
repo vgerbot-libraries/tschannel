@@ -7,5 +7,8 @@ module.exports = {
         "cobertura",
         "lcov"
     ],
+    collectCoverageFrom: [
+        "src/**/*.ts"
+    ],
     testRegex: /test\/specs\/.+\.spec\.[jt]s$/.source
 };
