@@ -36,7 +36,6 @@ export const REMOTE_UPLOAD_METHOD = 'download-method-id';
 export type UloadFileFunction = (file: ArrayBuffer, onprogress: (ratio: number) => void) => void;
 ```
 
-
 ```ts
 // iframe.ts
 
@@ -66,7 +65,6 @@ channelInstance.def_method(REMOTE_UPLOAD_METHOD, (file: ArrayBuffer, onprogress:
 })
 ```
 
-
 ```ts
 import { channel } from '@vgerbot/channel';
 import { CHANNEL_ID, UloadFileFunction, REMOTE_UPLOAD_METHOD } from './common';
@@ -93,7 +91,6 @@ remoteUploadFileFunction(buffer, ratio => {
 
 ```
 
-
 ### 创建‘远程’ class
 
 ```ts
@@ -104,7 +101,6 @@ export interface CommonAPI {
     hello(): string;
 }
 ```
-
 
 ```ts
 // iframe.ts
@@ -125,7 +121,6 @@ class CommonAPIImpl implements CommonAPI {
 // 注册一个本地 class
 channelIntance.def_class(COMMON_API_CLASS_ID, CommonAPIImpl);
 ```
-
 
 ```ts
 import { channel } from '@vgerbot/channel';
@@ -161,4 +156,3 @@ remoteCommonAPIInstance.__destroy__();
 ## 许可证
 
 `@vgerbot/channel` 库是根据 MIT 许可证的条款发布的。
-
