@@ -209,24 +209,7 @@ class AA {
 class RemoteAPIImpl extends AA {
     method() { }
 }
-c.def_class(\\"RemoteAPIImpl\\", RemoteAPIImpl);
-// ↑ same as ↓
-c.def_class('RemoteAPI', RemoteAPIImpl);
-"
-`;
-
-exports[`@vgerbot/channel-transformer should use the name of the first parent interface as the class id 2`] = `
-"\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: true });
-let channelBuilder = channel(\\"channel-id\\");
-let generator = channelBuilder.connectToMainThread();
-const c = generator.create();
-class AA {
-}
-class RemoteAPIImpl extends AA {
-    method() { }
-}
-c.def_class(\\"RemoteAPIImpl\\", RemoteAPIImpl);
+c.def_class(\\"RemoteAPI\\", RemoteAPIImpl);
 // ↑ same as ↓
 c.def_class('RemoteAPI', RemoteAPIImpl);
 "

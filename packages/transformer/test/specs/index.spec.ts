@@ -63,13 +63,6 @@ describe('@vgerbot/channel-transformer', () => {
             },
         },
         {
-            file: 'class id strategy first-interface',
-            name: 'should use the name of the first parent interface as the class id',
-            transformerOptions: {
-                classIdStrategy: 'first-interface',
-            },
-        },
-        {
             file: 'detect anonymous arrow functions',
             name: 'should throw when passing a anonymous arrow function to Channel.def_method',
             shouldThrow: 'The first function parameter of Channel.def_method cannot be anonymous',
@@ -84,19 +77,15 @@ describe('@vgerbot/channel-transformer', () => {
     specialFixtures
         .map((it) => {
             return {
+                ...it,
                 source: loadSpecialFixtures(it.file).source,
                 filepath: `fixtures/special/${it.file}.ts`,
-                name: it.name,
-                only: it.only,
-                skip: it.skip,
-                shouldThrow: it.shouldThrow,
             } as TestCase;
         })
         .concat(
             loadFixtures().map((it) => {
                 return {
-                    source: it.source,
-                    filepath: it.filepath,
+                    ...it,
                     name: `should transform "${it.filepath}" correctly`,
                     only: false,
                     skip: false,
