@@ -13,7 +13,7 @@ export function loadFixtureByRelPath(relpath: string): Fixture {
     const source = fs.readFileSync(path.resolve(FIXTURES_DIR_PATH, relpath)).toString('utf8');
     return {
         filepath,
-        source,
+        source
     };
 }
 
@@ -26,13 +26,13 @@ export function loadFixtures(): Fixture[] {
     const fixtureFiles = listDirTree(FIXTURES_DIR_PATH, (rootdir: string, relpath) => {
         return relpath !== 'special';
     });
-    return fixtureFiles.map((it) => loadFixtureByRelPath(it.rpath));
+    return fixtureFiles.map(it => loadFixtureByRelPath(it.rpath));
 }
 
 function listDirTree(rootdir: string, filter: (rootdir: string, relpath: string) => boolean) {
     const paths: Array<{ abspath: string; rpath: string }> = [];
     function _listDirTree(curpath: string, relpath: string) {
-        fs.readdirSync(curpath).forEach((fitem) => {
+        fs.readdirSync(curpath).forEach(fitem => {
             const rpath = relpath === '' ? fitem : relpath + path.sep + fitem;
             if (!filter(rootdir, rpath)) {
                 return;
@@ -43,7 +43,7 @@ function listDirTree(rootdir: string, filter: (rootdir: string, relpath: string)
             } else {
                 paths.push({
                     abspath,
-                    rpath,
+                    rpath
                 });
             }
         });

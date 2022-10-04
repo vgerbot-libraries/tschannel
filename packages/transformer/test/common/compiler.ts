@@ -1,10 +1,10 @@
 /* istanbul ignore file */
-import { TransformerOptions } from '../../src';
 import { createSystem, createVirtualCompilerHost } from '@typescript/vfs';
+import { TransformerOptions } from '../../src';
 import fs from 'fs';
+import globby from 'globby';
 import path from 'path';
 import ts from 'typescript';
-import globby from 'globby';
 
 export type TSChannelTransformerType = (
     program: ts.Program,
@@ -53,7 +53,6 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
         fsMap.set(it, code);
     });
 
-
     const system = createSystem(fsMap);
     const host = createVirtualCompilerHost(system, options, ts);
 
@@ -65,14 +64,14 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
         options: ts.CompilerOptions
     ): (ts.ResolvedModule | undefined)[] => {
         return moduleNames
-            .map((moduleName) => {
+            .map(moduleName => {
                 const result = ts.resolveModuleName(moduleName, containingFile, options, {
                     fileExists(fileName) {
                         return fsMap.has(fileName) || ts.sys.fileExists(fileName);
                     },
                     readFile(fileName) {
                         return fsMap.get(fileName) || ts.sys.readFile(fileName) || '';
-                    },
+                    }
                 });
                 return result.resolvedModule;
             })
@@ -81,7 +80,7 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
     const program = ts.createProgram({
         rootNames: [filepath],
         options,
-        host: host.compilerHost,
+        host: host.compilerHost
     });
 
     const transformers: Array<ts.TransformerFactory<ts.SourceFile>> = [];
@@ -98,7 +97,7 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
         /*cancellationToken*/ undefined,
         /*emitOnlyDtsFiles*/ undefined,
         {
-            before: transformers,
+            before: transformers
         }
     );
     return fsMap.get(filepath.replace(/\.ts$/, '.js')) || '';

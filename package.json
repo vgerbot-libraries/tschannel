@@ -5,7 +5,7 @@
     "description": "",
     "scripts": {
         "commit": "git-cz",
-        "lint:all": "yarn workspace @vgerbot/channel lint",
+        "lint:all": "zx ./scripts/run.mjs lint",
         "transformer": "yarn workspace @vgerbot/channel-transformer",
         "transformer:test": "yarn workspace @vgerbot/channel-transformer test",
         "debug:ci": "yarn workspace @vgerbot/channel debug:ci",
@@ -25,6 +25,7 @@
     },
     "homepage": "https://github.com/y1j2x34/channel-ts#readme",
     "devDependencies": {
+        "@parcel/packager-ts": "2.7.0",
         "buffer": "^6.0.3",
         "commitizen": "^4.2.5",
         "commitlint": "17.1.2",

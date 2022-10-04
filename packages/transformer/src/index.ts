@@ -14,12 +14,12 @@ export function channelTransformerFactory(
 ): ts.TransformerFactory<ts.SourceFile> {
     const resolvedOptions = {
         ...DEFAULT_TRANSFORMER_OPTIONS,
-        ...(options || {}),
+        ...(options || {})
     };
     return (context: ts.TransformationContext) => {
         const channelSymbols = findChannelSymbols(program);
         return (file: ts.SourceFile) => {
-            if(!channelSymbols) {
+            if (!channelSymbols) {
                 return file;
             }
             const programCtx = new ChannelProgramContext(program.getTypeChecker(), channelSymbols);
@@ -65,8 +65,8 @@ function findChannelSymbols(program: ts.Program) {
         const fileSymbol = typeChecker.getSymbolAtLocation(it);
         channelClassSymbol = channelClassSymbol || fileSymbol?.exports?.get('Channel' as ts.__String);
         channelMethodSymbol = channelMethodSymbol || fileSymbol?.exports?.get('channel' as ts.__String);
-    })
-    if(channelClassSymbol && channelMethodSymbol) {
+    });
+    if (channelClassSymbol && channelMethodSymbol) {
         return { channelClassSymbol, channelMethodSymbol };
     }
 }
@@ -133,7 +133,7 @@ function handleGetClassMethod(
     let memberNames: undefined | string[];
     if (ts.isClassDeclaration(typeNodeDeclaration)) {
         const modifiers = (typeNodeDeclaration as ts.ClassDeclaration).modifiers;
-        const isAbstract = !!modifiers && modifiers.some((it) => it.kind === ts.SyntaxKind.AbstractKeyword);
+        const isAbstract = !!modifiers && modifiers.some(it => it.kind === ts.SyntaxKind.AbstractKeyword);
         if (!isAbstract) {
             return factory.createCallExpression(
                 node.expression,
@@ -143,8 +143,8 @@ function handleGetClassMethod(
         }
         interfaceNode = typeChecker.getTypeAtLocation(typeNodeDeclaration);
         memberNames = typeNodeDeclaration.members
-            .filter((it) => !!it.name)
-            .map((it) => it.name?.getText())
+            .filter(it => !!it.name)
+            .map(it => it.name?.getText())
             .filter(Boolean) as string[];
     } else {
         interfaceNode = typeChecker.getTypeFromTypeNode(typeNode);
@@ -155,7 +155,7 @@ function handleGetClassMethod(
     let variable = variablesMap.get(interfaceNode);
     if (!variable) {
         if (!memberNames || memberNames.length === 0) {
-            memberNames = getMethodMembersFrom(typeChecker, interfaceNode).map((it) => it.getName());
+            memberNames = getMethodMembersFrom(typeChecker, interfaceNode).map(it => it.getName());
         }
         variable = variable || createMemberNamesvariable(typeNode.getText() + 'Members', memberNames, factory);
         variablesMap.set(interfaceNode, variable);
@@ -163,7 +163,6 @@ function handleGetClassMethod(
 
     return factory.createCallExpression(node.expression, [], [classIdArg, variable.name as ts.Identifier]);
 }
-
 
 function handleDefClassMethod(
     node: ts.CallExpression,
@@ -210,13 +209,13 @@ function handleDefClassMethod(
     return factory.createCallExpression(node.expression, [], [classIdArg, classIdentifier]);
 }
 
-function handleDefMethodMethod(node: ts.CallExpression, factory: any) {
+function handleDefMethodMethod(node: ts.CallExpression, factory: ts.NodeFactory) {
     const arg0 = node.arguments[0];
     if (ts.isIdentifier(arg0)) {
         const methodId = factory.createStringLiteral(arg0.text);
         return factory.createCallExpression(node.expression, [], [methodId, arg0]);
-    } else if (ts.isFunctionExpression(arg0)) {
-        const methodId = factory.createStringLiteral(arg0.name!.text);
+    } else if (ts.isFunctionExpression(arg0) && arg0.name) {
+        const methodId = factory.createStringLiteral(arg0.name.text);
         return factory.createCallExpression(node.expression, [], [methodId, arg0]);
     }
 }

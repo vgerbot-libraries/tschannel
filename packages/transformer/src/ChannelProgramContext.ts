@@ -142,15 +142,15 @@ export class ChannelProgramContext {
     recordChannelSymbolIfPossible(node: ts.ImportDeclaration) {
         const namedBindings = node.importClause?.namedBindings;
         if (namedBindings && ts.isNamedImports(namedBindings)) {
-            const importElementsArray = namedBindings.elements.map((it) => {
+            const importElementsArray = namedBindings.elements.map(it => {
                 const name = it.propertyName ? it.propertyName.text : it.name.text;
                 return { name, importSpecifier: it, symbol: this.typeChecker.getSymbolAtLocation(it.name) };
             });
-            const { symbol: channelMethodSymbol } = importElementsArray.find((it) => it.name === 'channel') || {};
+            const { symbol: channelMethodSymbol } = importElementsArray.find(it => it.name === 'channel') || {};
             if (channelMethodSymbol) {
                 this.channelMethodSymbol = channelMethodSymbol;
             }
-            const { symbol: channelClassSymbol } = importElementsArray.find((it) => it.name === 'Channel') || {};
+            const { symbol: channelClassSymbol } = importElementsArray.find(it => it.name === 'Channel') || {};
             if (channelClassSymbol) {
                 this.channelClassSymbol = channelClassSymbol;
             }
