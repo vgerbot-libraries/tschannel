@@ -6,11 +6,16 @@ const consts_1 = require("./consts");
 const utils_1 = require("./utils");
 const typescript_1 = tslib_1.__importStar(require("typescript"));
 const ChannelProgramContext_1 = require("./ChannelProgramContext");
+exports.default = channelTransformerFactory;
 function channelTransformerFactory(program, options) {
     const resolvedOptions = Object.assign(Object.assign({}, consts_1.DEFAULT_TRANSFORMER_OPTIONS), (options || {}));
     return (context) => {
+        const channelSymbols = findChannelSymbols(program);
         return (file) => {
-            const programCtx = new ChannelProgramContext_1.ChannelProgramContext(program.getTypeChecker());
+            if (!channelSymbols) {
+                return file;
+            }
+            const programCtx = new ChannelProgramContext_1.ChannelProgramContext(program.getTypeChecker(), channelSymbols);
             const sourceFileNode = typescript_1.default.visitEachChild(file, visitor, context);
             const variableDeclarations = Array.from(programCtx.variablesMap.values());
             const variableStatements = variableDeclarations.length > 0 ? [typescript_1.factory.createVariableStatement([], variableDeclarations)] : [];
@@ -28,6 +33,34 @@ function channelTransformerFactory(program, options) {
     };
 }
 exports.channelTransformerFactory = channelTransformerFactory;
+function findChannelSymbols(program) {
+    const typeChecker = program.getTypeChecker();
+    const channelFiles = program.getSourceFiles().filter(it => {
+        const fileSymbol = typeChecker.getSymbolAtLocation(it);
+        if (!fileSymbol) {
+            return false;
+        }
+        const symbolName = fileSymbol.getName();
+        if (symbolName.indexOf('packages/core/dist') > -1) {
+            return true;
+        }
+        if (symbolName.indexOf('@vgerbot/channel') > -1) {
+            return true;
+        }
+        return false;
+    });
+    let channelMethodSymbol;
+    let channelClassSymbol;
+    channelFiles.forEach(it => {
+        var _a, _b;
+        const fileSymbol = typeChecker.getSymbolAtLocation(it);
+        channelClassSymbol = channelClassSymbol || ((_a = fileSymbol === null || fileSymbol === void 0 ? void 0 : fileSymbol.exports) === null || _a === void 0 ? void 0 : _a.get('Channel'));
+        channelMethodSymbol = channelMethodSymbol || ((_b = fileSymbol === null || fileSymbol === void 0 ? void 0 : fileSymbol.exports) === null || _b === void 0 ? void 0 : _b.get('channel'));
+    });
+    if (channelClassSymbol && channelMethodSymbol) {
+        return { channelClassSymbol, channelMethodSymbol };
+    }
+}
 function visitNode(node, program, programCtx, context, options) {
     const variablesMap = programCtx.variablesMap;
     const typeChecker = program.getTypeChecker();
@@ -134,9 +167,7 @@ function handleDefClassMethod(node, typeChecker, options, factory) {
             const firstHeritageClause = classDec.heritageClauses[0];
             const expression = firstHeritageClause === null || firstHeritageClause === void 0 ? void 0 : firstHeritageClause.types[0].expression;
             const symbol = expression && typeChecker.getSymbolAtLocation(expression);
-            const declarations = symbol === null || symbol === void 0 ? void 0 : symbol.getDeclarations();
-            const declaration = declarations ? declarations[0] : undefined;
-            if (!!symbol && !!declaration && typescript_1.default.isInterfaceDeclaration(declaration)) {
+            if (!!symbol) {
                 classId = symbol.getName();
             }
         }

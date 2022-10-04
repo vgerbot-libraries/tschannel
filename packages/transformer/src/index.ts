@@ -6,6 +6,8 @@ import { TransformerOptions } from './TransformerOptions';
 
 export { TransformerOptions };
 
+export default channelTransformerFactory;
+
 export function channelTransformerFactory(
     program: ts.Program,
     options?: Partial<TransformerOptions>
@@ -15,8 +17,12 @@ export function channelTransformerFactory(
         ...(options || {}),
     };
     return (context: ts.TransformationContext) => {
-        return (file: ts.Node) => {
-            const programCtx = new ChannelProgramContext(program.getTypeChecker());
+        const channelSymbols = findChannelSymbols(program);
+        return (file: ts.SourceFile) => {
+            if(!channelSymbols) {
+                return file;
+            }
+            const programCtx = new ChannelProgramContext(program.getTypeChecker(), channelSymbols);
 
             const sourceFileNode = ts.visitEachChild(file, visitor, context) as ts.SourceFile;
 
@@ -35,6 +41,34 @@ export function channelTransformerFactory(
             }
         };
     };
+}
+
+function findChannelSymbols(program: ts.Program) {
+    const typeChecker = program.getTypeChecker();
+    const channelFiles = program.getSourceFiles().filter(it => {
+        const fileSymbol = typeChecker.getSymbolAtLocation(it);
+        if (!fileSymbol) {
+            return false;
+        }
+        const symbolName = fileSymbol.getName();
+        if (symbolName.indexOf('packages/core/dist') > -1) {
+            return true;
+        }
+        if (symbolName.indexOf('@vgerbot/channel') > -1) {
+            return true;
+        }
+        return false;
+    });
+    let channelMethodSymbol: undefined | ts.Symbol;
+    let channelClassSymbol: undefined | ts.Symbol;
+    channelFiles.forEach(it => {
+        const fileSymbol = typeChecker.getSymbolAtLocation(it);
+        channelClassSymbol = channelClassSymbol || fileSymbol?.exports?.get('Channel' as ts.__String);
+        channelMethodSymbol = channelMethodSymbol || fileSymbol?.exports?.get('channel' as ts.__String);
+    })
+    if(channelClassSymbol && channelMethodSymbol) {
+        return { channelClassSymbol, channelMethodSymbol };
+    }
 }
 
 function visitNode(
@@ -163,9 +197,7 @@ function handleDefClassMethod(
             const firstHeritageClause = classDec.heritageClauses[0];
             const expression = firstHeritageClause?.types[0].expression;
             const symbol = expression && typeChecker.getSymbolAtLocation(expression);
-            const declarations = symbol?.getDeclarations();
-            const declaration = declarations ? declarations[0] : undefined;
-            if (!!symbol && !!declaration && ts.isInterfaceDeclaration(declaration)) {
+            if (!!symbol) {
                 classId = symbol.getName();
             }
         }

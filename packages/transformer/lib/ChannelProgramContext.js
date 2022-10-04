@@ -4,8 +4,11 @@ exports.ChannelProgramContext = void 0;
 const tslib_1 = require("tslib");
 const typescript_1 = tslib_1.__importDefault(require("typescript"));
 class ChannelProgramContext {
-    constructor(typeChecker) {
+    constructor(typeChecker, channelSymbols) {
         this.typeChecker = typeChecker;
+        this.channelSymbols = channelSymbols;
+        this.channelMethodSymbol = this.channelSymbols.channelMethodSymbol;
+        this.channelClassSymbol = this.channelSymbols.channelClassSymbol;
         this.variablesMap = new Map();
         this.channel_variables = new Set();
     }

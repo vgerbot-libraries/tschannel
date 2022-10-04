@@ -1,10 +1,15 @@
 import ts from 'typescript';
 
-export class ChannelProgramContext {
-    constructor(private readonly typeChecker: ts.TypeChecker) {}
+export interface ChannelSymbols {
+    channelMethodSymbol: ts.Symbol;
+    channelClassSymbol: ts.Symbol;
+}
 
-    public channelMethodSymbol?: ts.Symbol;
-    public channelClassSymbol?: ts.Symbol;
+export class ChannelProgramContext {
+    constructor(private readonly typeChecker: ts.TypeChecker, private readonly channelSymbols: ChannelSymbols) {}
+
+    public channelMethodSymbol: ts.Symbol = this.channelSymbols.channelMethodSymbol;
+    public channelClassSymbol: ts.Symbol = this.channelSymbols.channelClassSymbol;
     public variablesMap = new Map<ts.Type, ts.VariableDeclaration>();
     public channel_variables = new Set<ts.Symbol>();
 
@@ -134,7 +139,6 @@ export class ChannelProgramContext {
         }
         return false;
     }
-
     recordChannelSymbolIfPossible(node: ts.ImportDeclaration) {
         const namedBindings = node.importClause?.namedBindings;
         if (namedBindings && ts.isNamedImports(namedBindings)) {
