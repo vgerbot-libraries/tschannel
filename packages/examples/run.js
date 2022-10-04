@@ -12,7 +12,9 @@ if(!fs.existsSync(exampleDir)) {
     raiseError('Example not exists: ' + exampleName);
 }
 
-child_process.execSync(`node ./node_modules/.bin/parcel serve --no-cache ./${exampleName}/src/**/*.html -p 8888`, {
+const command = fs.readFileSync(`./${exampleName}/start.sh`).toString('utf8');
+
+child_process.execSync(command, {
     stdio: [0,1,2]
 });
 
