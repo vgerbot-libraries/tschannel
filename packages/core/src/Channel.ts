@@ -151,8 +151,8 @@ export class Channel {
         return this.globalNamespace.get_method(metadata) as Promisify<F, T>;
     }
 
-    public def_method(name: string, func: AnyFunction);
-    public def_method(func: AnyFunction);
+    public def_method<T extends AnyFunction = AnyFunction>(name: string, func: T);
+    public def_method<T extends AnyFunction = AnyFunction>(func: T);
     public def_method(...args) {
         const name = args[0] as string;
         const func = args[1] as AnyFunction;
