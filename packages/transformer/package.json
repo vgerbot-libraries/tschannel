@@ -38,6 +38,7 @@
         "@typescript-eslint/eslint-plugin": "^5.37.0",
         "@typescript-eslint/parser": "^5.37.0",
         "@typescript/vfs": "^1.4.0",
+        "@vgerbot/channel": "1.0.0",
         "codecov": "*",
         "eslint": "8.22.0",
         "eslint-config-prettier": "^8.5.0",

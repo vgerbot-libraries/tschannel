@@ -103,7 +103,8 @@ channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 exports[`@vgerbot/channel-transformer should transform "fixtures/automatic method id.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-let channelBuilder = channel(\\"channel-id\\");
+const channel_1 = require(\\"@vgerbot/channel\\");
+let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
 let generator = channelBuilder.connectToMainThread();
 const c = generator.create();
 c.def_method(\\"hello\\", function hello() { });
@@ -118,7 +119,8 @@ exports[`@vgerbot/channel-transformer should transform "fixtures/channel builder
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
 var RemoteAPIMembers_1 = [\\"method\\"];
-let channelBuilder = channel(\\"channel-id\\");
+const channel_1 = require(\\"@vgerbot/channel\\");
+let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
 let generator = channelBuilder.connectToMainThread();
 const c = generator.create();
 c.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
@@ -128,7 +130,8 @@ c.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 exports[`@vgerbot/channel-transformer should transform "fixtures/def class.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-let channelBuilder = channel(\\"channel-id\\");
+const channel_1 = require(\\"@vgerbot/channel\\");
+let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
 let generator = channelBuilder.connectToMainThread();
 const c = generator.create();
 class AA {
@@ -184,7 +187,8 @@ channel.get_class(\\"RemoteAPI\\", RemoteAPIMembers_1);
 exports[`@vgerbot/channel-transformer should use the name of the first parent class as the class id 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-let channelBuilder = channel(\\"channel-id\\");
+const channel_1 = require(\\"@vgerbot/channel\\");
+let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
 let generator = channelBuilder.connectToMainThread();
 const c = generator.create();
 class AA {
@@ -192,7 +196,7 @@ class AA {
 class RemoteAPIImpl extends AA {
     method() { }
 }
-c.def_class(\\"RemoteAPIImpl\\", RemoteAPIImpl);
+c.def_class(\\"AA\\", RemoteAPIImpl);
 // ↑ same as ↓
 c.def_class('AA', RemoteAPIImpl);
 "
@@ -201,7 +205,8 @@ c.def_class('AA', RemoteAPIImpl);
 exports[`@vgerbot/channel-transformer should use the name of the first parent interface as the class id 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
-let channelBuilder = channel(\\"channel-id\\");
+const channel_1 = require(\\"@vgerbot/channel\\");
+let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
 let generator = channelBuilder.connectToMainThread();
 const c = generator.create();
 class AA {

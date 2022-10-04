@@ -26,7 +26,7 @@ describe('@vgerbot/channel-transformer', () => {
     const specialFixtures: SpecialFixture[] = [
         {
             file: 'normal',
-            name: 'should run normally with the transformer',
+            name: 'should run normally with the transformer'
         },
         {
             file: 'alias',
