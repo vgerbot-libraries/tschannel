@@ -9,7 +9,7 @@ const channel = new Channel(
     new WindowChannelCommunicator(parent)
 );
 
-channel.def_method('clear', () => {
+channel.def_method(function clear() {
     console.log('clear data');
 });
 class ClassDefinedInIframe implements CrossIframeClassInterface {
@@ -20,7 +20,7 @@ class ClassDefinedInIframe implements CrossIframeClassInterface {
         console.log('hello world');
     }
 }
-channel.def_class('ClassDefinedInIframe', ClassDefinedInIframe);
-channel.def_method('say_hello', (a: ClassDefinedInIframe) => {
+channel.def_class(ClassDefinedInIframe);
+channel.def_method(function say_hello(a: ClassDefinedInIframe) {
     a.hello();
 })
