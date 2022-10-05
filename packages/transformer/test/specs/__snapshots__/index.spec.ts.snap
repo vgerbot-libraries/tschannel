@@ -77,28 +77,6 @@ console.info(channel_1.Channel);
 "
 `;
 
-exports[`@vgerbot/channel-transformer should throw when passing a anonymous arrow function to Channel.def_method 1`] = `
-"\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: true });
-const channel_1 = require(\\"@vgerbot/channel\\");
-let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
-let generator = channelBuilder.connectToMainThread();
-const c = generator.create();
-c.def_method(() => { });
-"
-`;
-
-exports[`@vgerbot/channel-transformer should throw when passing a anonymous function to Channel.def_method 1`] = `
-"\\"use strict\\";
-Object.defineProperty(exports, \\"__esModule\\", { value: true });
-const channel_1 = require(\\"@vgerbot/channel\\");
-let channelBuilder = (0, channel_1.channel)(\\"channel-id\\");
-let generator = channelBuilder.connectToMainThread();
-const c = generator.create();
-c.def_method(function () { });
-"
-`;
-
 exports[`@vgerbot/channel-transformer should transform "fixtures/abstract class.ts" correctly 1`] = `
 "\\"use strict\\";
 Object.defineProperty(exports, \\"__esModule\\", { value: true });
