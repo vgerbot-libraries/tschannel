@@ -69,21 +69,30 @@ export default {
 before:
 
 ```ts
-import { Channel } from '@vgerbot/channel';
-const channel = new Channel();
-channel.get_class<RemoteAPI>();
+import { channel } from '@vgerbot/channel';
+const chnl = channel('channel-id')
+    .connectToMainThread()
+    .create();
+chnl.get_class<RemoteAPI>();
+chnl.def_method(function performCPUIntensiveCalculation() {})
 interface RemoteAPI {
-    method(){}
+    method();
 }
 ```
 
 after:
 
 ```ts
-import { Channel } from '@vgerbot/channel';
+import { channel } from '@vgerbot/channel';
 var RemoteAPIMembers_1 = ['method'];
-const channel = new Channel();
-channel.get_class('RemoteAPI1', RemoteAPIMembers_1);
+
+var chnl = channel('channel-id')
+    .connectToMainThread()
+    .create();
+
+chnl.get_class('RemoteAPI', RemoteAPIMembers_1);
+
+chnl.def_method('performCPUIntensiveCalculation', function performCPUIntensiveCalculation() {})
 ```
 
 ## License
