@@ -6,10 +6,13 @@ export interface ChannelSymbols {
 }
 
 export class ChannelProgramContext {
-    constructor(private readonly typeChecker: ts.TypeChecker, private readonly channelSymbols: ChannelSymbols) {}
+    constructor(private readonly typeChecker: ts.TypeChecker, channelSymbols: ChannelSymbols) {
+        this.channelClassSymbols.add(channelSymbols.channelClassSymbol);
+        this.channelMethodSymbols.add(channelSymbols.channelMethodSymbol);
+    }
 
-    public channelMethodSymbol: ts.Symbol = this.channelSymbols.channelMethodSymbol;
-    public channelClassSymbol: ts.Symbol = this.channelSymbols.channelClassSymbol;
+    public channelMethodSymbols = new Set<ts.Symbol>();
+    public channelClassSymbols = new Set<ts.Symbol>();
     public variablesMap = new Map<ts.Type, ts.VariableDeclaration>();
     public channel_variables = new Set<ts.Symbol>();
 
@@ -39,7 +42,7 @@ export class ChannelProgramContext {
             return false;
         }
         const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);
-        if (expressionType && expressionType.getSymbol() !== this.channelClassSymbol) {
+        if (expressionType && !this.isChannelClassSymbol(expressionType.getSymbol())) {
             return false;
         }
 
@@ -73,7 +76,7 @@ export class ChannelProgramContext {
             return false;
         }
         const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);
-        if (expressionType && expressionType.getSymbol() === this.channelClassSymbol) {
+        if (expressionType && this.isChannelClassSymbol(expressionType.getSymbol())) {
             return true;
         }
         const LeftHandSideExpressionSymbol = this.typeChecker.getSymbolAtLocation(propertyExpression.expression);
@@ -113,7 +116,7 @@ export class ChannelProgramContext {
         const typeChecker = this.typeChecker;
         if (ts.isNewExpression(initializer)) {
             const classSymbol = typeChecker.getSymbolAtLocation(initializer.expression);
-            if (classSymbol === this.channelClassSymbol) {
+            if (this.isChannelClassSymbol(classSymbol)) {
                 return true;
             }
         } else if (ts.isCallExpression(initializer)) {
@@ -129,7 +132,7 @@ export class ChannelProgramContext {
             }
             if (ts.isIdentifier(expression)) {
                 const symbol = typeChecker.getSymbolAtLocation(expression);
-                if (!!this.channelMethodSymbol && this.channelMethodSymbol === symbol) {
+                if (this.isChannelMethodSymbol(symbol)) {
                     return true;
                 }
                 if (symbol) {
@@ -138,6 +141,12 @@ export class ChannelProgramContext {
             }
         }
         return false;
+    }
+    isChannelMethodSymbol(symbol: undefined | ts.Symbol): symbol is ts.Symbol {
+        return !!symbol && this.channelMethodSymbols.has(symbol);
+    }
+    isChannelClassSymbol(symbol: undefined | ts.Symbol): symbol is ts.Symbol {
+        return !!symbol && this.channelClassSymbols.has(symbol);
     }
     recordChannelSymbolIfPossible(node: ts.ImportDeclaration) {
         const namedBindings = node.importClause?.namedBindings;
@@ -148,11 +157,11 @@ export class ChannelProgramContext {
             });
             const { symbol: channelMethodSymbol } = importElementsArray.find(it => it.name === 'channel') || {};
             if (channelMethodSymbol) {
-                this.channelMethodSymbol = channelMethodSymbol;
+                this.channelMethodSymbols.add(channelMethodSymbol);
             }
             const { symbol: channelClassSymbol } = importElementsArray.find(it => it.name === 'Channel') || {};
             if (channelClassSymbol) {
-                this.channelClassSymbol = channelClassSymbol;
+                this.channelClassSymbols.add(channelClassSymbol);
             }
         }
     }

@@ -6,11 +6,12 @@ const typescript_1 = tslib_1.__importDefault(require("typescript"));
 class ChannelProgramContext {
     constructor(typeChecker, channelSymbols) {
         this.typeChecker = typeChecker;
-        this.channelSymbols = channelSymbols;
-        this.channelMethodSymbol = this.channelSymbols.channelMethodSymbol;
-        this.channelClassSymbol = this.channelSymbols.channelClassSymbol;
+        this.channelMethodSymbols = new Set();
+        this.channelClassSymbols = new Set();
         this.variablesMap = new Map();
         this.channel_variables = new Set();
+        this.channelClassSymbols.add(channelSymbols.channelClassSymbol);
+        this.channelMethodSymbols.add(channelSymbols.channelMethodSymbol);
     }
     isAccessingDefClassMethod(callExpression, propertyExpression) {
         const propertyName = propertyExpression.name.text;
@@ -35,7 +36,7 @@ class ChannelProgramContext {
             return false;
         }
         const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);
-        if (expressionType && expressionType.getSymbol() !== this.channelClassSymbol) {
+        if (expressionType && !this.isChannelClassSymbol(expressionType.getSymbol())) {
             return false;
         }
         if (typescript_1.default.isArrowFunction(args[0])) {
@@ -69,7 +70,7 @@ class ChannelProgramContext {
             return false;
         }
         const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);
-        if (expressionType && expressionType.getSymbol() === this.channelClassSymbol) {
+        if (expressionType && this.isChannelClassSymbol(expressionType.getSymbol())) {
             return true;
         }
         const LeftHandSideExpressionSymbol = this.typeChecker.getSymbolAtLocation(propertyExpression.expression);
@@ -105,7 +106,7 @@ class ChannelProgramContext {
         const typeChecker = this.typeChecker;
         if (typescript_1.default.isNewExpression(initializer)) {
             const classSymbol = typeChecker.getSymbolAtLocation(initializer.expression);
-            if (classSymbol === this.channelClassSymbol) {
+            if (this.isChannelClassSymbol(classSymbol)) {
                 return true;
             }
         }
@@ -124,7 +125,7 @@ class ChannelProgramContext {
             }
             if (typescript_1.default.isIdentifier(expression)) {
                 const symbol = typeChecker.getSymbolAtLocation(expression);
-                if (!!this.channelMethodSymbol && this.channelMethodSymbol === symbol) {
+                if (this.isChannelMethodSymbol(symbol)) {
                     return true;
                 }
                 if (symbol) {
@@ -134,21 +135,27 @@ class ChannelProgramContext {
         }
         return false;
     }
+    isChannelMethodSymbol(symbol) {
+        return !!symbol && this.channelMethodSymbols.has(symbol);
+    }
+    isChannelClassSymbol(symbol) {
+        return !!symbol && this.channelClassSymbols.has(symbol);
+    }
     recordChannelSymbolIfPossible(node) {
         var _a;
         const namedBindings = (_a = node.importClause) === null || _a === void 0 ? void 0 : _a.namedBindings;
         if (namedBindings && typescript_1.default.isNamedImports(namedBindings)) {
-            const importElementsArray = namedBindings.elements.map((it) => {
+            const importElementsArray = namedBindings.elements.map(it => {
                 const name = it.propertyName ? it.propertyName.text : it.name.text;
                 return { name, importSpecifier: it, symbol: this.typeChecker.getSymbolAtLocation(it.name) };
             });
-            const { symbol: channelMethodSymbol } = importElementsArray.find((it) => it.name === 'channel') || {};
+            const { symbol: channelMethodSymbol } = importElementsArray.find(it => it.name === 'channel') || {};
             if (channelMethodSymbol) {
-                this.channelMethodSymbol = channelMethodSymbol;
+                this.channelMethodSymbols.add(channelMethodSymbol);
             }
-            const { symbol: channelClassSymbol } = importElementsArray.find((it) => it.name === 'Channel') || {};
+            const { symbol: channelClassSymbol } = importElementsArray.find(it => it.name === 'Channel') || {};
             if (channelClassSymbol) {
-                this.channelClassSymbol = channelClassSymbol;
+                this.channelClassSymbols.add(channelClassSymbol);
             }
         }
     }

@@ -15,6 +15,18 @@ function channelTransformerFactory(program, options) {
             if (!channelSymbols) {
                 return file;
             }
+            const findChannelModule = file.statements.find(it => {
+                if (typescript_1.default.isImportDeclaration(it)) {
+                    if (typescript_1.default.isStringLiteralLike(it.moduleSpecifier)) {
+                        const moduleName = it.moduleSpecifier.text;
+                        return moduleName === consts_1.CHANNEL_MODULE_NAME;
+                    }
+                }
+                return false;
+            });
+            if (!findChannelModule) {
+                return file;
+            }
             const programCtx = new ChannelProgramContext_1.ChannelProgramContext(program.getTypeChecker(), channelSymbols);
             const sourceFileNode = typescript_1.default.visitEachChild(file, visitor, context);
             const variableDeclarations = Array.from(programCtx.variablesMap.values());
@@ -44,6 +56,9 @@ function findChannelSymbols(program) {
         if (symbolName.indexOf('packages/core/dist') > -1) {
             return true;
         }
+        if (symbolName.indexOf('packages/core/src') > -1) {
+            return true;
+        }
         if (symbolName.indexOf('@vgerbot/channel') > -1) {
             return true;
         }
@@ -51,11 +66,12 @@ function findChannelSymbols(program) {
     });
     let channelMethodSymbol;
     let channelClassSymbol;
-    channelFiles.forEach(it => {
+    channelFiles.some(it => {
         var _a, _b;
         const fileSymbol = typeChecker.getSymbolAtLocation(it);
         channelClassSymbol = channelClassSymbol || ((_a = fileSymbol === null || fileSymbol === void 0 ? void 0 : fileSymbol.exports) === null || _a === void 0 ? void 0 : _a.get('Channel'));
         channelMethodSymbol = channelMethodSymbol || ((_b = fileSymbol === null || fileSymbol === void 0 ? void 0 : fileSymbol.exports) === null || _b === void 0 ? void 0 : _b.get('channel'));
+        return !!channelClassSymbol && !!channelMethodSymbol;
     });
     if (channelClassSymbol && channelMethodSymbol) {
         return { channelClassSymbol, channelMethodSymbol };
@@ -112,14 +128,14 @@ function handleGetClassMethod(node, typeChecker, factory, variablesMap) {
     let memberNames;
     if (typescript_1.default.isClassDeclaration(typeNodeDeclaration)) {
         const modifiers = typeNodeDeclaration.modifiers;
-        const isAbstract = !!modifiers && modifiers.some((it) => it.kind === typescript_1.default.SyntaxKind.AbstractKeyword);
+        const isAbstract = !!modifiers && modifiers.some(it => it.kind === typescript_1.default.SyntaxKind.AbstractKeyword);
         if (!isAbstract) {
             return factory.createCallExpression(node.expression, [], [classIdArg, factory.createRegularExpressionLiteral(typeNode.getText())]);
         }
         interfaceNode = typeChecker.getTypeAtLocation(typeNodeDeclaration);
         memberNames = typeNodeDeclaration.members
-            .filter((it) => !!it.name)
-            .map((it) => { var _a; return (_a = it.name) === null || _a === void 0 ? void 0 : _a.getText(); })
+            .filter(it => !!it.name)
+            .map(it => { var _a; return (_a = it.name) === null || _a === void 0 ? void 0 : _a.getText(); })
             .filter(Boolean);
     }
     else {
@@ -131,7 +147,7 @@ function handleGetClassMethod(node, typeChecker, factory, variablesMap) {
     let variable = variablesMap.get(interfaceNode);
     if (!variable) {
         if (!memberNames || memberNames.length === 0) {
-            memberNames = (0, utils_1.getMethodMembersFrom)(typeChecker, interfaceNode).map((it) => it.getName());
+            memberNames = (0, utils_1.getMethodMembersFrom)(typeChecker, interfaceNode).map(it => it.getName());
         }
         variable = variable || (0, utils_1.createMemberNamesvariable)(typeNode.getText() + 'Members', memberNames, factory);
         variablesMap.set(interfaceNode, variable);
@@ -184,7 +200,7 @@ function handleDefMethodMethod(node, factory) {
         const methodId = factory.createStringLiteral(arg0.text);
         return factory.createCallExpression(node.expression, [], [methodId, arg0]);
     }
-    else if (typescript_1.default.isFunctionExpression(arg0)) {
+    else if (typescript_1.default.isFunctionExpression(arg0) && arg0.name) {
         const methodId = factory.createStringLiteral(arg0.name.text);
         return factory.createCallExpression(node.expression, [], [methodId, arg0]);
     }

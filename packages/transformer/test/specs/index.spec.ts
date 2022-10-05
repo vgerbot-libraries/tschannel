@@ -86,6 +86,7 @@ describe('@vgerbot/channel-transformer', () => {
                 return {
                     ...it,
                     name: `should transform "${it.filepath}" correctly`,
+                    // only: it.filepath.indexOf('automatic method id') > -1,
                     only: false,
                     skip: false
                 };

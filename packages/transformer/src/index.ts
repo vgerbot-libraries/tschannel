@@ -22,6 +22,20 @@ export function channelTransformerFactory(
             if (!channelSymbols) {
                 return file;
             }
+            const findChannelModule = file.statements.find(it => {
+                if (ts.isImportDeclaration(it)) {
+                    if (ts.isStringLiteralLike(it.moduleSpecifier)) {
+                        const moduleName = it.moduleSpecifier.text;
+                        return moduleName === CHANNEL_MODULE_NAME;
+                    }
+                }
+                return false;
+            });
+
+            if (!findChannelModule) {
+                return file;
+            }
+
             const programCtx = new ChannelProgramContext(program.getTypeChecker(), channelSymbols);
 
             const sourceFileNode = ts.visitEachChild(file, visitor, context) as ts.SourceFile;
@@ -54,6 +68,9 @@ function findChannelSymbols(program: ts.Program) {
         if (symbolName.indexOf('packages/core/dist') > -1) {
             return true;
         }
+        if (symbolName.indexOf('packages/core/src') > -1) {
+            return true;
+        }
         if (symbolName.indexOf('@vgerbot/channel') > -1) {
             return true;
         }
@@ -61,10 +78,11 @@ function findChannelSymbols(program: ts.Program) {
     });
     let channelMethodSymbol: undefined | ts.Symbol;
     let channelClassSymbol: undefined | ts.Symbol;
-    channelFiles.forEach(it => {
+    channelFiles.some(it => {
         const fileSymbol = typeChecker.getSymbolAtLocation(it);
         channelClassSymbol = channelClassSymbol || fileSymbol?.exports?.get('Channel' as ts.__String);
         channelMethodSymbol = channelMethodSymbol || fileSymbol?.exports?.get('channel' as ts.__String);
+        return !!channelClassSymbol && !!channelMethodSymbol;
     });
     if (channelClassSymbol && channelMethodSymbol) {
         return { channelClassSymbol, channelMethodSymbol };
