@@ -24,7 +24,7 @@ const compilerOptions: ts.CompilerOptions = {
     include: '/',
     baseUrl: path.resolve(__dirname, '../'),
     paths: {
-        '@vgerbot/channel': [path.resolve(__dirname, '../../../core/dist/index.d.ts')]
+        '@vgerbot/channel': [path.resolve(__dirname, '../../../core/dist/index')]
     }
 };
 
