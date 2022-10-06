@@ -67,6 +67,7 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
             .map(moduleName => {
                 const result = ts.resolveModuleName(moduleName, containingFile, options, {
                     fileExists(fileName) {
+                        console.log('file exists', fileName, fsMap.has(fileName) || ts.sys.fileExists(fileName));
                         return fsMap.has(fileName) || ts.sys.fileExists(fileName);
                     },
                     readFile(fileName) {
