@@ -33,8 +33,8 @@ For more information about the usage of `@vgerbot/channel-transformer` please re
 // api.ts
 ```ts
 export interface SpellChecker {
-    saveToDictionary(word: string);
-    setCaseSensitive(caseSensitive: boolean);
+    saveToDictionary(word: string): void;
+    setCaseSensitive(caseSensitive: boolean): void;
     check(sentence: string): boolean;
 }
 ```
@@ -74,13 +74,27 @@ performCPUIntensiveCalculation().then(console.log) // Console Output: "Result!"
 
 const DefaultSpellCheckerImpl = chnl.get_class<SpellChecker>('DefaultSpellCheckerImpl');
 
+/*
+class DefaultSpellCheckerImpl {
+    saveToDictionary(word: string): Promise<void> {
+        //  REMOVE METHOD
+    }
+    setCaseSensitive(caseSensitive: boolean): Promise<void> {
+        //  REMOVE METHOD
+    }
+    check(sentence: string): Promise<boolean> {
+        //  REMOVE METHOD
+    }
+}
+*/
+
 const spellChecker = new DefaultSpellCheckerImpl();
 
 spellChecker.saveToDictionary('halo');
 spellChecker.setCaseSensitive(false);
 spellChecker.check('Halo world!').then(console.log); // Console Output: true
 
-spellChecker.__destroy__(); // Remote instances cannot be automatically cleared by GC and need to be destroyed manually
+spellChecker.__destroy__(); // Since the remote instance cannot be automatically cleared by the GC, it must be destroyed manually.
 ```
 
 For more examples, see [examples](https://github.com/vgerbot-libraries/tschannel/tree/master/packages/examples) and unit tests.
