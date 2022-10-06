@@ -94,16 +94,11 @@ describe('@vgerbot/channel-transformer', () => {
         )
         .forEach(({ filepath, source, name, only, skip, transformerOptions, shouldThrow }) => {
             let callback: jest.ProvidesCallback = () => {
-                try {
-                    const output = transpile(filepath, source, {
-                        channelTransformer: channelTransformerFactory,
-                        channelTransformerOptions: transformerOptions
-                    });
-                    expect(output).toMatchSnapshot();
-                } catch (e) {
-                    console.error(e);
-                    throw e;
-                }
+                const output = transpile(filepath, source, {
+                    channelTransformer: channelTransformerFactory,
+                    channelTransformerOptions: transformerOptions
+                });
+                expect(output).toMatchSnapshot();
             };
             if (shouldThrow) {
                 const test_case = callback;
