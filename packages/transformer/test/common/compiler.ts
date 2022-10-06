@@ -24,7 +24,7 @@ const compilerOptions: ts.CompilerOptions = {
     include: '/',
     baseUrl: path.resolve(__dirname, '../'),
     paths: {
-        '@vgerbot/channel': [path.resolve(__dirname, '../../../core/dist/index')]
+        '@vgerbot/channel': [path.resolve(__dirname, '../../../core/dist/index.d.ts')]
     }
 };
 
@@ -52,7 +52,6 @@ export function transpile(filepath: string, code: string, transpileOptions: Tran
         const code = fs.readFileSync(it).toString('utf8');
         fsMap.set(it, code);
     });
-    console.log(Array.from(files));
 
     const system = createSystem(fsMap);
     const host = createVirtualCompilerHost(system, options, ts);
