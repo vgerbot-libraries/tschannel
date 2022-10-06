@@ -1,7 +1,7 @@
 {
     "name": "@vgerbot/channel",
     "version": "1.0.0",
-    "description": "A library that provides a consistent and asynchrounous communication API for iframes, webworkers and even websocket to nodejs",
+    "description": "A TypeScript-based cross-context messaging library",
     "main": "dist/index.cjs.js",
     "module": "dist/index.esm.js",
     "browser": "dist/index.umd.js",
