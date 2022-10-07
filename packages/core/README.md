@@ -4,7 +4,7 @@
 
 This is a messaging abstraction layer implemented by Typescript. Its purpose is to encapsulate the details of message passing, so that js can construct classes that exist in different contexts and call methods in different contexts in an idiomatic way.
 
-## Features
+## 💪 Features
 
 1. Encapsulation: Encapsulates communication details and provides consistent upper-layer APIs
 2. Isolation: Data is securely isolated in different channel-ids.
@@ -12,9 +12,9 @@ This is a messaging abstraction layer implemented by Typescript. Its purpose is 
 4. Parallel: support decomposing tasks into multiple target contexts for parallel execution
 5. Extension: support custom communicator to for more features
 
-## Getting started
+## 📖 Getting started
 
-### Install
+### 🔌 Install
 
 ```sh
 npm i -s @vgerbot/channel
@@ -28,9 +28,10 @@ npm i -D @vgerbot/channel-transformer
 
 For more information about the usage of `@vgerbot/channel-transformer` please refer <https://github.com/vgerbot-libraries/tschannel/blob/master/packages/transformer/README.md>
 
-### Sample Usage
+### 📚 Sample Usage
 
-// api.ts
+api.ts
+
 ```ts
 export interface SpellChecker {
     saveToDictionary(word: string): void;
@@ -40,6 +41,7 @@ export interface SpellChecker {
 ```
 
 task.ts
+
 ```ts
 import { channel } from '@vgerbot/channel';
 import { SpellChecker } form './api';
@@ -99,12 +101,12 @@ spellChecker.__destroy__(); // Since the remote instance cannot be automatically
 
 For more examples, see [examples](https://github.com/vgerbot-libraries/tschannel/tree/master/packages/examples) and unit tests.
 
-## Supported parameter types
+## 🌟 Supported parameter types
 
 Like the postMessage API, it supports all types that can be cloned using the structured clone algorithm. For more detailed description, please refer to[The structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
 In addition to supporting the parameter types of postMessage, remote objects and callback functions are also supported, but these two types cannot be nested in other objects.
 
 
-## LICENSE
+## 📘 LICENSE
 
 The `@vgerbot/channel` library is released under the terms of the [![MIT License](https://badgen.net/github/license/y1j2x34/tschannel)](https://github.com/y1j2x34/tschannel/blob/master/LICENSE).
