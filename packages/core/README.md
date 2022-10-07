@@ -99,7 +99,7 @@ spellChecker.__destroy__(); // Since the remote instance cannot be automatically
 
 For more examples, see [examples](https://github.com/vgerbot-libraries/tschannel/tree/master/packages/examples) and unit tests.
 
-## All supported parameter data types
+## Supported parameter types
 
 Like the postMessage API, it supports all types that can be cloned using the structured clone algorithm. For more detailed description, please refer to[The structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
 In addition to supporting the parameter types of postMessage, remote objects and callback functions are also supported, but these two types cannot be nested in other objects.
