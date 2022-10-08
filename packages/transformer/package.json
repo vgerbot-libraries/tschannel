@@ -6,6 +6,7 @@
     "homepage": "https://github.com/y1j2x34/channel-ts/tree/master/packages/channel-ts-transformer#readme",
     "license": "MIT",
     "main": "lib/index.js",
+    "typings": "lib/index.d.ts",
     "engine": {
         "node": ">= 3.2.2"
     },
@@ -17,7 +18,8 @@
         "lib"
     ],
     "publishConfig": {
-        "registry": "https://registry.npm.taobao.org"
+        "access": "public",
+        "registry": "https://registry.npmjs.org/"
     },
     "repository": {
         "type": "git",

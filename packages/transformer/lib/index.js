@@ -59,7 +59,7 @@ function findChannelSymbols(program) {
         if (symbolName.indexOf('packages/core/src') > -1) {
             return true;
         }
-        if (symbolName.indexOf('@vgerbot/channel') > -1) {
+        if (symbolName.indexOf(consts_1.CHANNEL_MODULE_NAME) > -1) {
             return true;
         }
         return false;
