@@ -54,7 +54,7 @@
     },
     "homepage": "https://github.com/y1j2x34/channel-ts/blob/master/packages/channel-ts#readme",
     "author": "'y1j2x34' <y1j2x34@qq.com> (http://www.vgerbot.com/)",
-    "license": "ISC",
+    "license": "MIT",
     "devDependencies": {
         "@rollup/plugin-commonjs": "22.0.2",
         "@rollup/plugin-json": "4.1.0",
