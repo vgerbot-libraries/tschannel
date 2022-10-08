@@ -1,6 +1,6 @@
 # @vgerbot/channel-transformer
 
-A typescript transformer, which is used to simplify the use of the [@vgerbot/channel](https://npmjs.com/packages/@vgerbot/channel) library.
+A typescript transformer, which is used to simplify the use of the [@vgerbot/channel](https://npmjs.com/package/@vgerbot/channel) library.
 It has the following conversion features:
 
 - Convert the members of the interface passed to the `get_class` method to an array:
