@@ -6,6 +6,9 @@
     "homepage": "https://github.com/y1j2x34/channel-ts/tree/master/packages/channel-ts-transformer#readme",
     "license": "MIT",
     "main": "lib/index.js",
+    "engine": {
+        "node": ">= 3.2.2"
+    },
     "directories": {
         "lib": "lib",
         "test": "test"
