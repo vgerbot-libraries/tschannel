@@ -49,6 +49,9 @@
     "files": [
         "dist"
     ],
+    "publishConfig": {
+        "access": "public"
+    },
     "homepage": "https://github.com/y1j2x34/channel-ts/blob/master/packages/channel-ts#readme",
     "author": "'y1j2x34' <y1j2x34@qq.com> (http://www.vgerbot.com/)",
     "license": "ISC",
