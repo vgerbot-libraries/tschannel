@@ -1,8 +1,6 @@
 # @vgerbot/channel ![tschannel workflow](https://github.com/y1j2x34/channel-ts/actions/workflows/runtest.yml/badge.svg) [![codecov](https://codecov.io/gh/vgerbot-libraries/tschannel/branch/master/graph/badge.svg?token=fPomBmOknB)](https://codecov.io/gh/vgerbot-libraries/tschannel)
 
----
-
-This is a messaging abstraction layer implemented by Typescript. Its purpose is to encapsulate the details of message passing, so that js can construct classes that exist in different contexts and call methods in different contexts in an idiomatic way.
+This is a message-passing abstraction layer implemented by Typescript. Its purpose is to encapsulate the details of messaging, allowing js to construct classes that exist in different contexts and call methods in different contexts in an idiomatic way.
 
 ## 💪 Features
 
@@ -99,9 +97,9 @@ spellChecker.check('Halo world!').then(console.log); // Console Output: true
 spellChecker.__destroy__(); // Since the remote instance cannot be automatically cleared by the GC, it must be destroyed manually.
 ```
 
-For more examples, see [examples](https://github.com/vgerbot-libraries/tschannel/tree/master/packages/examples) and unit tests.
+For more examples, please refer to [examples](https://github.com/vgerbot-libraries/tschannel/tree/master/packages/examples) and unit tests.
 
-## 🌟 Supported parameter types
+## 🛴 Supported parameter types
 
 Like the postMessage API, it supports all types that can be cloned using the structured clone algorithm. For more detailed description, please refer to[The structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
 In addition to supporting the parameter types of postMessage, remote objects and callback functions are also supported, but these two types cannot be nested in other objects.
