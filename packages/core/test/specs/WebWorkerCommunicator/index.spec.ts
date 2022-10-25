@@ -19,6 +19,41 @@ describe('WebWorkerCommunicator', () => {
 
         expect(dog.getType()).to.eventually.become('Loki');
     });
+    // it('Should getConstructorTransferable be called', async () => {
+    //     const getConstructorTransferableStub = sinon.stub().returns([]);
+    //     interface Painter {
+    //         getCanvas(): OffscreenCanvas;
+    //     }
+    //     const Painter = channel.get_class<Painter>('Painter', ['getCanvas'], {
+    //         getConstructorTransferable: getConstructorTransferableStub
+    //     });
+    //     const canvas = document.createElement('canvas');
+    //     canvas.width = canvas.height = 100;
+    //     const offscreenCanvas = (canvas as any).transferControlToOffscreen();
+    //     new Painter(offscreenCanvas);
+    //     expect(getConstructorTransferableStub).to.be.calledOnceWith(offscreenCanvas);
+    // });
+    it('Should transform OffscreenCanvas correctly', async () => {
+        interface Painter {
+            checkCanvas(canvas: OffscreenCanvas): boolean;
+        }
+        const Painter = channel.get_class<Painter>('Painter', ['checkCanvas'], {
+            getConstructorTransferable: (...args) => [args[0]],
+            getTransferable: (methodName, ...args) => {
+                if (methodName === 'checkCanvas') {
+                    return [args[0]];
+                }
+                return [];
+            }
+        });
+
+        const canvas = document.createElement('canvas');
+        canvas.width = canvas.height = 100;
+        const offscreenCanvas = (canvas as any).transferControlToOffscreen();
+        const painter = new Painter(offscreenCanvas);
+        const passed = await painter.checkCanvas(offscreenCanvas);
+        expect(passed).to.be.true;
+    });
     after(async () => {
         if (typeof __coverage__ !== 'undefined') {
             const coverageData = await channel.get_method<() => istanbul.CoverageMapData>('get-coverage')();
