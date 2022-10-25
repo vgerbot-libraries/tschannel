@@ -1,5 +1,5 @@
-import { ParameterType } from '../../types/ParameterType';
-import { Transferable } from '../../types/Transferable';
+import { ParameterType } from './ParameterType';
+import { Transferable } from './Transferable';
 
 export interface RemoteMethodOptions {
     methodName?: string;

@@ -7,7 +7,9 @@ export class WebWorkerCommunicator extends AbstractMessageChannelCommunicator<Wo
         super(new Worker(workerScriptURL, options));
     }
     sendPayload(serializable: SerializableValue, transferables: Transferable[]): void {
-        this.target.postMessage(serializable, transferables);
+        this.target.postMessage(serializable, {
+            transfer: transferables
+        });
     }
     close(): void {
         this.target.terminate();

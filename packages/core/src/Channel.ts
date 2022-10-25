@@ -1,3 +1,4 @@
+import { RemoteMethodOptions } from './types/RemoteMethodOptions';
 import { RMIClass, RMIClassConstructor } from './annotations/types/RMIClass';
 import { RMIMethod } from './annotations/types/RMIMethod';
 import uid from './common/uid';
@@ -8,6 +9,7 @@ import { RMIMethodMetadata } from './metadata/RMIMethodMetadata';
 import { AnyConstructor, Constructor } from './types/AnyConstructor';
 import { AnyFunction } from './types/AnyFunction';
 import { Communicator } from './types/Communicator';
+import { RemoteClassOptions } from './types/RemoteClassOptions';
 import { PromisifyClass } from './types/PromisifyType';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
@@ -43,7 +45,8 @@ export class Channel {
 
     public get_class<T>(
         remoteClassId?: string,
-        _clazzOrMembers?: Constructor<T> | Array<keyof T>
+        _clazzOrMembers?: Constructor<T> | Array<keyof T>,
+        options?: RemoteClassOptions<T>
     ): PromisifyClass<T & Remote> {
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const channel = this;
@@ -74,10 +77,9 @@ export class Channel {
             constructor(...args) {
                 super(...args);
                 channel.namespaces[this.$namespace.id] = this.$namespace;
-                this.$initPromise = channel.get_method(remoteClassId + '-new-instance')(
-                    this.$namespace.id,
-                    args
-                ) as Promise<void>;
+                this.$initPromise = channel.get_method(remoteClassId + '-new-instance')(this.$namespace.id, args, {
+                    getTransferable: options?.getConstructorTransferable
+                }) as Promise<void>;
             }
 
             __destroy__() {
@@ -95,7 +97,14 @@ export class Channel {
             if (method.isLocal) {
                 return;
             }
-            const metadata = new RMIMethodMetadata(propertyName, method.options);
+            const methodOptions: RemoteMethodOptions = method.options || {};
+            const classLevelGetTransferable = options?.getTransferable;
+            if (!methodOptions.transferables && classLevelGetTransferable) {
+                methodOptions.transferables = (...args) => {
+                    return classLevelGetTransferable(propertyName as keyof T, ...args);
+                };
+            }
+            const metadata = new RMIMethodMetadata(propertyName, methodOptions);
             cls.prototype[propertyName] = function (this: cls, ...args) {
                 return this.$initPromise.then(() => {
                     return this.$namespace.get_method(metadata).apply(this, args);
@@ -143,10 +152,11 @@ export class Channel {
 
     public get_method<F extends AnyFunction, T = void>(
         metadata: string | RMIMethodMetadata,
-        func?: F
+        func?: F,
+        options?: RemoteMethodOptions
     ): (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>> {
         if (typeof metadata === 'string') {
-            metadata = new RMIMethodMetadata(metadata, (func as unknown as RMIMethod)?.options || {});
+            metadata = new RMIMethodMetadata(metadata, options || (func as unknown as RMIMethod)?.options || {});
         }
         return this.globalNamespace.get_method(metadata) as Promisify<F, T>;
     }

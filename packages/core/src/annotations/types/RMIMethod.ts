@@ -1,4 +1,4 @@
-import { RemoteMethodOptions } from './RemoteMethodOptions';
+import { RemoteMethodOptions } from '../../types/RemoteMethodOptions';
 
 export type RMIMethod =
     | {

@@ -1,4 +1,4 @@
-import { RemoteMethodOptions } from './types/RemoteMethodOptions';
+import { RemoteMethodOptions } from '../types/RemoteMethodOptions';
 import { RMIMethod } from './types/RMIMethod';
 
 export function rmethod(options: RemoteMethodOptions) {

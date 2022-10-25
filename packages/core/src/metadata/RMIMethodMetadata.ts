@@ -1,4 +1,4 @@
-import { RemoteMethodOptions } from '../annotations/types/RemoteMethodOptions';
+import { RemoteMethodOptions } from '../types/RemoteMethodOptions';
 import uid from '../common/uid';
 import { CallbackParameter } from '../foundation/CallbackParameter';
 import { RemoteInstance } from '../foundation/RemoteInstance';
