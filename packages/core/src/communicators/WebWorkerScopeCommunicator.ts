@@ -1,11 +1,16 @@
 import { SerializableValue } from '../types/Serializable';
 import { Transferable } from '../types/Transferable';
 import AbstractMessageChannelCommunicator from './AbstractMessageChannelCommunicator';
-export class WebWorkerScopeCommunicator extends AbstractMessageChannelCommunicator<typeof globalThis> {
+
+export class WebWorkerScopeCommunicator extends AbstractMessageChannelCommunicator<WorkerGlobalScope> {
     sendPayload(serializable: SerializableValue, transferables: Transferable[]): void {
-        self.postMessage(serializable, transferables);
+        postMessage(serializable, transferables);
     }
     constructor() {
-        super(globalThis);
+        if (!WorkerGlobalScope || !(self instanceof WorkerGlobalScope)) {
+            // eslint-disable-next-line quotes
+            throw new Error("I'm confident that you didn't initialize WebWorkerScopeCommunicator in a Web Worker!");
+        }
+        super(self);
     }
 }
