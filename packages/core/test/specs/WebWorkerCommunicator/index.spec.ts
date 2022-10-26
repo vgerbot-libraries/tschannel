@@ -19,23 +19,9 @@ describe('WebWorkerCommunicator', () => {
 
         expect(dog.getType()).to.eventually.become('Loki');
     });
-    // it('Should getConstructorTransferable be called', async () => {
-    //     const getConstructorTransferableStub = sinon.stub().returns([]);
-    //     interface Painter {
-    //         getCanvas(): OffscreenCanvas;
-    //     }
-    //     const Painter = channel.get_class<Painter>('Painter', ['getCanvas'], {
-    //         getConstructorTransferable: getConstructorTransferableStub
-    //     });
-    //     const canvas = document.createElement('canvas');
-    //     canvas.width = canvas.height = 100;
-    //     const offscreenCanvas = (canvas as any).transferControlToOffscreen();
-    //     new Painter(offscreenCanvas);
-    //     expect(getConstructorTransferableStub).to.be.calledOnceWith(offscreenCanvas);
-    // });
-    it('Should transform OffscreenCanvas correctly', async () => {
+    it('Should transfer OffscreenCanvas correctly', async () => {
         interface Painter {
-            checkCanvas(canvas: OffscreenCanvas): boolean;
+            checkCanvas(): boolean;
         }
         const Painter = channel.get_class<Painter>('Painter', ['checkCanvas'], {
             getConstructorTransferable: (...args) => [args[0]],
@@ -51,8 +37,7 @@ describe('WebWorkerCommunicator', () => {
         canvas.width = canvas.height = 100;
         const offscreenCanvas = (canvas as any).transferControlToOffscreen();
         const painter = new Painter(offscreenCanvas);
-        const passed = await painter.checkCanvas(offscreenCanvas);
-        expect(passed).to.be.true;
+        expect(painter.checkCanvas()).to.eventually.become(true);
     });
     after(async () => {
         if (typeof __coverage__ !== 'undefined') {

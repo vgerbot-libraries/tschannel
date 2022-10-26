@@ -21,8 +21,8 @@ workerChannel.def_class(
     'Painter',
     class Painter {
         constructor(private canvas: OffscreenCanvas) {}
-        checkCanvas(canvas: OffscreenCanvas) {
-            return this.canvas == canvas;
+        checkCanvas() {
+            return !!this.canvas;
         }
     }
 );

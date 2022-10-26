@@ -77,9 +77,11 @@ export class Channel {
             constructor(...args) {
                 super(...args);
                 channel.namespaces[this.$namespace.id] = this.$namespace;
-                this.$initPromise = channel.get_method(remoteClassId + '-new-instance')(this.$namespace.id, args, {
-                    getTransferable: options?.getConstructorTransferable
-                }) as Promise<void>;
+
+                this.$initPromise = channel.get_method(remoteClassId + '-new-instance', undefined, {
+                    transferables: () =>
+                        options && options.getConstructorTransferable ? options.getConstructorTransferable(...args) : []
+                })(this.$namespace.id, args) as Promise<void>;
             }
 
             __destroy__() {
