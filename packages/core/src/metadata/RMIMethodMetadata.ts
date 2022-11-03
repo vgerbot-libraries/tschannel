@@ -10,7 +10,7 @@ import { Transferable } from '../types/Transferable';
 export class RMIMethodMetadata {
     private paramTypes?: ParameterType[];
     private getTransferablesFn?: (this: void, ...args) => Transferable[];
-    constructor(private readonly methodName: string, options: RemoteMethodOptions = {}) {
+    constructor(private readonly methodName: string, options: Omit<RemoteMethodOptions, 'methodName'>) {
         this.paramTypes = options.paramTypes;
         this.getTransferablesFn = options.transferables;
     }

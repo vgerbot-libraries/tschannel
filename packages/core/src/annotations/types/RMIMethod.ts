@@ -4,7 +4,7 @@ export type RMIMethod =
     | {
           (...args): unknown;
           isLocal: false;
-          options: RemoteMethodOptions;
+          options: Omit<RemoteMethodOptions, 'methodName'>;
       }
     | {
           (...args): unknown;

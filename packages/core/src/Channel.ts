@@ -1,4 +1,4 @@
-import { RemoteMethodOptions } from './types/RemoteMethodOptions';
+import { GetRemoteMethodOptions, RemoteMethodOptions } from './types/RemoteMethodOptions';
 import { RMIClass, RMIClassConstructor } from './annotations/types/RMIClass';
 import { RMIMethod } from './annotations/types/RMIMethod';
 import uid from './common/uid';
@@ -44,10 +44,17 @@ export class Channel {
     }
 
     public get_class<T>(
-        remoteClassId?: string,
-        _clazzOrMembers?: Constructor<T> | Array<keyof T>,
-        options?: RemoteClassOptions<T>
+        remoteClassIdOrOptions?: string | RemoteClassOptions<T>,
+        _clazzOrMembers?: Constructor<T> | Array<keyof T>
     ): PromisifyClass<T & Remote> {
+        if (!remoteClassIdOrOptions) {
+            throw new TypeError(`Invalid Parameter Error: remoteClassId: ${remoteClassIdOrOptions}`);
+        }
+        const options =
+            typeof remoteClassIdOrOptions === 'object'
+                ? remoteClassIdOrOptions
+                : { remoteClassId: remoteClassIdOrOptions };
+        const remoteClassId = options.remoteClassId;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const channel = this;
         let clazz;
@@ -77,10 +84,12 @@ export class Channel {
             constructor(...args) {
                 super(...args);
                 channel.namespaces[this.$namespace.id] = this.$namespace;
-
-                this.$initPromise = channel.get_method(remoteClassId + '-new-instance', undefined, {
-                    transferables: () =>
-                        options && options.getConstructorTransferable ? options.getConstructorTransferable(...args) : []
+                const getConstructorTransferable = options?.getConstructorTransferable;
+                this.$initPromise = channel.get_method({
+                    methodName: remoteClassId + '-new-instance',
+                    transferables: getConstructorTransferable ? (id, args) => {
+                        return getConstructorTransferable(...args);
+                    } : undefined
                 })(this.$namespace.id, args) as Promise<void>;
             }
 
@@ -99,7 +108,7 @@ export class Channel {
             if (method.isLocal) {
                 return;
             }
-            const methodOptions: RemoteMethodOptions = method.options || {};
+            const methodOptions: RemoteMethodOptions = Object.assign({}, method.options);
             const classLevelGetTransferable = options?.getTransferable;
             if (!methodOptions.transferables && classLevelGetTransferable) {
                 methodOptions.transferables = (...args) => {
@@ -153,14 +162,44 @@ export class Channel {
     }
 
     public get_method<F extends AnyFunction, T = void>(
-        metadata: string | RMIMethodMetadata,
-        func?: F,
-        options?: RemoteMethodOptions
+        methodNameOrmetadataOrOptions?: string | RMIMethodMetadata | GetRemoteMethodOptions,
+        func?: F
     ): (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>> {
-        if (typeof metadata === 'string') {
-            metadata = new RMIMethodMetadata(metadata, options || (func as unknown as RMIMethod)?.options || {});
+        if (!methodNameOrmetadataOrOptions) {
+            throw new TypeError(`Invalid Parameter Error: methodName: ${methodNameOrmetadataOrOptions}`);
+        }
+        const {
+            metadata: inputMetadata,
+            options,
+            methodName
+        } = this.resolveRemoteMethodOptions(methodNameOrmetadataOrOptions);
+        let metadata = inputMetadata;
+        if (!metadata) {
+            metadata = new RMIMethodMetadata(
+                methodName,
+                Object.assign({}, (func as unknown as RMIMethod)?.options || {}, options || {})
+            );
         }
         return this.globalNamespace.get_method(metadata) as Promisify<F, T>;
+    }
+
+    private resolveRemoteMethodOptions(opt: string | RMIMethodMetadata | GetRemoteMethodOptions) {
+        if (typeof opt === 'string') {
+            return {
+                metadata: undefined,
+                methodName: opt
+            };
+        } else if (opt instanceof RMIMethodMetadata) {
+            return {
+                metadata: opt,
+                methodName: opt.getName()
+            };
+        }
+        return {
+            metadata: undefined,
+            options: opt,
+            methodName: opt.methodName
+        };
     }
 
     public def_method<T extends AnyFunction = AnyFunction>(name: string, func: T);
