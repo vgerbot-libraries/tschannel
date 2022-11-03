@@ -23,18 +23,14 @@ describe('WebWorkerCommunicator', () => {
         interface Painter {
             checkCanvas(): boolean;
         }
-        const Painter = channel.get_class<Painter>('Painter', ['checkCanvas'], {
-            getConstructorTransferable: (...args) => [args[0]],
-            getTransferable: (methodName, ...args) => {
-                if (methodName === 'checkCanvas') {
-                    return [args[0]];
-                }
-                return [];
-            }
+        const Painter = channel.get_class<Painter>({
+            remoteClassId: 'Painter',
+            getConstructorTransferable: (...args) => [args[0]]
         });
 
         const canvas = document.createElement('canvas');
         canvas.width = canvas.height = 100;
+        // eslint-disable-next-line @typescript-eslint/no-explicit-any
         const offscreenCanvas = (canvas as any).transferControlToOffscreen();
         const painter = new Painter(offscreenCanvas);
         expect(painter.checkCanvas()).to.eventually.become(true);
