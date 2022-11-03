@@ -31,7 +31,8 @@ module.exports = [
                 include: /node_modules/,
                 ignore: ['js-base64'],
                 sourceMap: false
-            })
+            }),
+            plugins.printError()
         ],
         external: ['txon']
     }

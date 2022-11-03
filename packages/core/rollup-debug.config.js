@@ -27,7 +27,8 @@ const rollupPlugins = [
         namedExports: {
             chai: ['expect']
         }
-    })
+    }),
+    plugins.printError()
 ];
 module.exports = {
     context: 'this',

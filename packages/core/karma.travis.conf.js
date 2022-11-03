@@ -41,7 +41,8 @@ module.exports = function (config) {
                 embedSource: false,
                 debug: false
             }
-        })
+        }),
+        plugins.printError()
     ];
     config.set(Object.assign({}, baseConfig, {
         preprocessors: {

@@ -54,5 +54,15 @@ module.exports = {
     },
     uglify(opt) {
         return uglify(ext({}, opt));
+    },
+    printError() {
+        return {
+            name: 'PrintError',
+            buildEnd(err) {
+                if (err) {
+                    console.error('Rollup Error: ', err);
+                }
+            }
+        }
     }
 };
