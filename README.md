@@ -18,7 +18,7 @@ This is a message-passing abstraction layer implemented by Typescript. Its purpo
 npm i -s @vgerbot/channel
 ```
 
-Then install `@vgerbot/channel-transformer`, this is to simplify stuffs and make channel APIs more convenient to use
+Then install `@vgerbot/channel-transformer`, this is to simplify things and make channel APIs more convenient to use
 
 ```sh
 npm i -D @vgerbot/channel-transformer
@@ -38,7 +38,7 @@ export interface SpellChecker {
 }
 ```
 
-task.ts
+worker.ts
 
 ```ts
 import { channel } from '@vgerbot/channel';
@@ -61,12 +61,14 @@ chnl.def_class(class DefaultSpellCheckerImpl implements SpellChecker {
 })
 ```
 
+client.ts
+
 ```ts
 import { channel } from '@vgerbot/channel';
 import { SpellChecker } form './api';
 
 const chnl = channel('worker-channel')
-    .connectToWorker('./task.js')
+    .connectToWorker('./worker.js') // This is the path to the compiled js file for worker.ts
     .create();
 
 const performCPUIntensiveCalculation = chnl.get_method<() => string>('performCPUIntensiveCalculation');
@@ -74,6 +76,7 @@ performCPUIntensiveCalculation().then(console.log) // Console Output: "Result!"
 
 const DefaultSpellCheckerImpl = chnl.get_class<SpellChecker>('DefaultSpellCheckerImpl');
 
+// DefaultSpellCheckerImpl is defined as follows
 /*
 class DefaultSpellCheckerImpl {
     saveToDictionary(word: string): Promise<void> {
@@ -88,6 +91,7 @@ class DefaultSpellCheckerImpl {
 }
 */
 
+// You can construct an instance as you would a normal object, and then call the interface methods, except that they are all asynchronous, i.e. the return value is a Promise
 const spellChecker = new DefaultSpellCheckerImpl();
 
 spellChecker.saveToDictionary('halo');
