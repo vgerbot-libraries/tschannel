@@ -102,6 +102,13 @@ export function channel(channelId: string) {
                 .fill(undefined)
                 .map((_, index) => generator(index));
             return new ParallelChannelChainGenerator(channelId, communicators);
+        },
+        connectTo(communicator: Communicator) {
+            return {
+                create() {
+                    return createChannel(channelId, communicator);
+                }
+            };
         }
     };
 }
