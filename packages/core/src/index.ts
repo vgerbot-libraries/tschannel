@@ -19,5 +19,8 @@ export { default as MethodReturningPayload } from './foundation/MethodReturningP
 export { StorageChannelCommunicator } from './communicators/StorageChannelCommunicator';
 export { Adaptor } from './Adaptor';
 export { Destructible } from './foundation/Destructible';
+export { Communicator, CommunicatorMessageReceiver } from './types/Communicator';
+export { CommunicationData } from './types/CommunicationData';
+export { AbstractCommunicator } from './communicators/AbstractCommunicator';
 
 export * from './builder';

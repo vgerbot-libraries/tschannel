@@ -17,3 +17,4 @@ export default abstract class AbstractCommunicator implements Communicator {
         };
     }
 }
+export { AbstractCommunicator };
