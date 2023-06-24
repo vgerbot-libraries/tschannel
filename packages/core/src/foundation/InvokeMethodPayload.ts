@@ -1,11 +1,8 @@
-import { InvokeMethodData } from '../types/InvokeMethodData';
-import Payload from '../types/Payload';
-import { SerializableValue } from '../types/Serializable';
-import { Transferable } from '../types/Transferable';
+import { InvokeMethodData, Payload, SerializableValue, Transferable } from '../types';
 
 const INVOKE_METHOD_DATA_SYMBOL = 'is-invoke-method-data';
 
-export default class InvokeMethodPayload implements Payload<InvokeMethodData> {
+export class InvokeMethodPayload implements Payload<InvokeMethodData> {
     public static isInvokeMethodData(data: SerializableValue): data is InvokeMethodData {
         return !!(data as Object)[INVOKE_METHOD_DATA_SYMBOL];
     }

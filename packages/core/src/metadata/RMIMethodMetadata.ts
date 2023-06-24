@@ -1,15 +1,12 @@
-import { RemoteMethodOptions } from '../types/RemoteMethodOptions';
 import uid from '../common/uid';
 import { CallbackParameter } from '../foundation/CallbackParameter';
 import { RemoteInstance } from '../foundation/RemoteInstance';
 import { RMINamespace } from '../foundation/RNamespace';
-import { ParameterType } from '../types/ParameterType';
-import { SerializableValue } from '../types/Serializable';
-import { Transferable } from '../types/Transferable';
+import { ParameterType, RemoteMethodOptions, SerializableValue, Transferable } from '../types';
 
 export class RMIMethodMetadata {
-    private paramTypes?: ParameterType[];
-    private getTransferablesFn?: (this: void, ...args) => Transferable[];
+    private readonly paramTypes?: ParameterType[];
+    private readonly getTransferablesFn?: (this: void, ...args) => Transferable[];
     constructor(private readonly methodName: string, options: Omit<RemoteMethodOptions, 'methodName'>) {
         this.paramTypes = options.paramTypes;
         this.getTransferablesFn = options.transferables;

@@ -1,16 +1,19 @@
-import { GetRemoteMethodOptions, RemoteMethodOptions } from './types/RemoteMethodOptions';
 import { RMIClass, RMIClassConstructor } from './annotations/types/RMIClass';
 import { RMIMethod } from './annotations/types/RMIMethod';
 import uid from './common/uid';
-import { Destructible } from './foundation/Destructible';
+import { Destructible, RMINamespace } from './foundation';
 import MessageAdaptor from './foundation/MessageAdaptor';
-import { RMINamespace } from './foundation/RNamespace';
 import { RMIMethodMetadata } from './metadata/RMIMethodMetadata';
-import { AnyConstructor, Constructor } from './types/AnyConstructor';
-import { AnyFunction } from './types/AnyFunction';
-import { Communicator } from './types/Communicator';
-import { RemoteClassOptions } from './types/RemoteClassOptions';
-import { PromisifyClass } from './types/PromisifyType';
+import {
+    AnyConstructor,
+    AnyFunction,
+    Communicator,
+    Constructor,
+    GetRemoteMethodOptions,
+    PromisifyClass,
+    RemoteClassOptions,
+    RemoteMethodOptions
+} from './types';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
 
@@ -87,9 +90,11 @@ export class Channel {
                 const getConstructorTransferable = options?.getConstructorTransferable;
                 this.$initPromise = channel.get_method({
                     methodName: remoteClassId + '-new-instance',
-                    transferables: getConstructorTransferable ? (id, args) => {
-                        return getConstructorTransferable(...args);
-                    } : undefined
+                    transferables: getConstructorTransferable
+                        ? (id, args) => {
+                              return getConstructorTransferable(...args);
+                          }
+                        : undefined
                 })(this.$namespace.id, args) as Promise<void>;
             }
 

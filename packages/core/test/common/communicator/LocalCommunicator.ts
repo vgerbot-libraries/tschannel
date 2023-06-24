@@ -1,9 +1,5 @@
 import AbstractCommunicator from '../../../src/communicators/AbstractCommunicator';
-import { Communicator } from '../../../src/types/Communicator';
-import { InvokeMethodData } from '../../../src/types/InvokeMethodData';
-import Payload from '../../../src/types/Payload';
-import { Returning } from '../../../src/types/Returning';
-import { SerializableValue } from '../../../src/types/Serializable';
+import { Communicator, InvokeMethodData, Payload, Returning, SerializableValue } from '../../../src/types';
 
 export default class LocalCommunicator extends AbstractCommunicator implements Communicator {
     private other?: LocalCommunicator;

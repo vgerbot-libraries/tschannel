@@ -1,8 +1,6 @@
-import Payload from '../types/Payload';
-import { Returning } from '../types/Returning';
-import { Transferable } from '../types/Transferable';
+import { Payload, Returning, Transferable } from '../types';
 
-export default class MethodReturningPayload implements Payload<Returning> {
+export class MethodReturningPayload implements Payload<Returning> {
     constructor(
         private readonly data: Returning,
         private readonly namespace: string,

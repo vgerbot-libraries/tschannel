@@ -1,7 +1,4 @@
-import { CommunicationData } from '../types/CommunicationData';
-import { Communicator } from '../types/Communicator';
-import Payload from '../types/Payload';
-import { Returning } from '../types/Returning';
+import { CommunicationData, Communicator, Payload, Returning } from '../types';
 import AbstractCommunicator from './AbstractCommunicator';
 
 export type ParallelDataDistributor<T extends CommunicationData> = (no: number, payload: Payload<T>) => Payload<T>;

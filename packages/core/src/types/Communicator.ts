@@ -1,6 +1,6 @@
 import { CommunicationData } from './CommunicationData';
 import { InvokeMethodData } from './InvokeMethodData';
-import Payload from './Payload';
+import { Payload } from './Payload';
 import { Returning } from './Returning';
 
 export type CommunicatorMessageReceiver = (data: InvokeMethodData | Returning) => void;

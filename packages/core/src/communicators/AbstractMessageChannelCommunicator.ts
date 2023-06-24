@@ -1,6 +1,4 @@
-import Payload from '../types/Payload';
-import { SerializableValue } from '../types/Serializable';
-import { Transferable } from '../types/Transferable';
+import { Payload, SerializableValue, Transferable } from '../types';
 import AbstractCommunicator from './AbstractCommunicator';
 
 export interface EventTarget {

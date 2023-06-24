@@ -1,6 +1,4 @@
-import { Communicator, CommunicatorMessageReceiver } from '../types/Communicator';
-import Payload from '../types/Payload';
-import { SerializableValue } from '../types/Serializable';
+import { Communicator, CommunicatorMessageReceiver, Payload, SerializableValue } from '../types';
 
 export default abstract class AbstractCommunicator implements Communicator {
     protected messageReceivers: CommunicatorMessageReceiver[] = [];

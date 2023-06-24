@@ -1,15 +1,14 @@
 import { Channel } from './Channel';
-import { WindowChannelCommunicator } from './communicators/WindowChannelCommunicator';
-import { StorageChannelCommunicator } from './communicators/StorageChannelCommunicator';
-import { WebWorkerCommunicator } from './communicators/WebWorkerCommunicator';
-import { WebWorkerScopeCommunicator } from './communicators/WebWorkerScopeCommunicator';
-import { Communicator } from './types/Communicator';
-import { CommunicationData } from './types/CommunicationData';
 import {
     ParallelCommunicator,
     ParallelDataCombiner,
-    ParallelDataDistributor
-} from './communicators/ParallelCommunicator';
+    ParallelDataDistributor,
+    StorageChannelCommunicator,
+    WebWorkerCommunicator,
+    WebWorkerScopeCommunicator,
+    WindowChannelCommunicator
+} from './communicators';
+import { CommunicationData, Communicator } from './types';
 
 interface ChannelFactory {
     create(): Channel;

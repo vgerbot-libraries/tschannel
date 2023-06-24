@@ -1,8 +1,5 @@
-import InvokeMethodPayload from './foundation/InvokeMethodPayload';
-import MethodReturningPayload from './foundation/MethodReturningPayload';
-import { Communicator } from './types/Communicator';
-import { InvokeMethodData } from './types/InvokeMethodData';
-import { Returning } from './types/Returning';
+import { InvokeMethodPayload, MethodReturningPayload } from './foundation';
+import { Communicator, InvokeMethodData, Returning } from './types';
 
 export class Adaptor {
     constructor(private downline: Communicator, private upline: Communicator, private channelId: string) {

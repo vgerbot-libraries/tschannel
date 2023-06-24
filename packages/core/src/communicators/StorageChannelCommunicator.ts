@@ -1,9 +1,6 @@
-import { InvokeMethodData } from '../types/InvokeMethodData';
-import Payload from '../types/Payload';
-import { Returning } from '../types/Returning';
-import { SerializableValue } from '../types/Serializable';
-import AbstractCommunicator from './AbstractCommunicator';
 import txon from 'txon';
+import { InvokeMethodData, Payload, Returning, SerializableValue } from '../types';
+import AbstractCommunicator from './AbstractCommunicator';
 
 type CommunicationData = InvokeMethodData | Returning;
 

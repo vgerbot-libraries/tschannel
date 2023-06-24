@@ -1,14 +1,10 @@
 import Defer from '../common/Defer';
 import uid from '../common/uid';
 import { RMIMethodMetadata } from '../metadata/RMIMethodMetadata';
-import { Communicator } from '../types/Communicator';
-import { InvokeMethodData } from '../types/InvokeMethodData';
-import { Returning } from '../types/Returning';
-import { SerializableValue } from '../types/Serializable';
-import { Transferable } from '../types/Transferable';
+import { Communicator, InvokeMethodData, Returning, SerializableValue, Transferable } from '../types';
 import { isCallback } from './CallbackParameter';
-import InvokeMethodPayload from './InvokeMethodPayload';
-import MethodReturningPayload from './MethodReturningPayload';
+import { InvokeMethodPayload } from './InvokeMethodPayload';
+import { MethodReturningPayload } from './MethodReturningPayload';
 import { RemoteError } from './RemoteError';
 import { isRemoteInstance } from './RemoteInstance';
 import { RMINamespace } from './RNamespace';
