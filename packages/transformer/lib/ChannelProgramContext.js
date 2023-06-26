@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.ChannelProgramContext = void 0;
 const tslib_1 = require("tslib");
 const typescript_1 = tslib_1.__importDefault(require("typescript"));
+const utils_1 = require("./utils");
 class ChannelProgramContext {
     constructor(typeChecker, channelSymbols) {
         this.typeChecker = typeChecker;
@@ -61,12 +62,12 @@ class ChannelProgramContext {
         return false;
     }
     isAccessingTheGetClassMethod(callExpression, propertyExpression) {
-        var _a;
         const propertyName = propertyExpression.name.text;
         if (propertyName !== 'get_class') {
             return false;
         }
-        if (((_a = callExpression.typeArguments) === null || _a === void 0 ? void 0 : _a.length) !== 1) {
+        const typeArgs = (0, utils_1.getTypeArguments)(callExpression);
+        if (!typeArgs || typeArgs.length < 1) {
             return false;
         }
         const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);

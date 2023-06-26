@@ -1,5 +1,5 @@
 import { CHANNEL_MODULE_NAME, DEFAULT_TRANSFORMER_OPTIONS } from './consts';
-import { createMemberNamesvariable, getMethodMembersFrom, getTypeNodeDecration } from './utils';
+import { createMemberNamesvariable, getMethodMembersFrom, getTypeArguments, getTypeNodeDecration } from './utils';
 import ts, { factory } from 'typescript';
 import { ChannelProgramContext } from './ChannelProgramContext';
 import { TransformerOptions } from './TransformerOptions';
@@ -129,7 +129,7 @@ function handleGetClassMethod(
     factory: ts.NodeFactory,
     variablesMap: Map<ts.Type, ts.VariableDeclaration>
 ) {
-    const typeArgs = node.typeArguments;
+    const typeArgs = getTypeArguments(node);
     if (!typeArgs || typeArgs.length < 1) {
         return;
     }

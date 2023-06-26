@@ -110,7 +110,7 @@ function visitNode(node, program, programCtx, context, options) {
     }
 }
 function handleGetClassMethod(node, typeChecker, factory, variablesMap) {
-    const typeArgs = node.typeArguments;
+    const typeArgs = (0, utils_1.getTypeArguments)(node);
     if (!typeArgs || typeArgs.length < 1) {
         return;
     }

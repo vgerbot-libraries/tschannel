@@ -1,4 +1,5 @@
 import ts from 'typescript';
+import { getTypeArguments } from './utils';
 
 export interface ChannelSymbols {
     channelMethodSymbol: ts.Symbol;
@@ -72,7 +73,8 @@ export class ChannelProgramContext {
         if (propertyName !== 'get_class') {
             return false;
         }
-        if (callExpression.typeArguments?.length !== 1) {
+        const typeArgs = getTypeArguments(callExpression);
+        if (!typeArgs || typeArgs.length < 1) {
             return false;
         }
         const expressionType = this.typeChecker.getTypeAtLocation(propertyExpression.expression);

@@ -1,6 +1,6 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
-exports.getMethodMembersFrom = exports.createMemberNamesvariable = exports.getTypeNodeDecration = void 0;
+exports.getTypeArguments = exports.getMethodMembersFrom = exports.createMemberNamesvariable = exports.getTypeNodeDecration = void 0;
 const tslib_1 = require("tslib");
 const typescript_1 = tslib_1.__importDefault(require("typescript"));
 function getTypeNodeDecration(typeNodeObj) {
@@ -29,4 +29,15 @@ function getMethodMembersFrom(typeChecker, typeNode) {
     return members.filter(it => it.valueDeclaration !== undefined && typescript_1.default.isMethodSignature(it.valueDeclaration));
 }
 exports.getMethodMembersFrom = getMethodMembersFrom;
+function getTypeArguments(node) {
+    let typeArgs = node.typeArguments;
+    if (!typeArgs || typeArgs.length < 1) {
+        const original = node.original;
+        if (!!original && typescript_1.default.isCallExpression(original)) {
+            typeArgs = original.typeArguments;
+        }
+    }
+    return typeArgs;
+}
+exports.getTypeArguments = getTypeArguments;
 //# sourceMappingURL=utils.js.map

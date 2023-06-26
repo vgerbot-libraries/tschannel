@@ -27,3 +27,14 @@ export function getMethodMembersFrom(typeChecker: ts.TypeChecker, typeNode: ts.T
     const members = typeChecker.getPropertiesOfType(typeNode);
     return members.filter(it => it.valueDeclaration !== undefined && ts.isMethodSignature(it.valueDeclaration));
 }
+
+export function getTypeArguments(node: ts.CallExpression) {
+    let typeArgs = node.typeArguments;
+    if (!typeArgs || typeArgs.length < 1) {
+        const original = (node as any).original;
+        if (!!original && ts.isCallExpression(original)) {
+            typeArgs = original.typeArguments;
+        }
+    }
+    return typeArgs;
+}
