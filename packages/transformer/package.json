@@ -1,6 +1,6 @@
 {
     "name": "@vgerbot/channel-transformer",
-    "version": "1.0.0",
+    "version": "1.0.1",
     "description": "A typescript transformer which is used to simplify the use of the @vgerbot/channel",
     "author": "y1j2x34 <y1j2x34@qq.com>",
     "homepage": "https://github.com/y1j2x34/channel-ts/tree/master/packages/channel-ts-transformer#readme",
