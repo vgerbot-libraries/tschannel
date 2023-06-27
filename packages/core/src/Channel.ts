@@ -1,5 +1,6 @@
 import { RMIClass, RMIClassConstructor } from './annotations/types/RMIClass';
 import { RMIMethod } from './annotations/types/RMIMethod';
+import { getPropertyNames } from './common/reflect';
 import uid from './common/uid';
 import { Destructible, RMINamespace } from './foundation';
 import MessageAdaptor from './foundation/MessageAdaptor';
@@ -139,7 +140,7 @@ export class Channel {
         if (this.globalNamespace.containsMethod(constructorMethodName)) {
             throw new Error(`Duplicate local class id: ${id}`);
         }
-        const propertyNames = Object.getOwnPropertyNames(clazz.prototype);
+        const propertyNames = getPropertyNames(clazz.prototype);
         const methodNames = propertyNames.filter(propertyName => {
             return propertyName !== 'constructor' && typeof clazz.prototype[propertyName] === 'function';
         });
