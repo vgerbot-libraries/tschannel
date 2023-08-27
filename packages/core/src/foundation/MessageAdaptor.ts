@@ -1,4 +1,5 @@
 import Defer from '../common/Defer';
+import { isPromise } from '../common/isPromise';
 import uid from '../common/uid';
 import { RMIMethodMetadata } from '../metadata/RMIMethodMetadata';
 import { Communicator, InvokeMethodData, Returning, SerializableValue, Transferable } from '../types';
@@ -137,7 +138,7 @@ export default class MessageAdaptor {
         const args = this.normalizeArguments(parameters);
         try {
             const retValue = method(...args);
-            if (retValue instanceof Promise) {
+            if (isPromise<SerializableValue>(retValue)) {
                 retValue.then(
                     (value: SerializableValue) => {
                         this.returnValue(callId, value, ns, methodName);
