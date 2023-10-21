@@ -15,25 +15,33 @@ function createOutputConfig(file, format, cfg = {}) {
 }
 
 module.exports = [
-    {
-        input: 'src/index.ts',
-        output: [
-            [pkg.browser, 'umd'],
-            [pkg.module, 'es'],
-            [pkg.main, 'cjs']
-        ].map(confs => createOutputConfig(...confs)),
-        plugins: [
-            plugins.typescript(),
-            plugins.nodeResolve({
-                mainFields: ['main', 'browser', 'module']
-            }),
-            plugins.commonjs({
-                include: /node_modules/,
-                ignore: ['js-base64'],
-                sourceMap: false
-            }),
-            plugins.printError()
-        ],
-        external: ['txon']
-    }
-];
+    [pkg.browser, 'umd'],
+    [pkg.module, 'es'],
+    [pkg.main, 'cjs']
+].map(confs => createOutputConfig(...confs))
+    .map(output => {
+        console.log(output);
+        return {
+            input: 'src/index.ts',
+            output,
+            plugins: [
+                plugins.typescript({
+                    tsconfigOverride: {
+                        compilerOptions: {
+                            target: output.format === 'es' ? 'ESNext' : 'ES5'
+                        }
+                    }
+                }),
+                plugins.nodeResolve({
+                    mainFields: ['main', 'browser', 'module']
+                }),
+                plugins.commonjs({
+                    include: /node_modules/,
+                    ignore: ['js-base64'],
+                    sourceMap: false
+                }),
+                plugins.printError()
+            ],
+            external: ['txon']
+        }
+    })
