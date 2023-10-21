@@ -1,6 +1,6 @@
 {
     "name": "@vgerbot/channel",
-    "version": "1.0.2",
+    "version": "1.0.3",
     "description": "A TypeScript-based cross-context messaging library",
     "main": "dist/index.cjs.js",
     "module": "dist/index.esm.js",
