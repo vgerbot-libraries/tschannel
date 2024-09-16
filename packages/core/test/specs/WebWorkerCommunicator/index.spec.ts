@@ -24,8 +24,7 @@ describe('WebWorkerCommunicator', () => {
             checkCanvas(): boolean;
         }
         const Painter = channel.get_class<Painter>({
-            remoteClassId: 'Painter',
-            getConstructorTransferable: (...args) => [args[0]]
+            remoteClassId: 'Painter'
         });
 
         const canvas = document.createElement('canvas');

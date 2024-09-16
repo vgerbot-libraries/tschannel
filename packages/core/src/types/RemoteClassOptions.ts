@@ -1,5 +1,3 @@
-export interface RemoteClassOptions<T> {
+export interface RemoteClassOptions {
     remoteClassId: string;
-    getConstructorTransferable?: (...args) => Transferable[];
-    getTransferable?: (methodName: keyof T, ...args) => Transferable[];
 }

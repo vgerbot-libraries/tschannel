@@ -12,5 +12,5 @@ export class CallbackParameter {
 export interface CallbackParameter extends SerializableObject {}
 
 export function isCallback(value: SerializableValue): value is CallbackParameter {
-    return !!value && !!(value as Object)[CALLBACK_PARAMETER_SYMBOLE];
+    return !!value && (value as Object)[CALLBACK_PARAMETER_SYMBOLE] === true;
 }

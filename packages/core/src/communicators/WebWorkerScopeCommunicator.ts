@@ -1,10 +1,10 @@
+import { extractTransferables } from '../common/extractTransferables';
 import { SerializableValue } from '../types/Serializable';
-import { Transferable } from '../types/Transferable';
 import AbstractMessageChannelCommunicator from './AbstractMessageChannelCommunicator';
 
 export class WebWorkerScopeCommunicator extends AbstractMessageChannelCommunicator<WorkerGlobalScope> {
-    sendPayload(serializable: SerializableValue, transferables: Transferable[]): void {
-        postMessage(serializable, transferables);
+    sendPayload(serializable: SerializableValue): void {
+        (self as DedicatedWorkerGlobalScope).postMessage(serializable, extractTransferables(serializable));
     }
     constructor() {
         if (!WorkerGlobalScope || !(self instanceof WorkerGlobalScope)) {

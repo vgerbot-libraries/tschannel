@@ -15,12 +15,7 @@ export class RMINamespace implements Destructible {
             const name = metadata.getName();
             if (!(name in this.remote_methods)) {
                 this.remote_methods[name] = (...args) => {
-                    return this.adaptor.invoke(
-                        this.id,
-                        name,
-                        metadata.getParameterData(this, ...args),
-                        metadata.getTransferable(...args)
-                    );
+                    return this.adaptor.invoke(this.id, name, metadata.getParameterData(this, ...args));
                 };
             }
             return this.remote_methods[name];

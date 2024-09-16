@@ -18,13 +18,10 @@ describe('ParallelCommunicator', function () {
             const [buffer] = data.parameters as Parameters<typeof hex>;
             const partSize = buffer.byteLength / parallels;
 
-            return payload.newPayload(
-                {
-                    ...data,
-                    parameters: [buffer, partSize * no, partSize]
-                },
-                []
-            );
+            return payload.newPayload({
+                ...data,
+                parameters: [buffer, partSize * no, partSize]
+            });
         })
         .combiner(data => {
             const errorData = data.find(it => {

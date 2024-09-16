@@ -1,6 +1,5 @@
 import {
     Channel,
-    ParameterType,
     WindowChannelCommunicator,
     RMIMethodMetadata
 } from '@vgerbot/channel';
@@ -24,9 +23,7 @@ iframe.onload = async () => {
     await remoteInstance.hello();
 
     await channel.get_method(new RMIMethodMetadata('say_hello', {
-        paramTypes: [
-            ParameterType.remoteObject
-        ]
+
     }))(remoteInstance);
 
     await channel.get_method('clear')(); // Executing remote method.

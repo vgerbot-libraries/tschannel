@@ -1,4 +1,4 @@
-import { Payload, Returning, Transferable } from '../types';
+import { Payload, Returning } from '../types';
 
 export class MethodReturningPayload implements Payload<Returning> {
     constructor(
@@ -11,9 +11,6 @@ export class MethodReturningPayload implements Payload<Returning> {
     }
     serialize(): Returning {
         return this.data;
-    }
-    transferables(): Transferable[] {
-        return [];
     }
     getMethodName() {
         return this.methodName;

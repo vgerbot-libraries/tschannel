@@ -29,7 +29,7 @@ export class Adaptor {
         const invokeMethodData = Object.assign({}, data, {
             channelId: this.channelId
         }) as InvokeMethodData;
-        return new InvokeMethodPayload(invokeMethodData, [], data.namespace, data.methodName);
+        return new InvokeMethodPayload(invokeMethodData, data.namespace, data.methodName);
     }
     close() {
         this.downline.close();

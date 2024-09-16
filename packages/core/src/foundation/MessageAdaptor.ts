@@ -2,7 +2,7 @@ import Defer from '../common/Defer';
 import { isPromise } from '../common/isPromise';
 import uid from '../common/uid';
 import { RMIMethodMetadata } from '../metadata/RMIMethodMetadata';
-import { Communicator, InvokeMethodData, Returning, SerializableValue, Transferable } from '../types';
+import { Communicator, InvokeMethodData, Returning, SerializableValue } from '../types';
 import { isCallback } from './CallbackParameter';
 import { InvokeMethodPayload } from './InvokeMethodPayload';
 import { MethodReturningPayload } from './MethodReturningPayload';
@@ -31,12 +31,7 @@ export default class MessageAdaptor {
             }
         });
     }
-    public invoke(
-        namespace: string,
-        methodName: string,
-        parameters: SerializableValue,
-        transferables: Transferable[]
-    ): Promise<unknown> {
+    public invoke(namespace: string, methodName: string, parameters: SerializableValue): Promise<unknown> {
         if (this.isDestroyed) {
             throw new Error('The message channel has been destroyed!');
         }
@@ -48,7 +43,7 @@ export default class MessageAdaptor {
             callId,
             parameters
         };
-        const payload = new InvokeMethodPayload(data, transferables, namespace, methodName);
+        const payload = new InvokeMethodPayload(data, namespace, methodName);
         const defer = new Defer();
         this.deferes[callId] = defer;
         this.communicator.send(payload);

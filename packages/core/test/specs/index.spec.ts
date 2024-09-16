@@ -1,4 +1,4 @@
-import { ParameterType, rmethod, Channel } from '@vgerbot/channel';
+import { Channel } from '@vgerbot/channel';
 import LocalCommunicator from '../common/communicator/LocalCommunicator';
 
 describe('Remote method invocation', () => {
@@ -117,23 +117,16 @@ describe('Remote method invocation', () => {
         expect(callback).to.be.callCount(5);
     });
 
-    it('Should paramTypes of @rmethod() option work correctly', async () => {
+    it('Should callback parameters work correctly', async () => {
         function method(data: string, callback: (data: string) => void) {
             callback(data);
         }
-        rmethod({
-            paramTypes: [ParameterType.serializable, ParameterType.callback]
-        })(
-            {
-                m: method
-            },
-            'm'
-        );
         const receiver = sinon.spy();
         remoteCommunicator.addReceiveMessageListener(receiver);
         remoteChannel.def_method('method', method);
         const callback = sinon.spy();
-        await localChannel.get_method('method', method)('data', callback);
+        const rmMethod = localChannel.get_method<typeof method>('method');
+        await rmMethod('data', callback);
 
         expect(callback).to.be.calledOnce;
         expect(typeof receiver.args[0][0]).not.to.be.eql('function');
@@ -215,7 +208,7 @@ describe('Remote method invocation', () => {
                 }
             }
         );
-        const RemoteAPIImpl = remoteChannel.get_class<RemoteAPI>('RemoteAPI', ['method1', 'method2']);
+        const RemoteAPIImpl = remoteChannel.get_class<RemoteAPI>('RemoteAPI');
 
         const instance = new RemoteAPIImpl();
         await expect(instance.method1()).to.become('method1');

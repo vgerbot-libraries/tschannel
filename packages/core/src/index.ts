@@ -1,4 +1,3 @@
-export { rmethod } from './annotations/rmethod';
 // export { get_class } from './annotations/get_class';
 export { Channel, Remote } from './Channel';
 export { RMIMethodMetadata } from './metadata/RMIMethodMetadata';

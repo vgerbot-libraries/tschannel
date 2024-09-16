@@ -1,4 +1,4 @@
-import { InvokeMethodData, Payload, SerializableValue, Transferable } from '../types';
+import { InvokeMethodData, Payload, SerializableValue } from '../types';
 
 const INVOKE_METHOD_DATA_SYMBOL = 'is-invoke-method-data';
 
@@ -8,20 +8,16 @@ export class InvokeMethodPayload implements Payload<InvokeMethodData> {
     }
     constructor(
         private readonly data: InvokeMethodData,
-        private readonly transferableArray: Transferable[],
         private readonly namespace: string,
         private readonly methodName: string
     ) {
         data[INVOKE_METHOD_DATA_SYMBOL] = true;
     }
-    newPayload(data: InvokeMethodData, transferables?: Transferable[]): Payload<InvokeMethodData> {
-        return new InvokeMethodPayload(data, transferables || [], this.namespace, this.methodName);
+    newPayload(data: InvokeMethodData): Payload<InvokeMethodData> {
+        return new InvokeMethodPayload(data, this.namespace, this.methodName);
     }
     serialize(): InvokeMethodData {
         return this.data;
-    }
-    transferables(): Transferable[] {
-        return this.transferableArray;
     }
     getNamespace() {
         return this.namespace;

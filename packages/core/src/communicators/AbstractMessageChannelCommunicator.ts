@@ -1,17 +1,16 @@
-import { Payload, SerializableValue, Transferable } from '../types';
+import { Payload, SerializableValue } from '../types';
 import AbstractCommunicator from './AbstractCommunicator';
 
 export interface EventTarget {
-    addEventListener(type: string, callback: (e: MessageEvent) => void);
-    removeEventListener(type: string, callback: (e: MessageEvent) => void);
+    addEventListener(type: string, callback: (e: MessageEvent) => void): void;
+    removeEventListener(type: string, callback: (e: MessageEvent) => void): void;
 }
 
 export default abstract class AbstractMessageChannelCommunicator<T extends EventTarget> extends AbstractCommunicator {
     protected removeEventListener: () => void;
-    constructor(protected target: T) {
+    protected constructor(protected target: T) {
         super();
-        const listener = e => {
-            const event = e as MessageEvent;
+        const listener = (event: MessageEvent) => {
             this.messageReceivers.forEach(receiver => {
                 receiver(event.data);
             });
@@ -21,10 +20,10 @@ export default abstract class AbstractMessageChannelCommunicator<T extends Event
             this.target.removeEventListener('message', listener);
         };
     }
-    send(payload: Payload<SerializableValue>): void {
-        this.sendPayload(payload.serialize(), payload.transferables());
+    send(payload: Payload): void {
+        this.sendPayload(payload.serialize());
     }
-    abstract sendPayload(serializable: SerializableValue, transferables: Transferable[]): void;
+    abstract sendPayload(serializable: SerializableValue): void;
     close() {
         this.removeEventListener();
     }

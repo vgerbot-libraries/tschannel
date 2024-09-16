@@ -1,20 +1,19 @@
-import { RMIClass, RMIClassConstructor } from './annotations/types/RMIClass';
-import { RMIMethod } from './annotations/types/RMIMethod';
+import { RMIClass } from './annotations/types/RMIClass';
 import { getPropertyNames } from './common/reflect';
 import uid from './common/uid';
 import { Destructible, RMINamespace } from './foundation';
 import MessageAdaptor from './foundation/MessageAdaptor';
+import { RemoteClass } from './foundation/RemoteClass';
 import { RMIMethodMetadata } from './metadata/RMIMethodMetadata';
 import {
     AnyConstructor,
     AnyFunction,
     Communicator,
-    Constructor,
     GetRemoteMethodOptions,
     PromisifyClass,
-    RemoteClassOptions,
-    RemoteMethodOptions
+    RemoteClassOptions
 } from './types';
+import { InternalRemoteClass } from './types/InternalRemoteClass';
 
 type Promisify<F extends AnyFunction, T = void> = (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>>;
 
@@ -47,10 +46,7 @@ export class Channel {
         this.def_instance(this.globalNamespace, this.globalInstance);
     }
 
-    public get_class<T>(
-        remoteClassIdOrOptions?: string | RemoteClassOptions<T>,
-        _clazzOrMembers?: Constructor<T> | Array<keyof T>
-    ): PromisifyClass<T & Remote> {
+    public get_class<T>(remoteClassIdOrOptions?: string | RemoteClassOptions): PromisifyClass<T & Remote> {
         if (!remoteClassIdOrOptions) {
             throw new TypeError(`Invalid Parameter Error: remoteClassId: ${remoteClassIdOrOptions}`);
         }
@@ -61,41 +57,38 @@ export class Channel {
         const remoteClassId = options.remoteClassId;
         // eslint-disable-next-line @typescript-eslint/no-this-alias
         const channel = this;
-        let clazz;
-        if (Array.isArray(_clazzOrMembers)) {
-            clazz = class {};
-            const abstractMethod = () => {
-                // EMPTY
-            };
-            Object.assign(
-                clazz.prototype,
-                _clazzOrMembers.reduce((members, member) => {
-                    members[member as string] = abstractMethod;
-                    return members;
-                }, {} as Record<string | symbol, typeof abstractMethod>)
-            );
-        } else {
-            clazz = _clazzOrMembers as unknown as RMIClassConstructor;
-        }
+
         if (typeof remoteClassId !== 'string' || remoteClassId.length < 1) {
             throw new Error(`Incorrect classId: ${remoteClassId}`);
         }
 
-        class cls extends clazz implements Remote {
+        const RemoteClassFn = function RemoteClassFn() {
+            //
+        } as unknown as {
+            new (): Object;
+            prototype: Object;
+        };
+
+        RemoteClassFn.prototype = new Proxy(new RemoteClass(), {
+            get: (target, p, receiver) => {
+                if (Reflect.has(target, p) || typeof p === 'symbol') {
+                    return Reflect.get(target, p, receiver);
+                }
+                const method = this.generateRemoteMemberMethod(p);
+                Reflect.set(target, p, method, receiver);
+                return method;
+            }
+        });
+
+        class cls extends RemoteClassFn implements Remote, InternalRemoteClass {
             public readonly $namespace = new RMINamespace(uid(), channel.adaptor, this);
             public readonly $initPromise: Promise<void>;
 
-            constructor(...args) {
-                super(...args);
+            constructor(...args: unknown[]) {
+                super();
                 channel.namespaces[this.$namespace.id] = this.$namespace;
-                const getConstructorTransferable = options?.getConstructorTransferable;
                 this.$initPromise = channel.get_method({
-                    methodName: remoteClassId + '-new-instance',
-                    transferables: getConstructorTransferable
-                        ? (id, args) => {
-                              return getConstructorTransferable(...args);
-                          }
-                        : undefined
+                    methodName: remoteClassId + '-new-instance'
                 })(this.$namespace.id, args) as Promise<void>;
             }
 
@@ -103,36 +96,18 @@ export class Channel {
                 return channel.destroyThat(this);
             }
         }
-
-        const propertyNames = Object.getOwnPropertyNames(clazz.prototype).filter(it => it !== 'constructor');
-        propertyNames.forEach(propertyName => {
-            const propertyValue = clazz.prototype[propertyName];
-            if (typeof propertyValue != 'function') {
-                return;
-            }
-            const method = clazz.prototype[propertyName] as RMIMethod;
-            if (method.isLocal) {
-                return;
-            }
-            const methodOptions: RemoteMethodOptions = Object.assign({}, method.options);
-            const classLevelGetTransferable = options?.getTransferable;
-            if (!methodOptions.transferables && classLevelGetTransferable) {
-                methodOptions.transferables = (...args) => {
-                    return classLevelGetTransferable(propertyName as keyof T, ...args);
-                };
-            }
-            const metadata = new RMIMethodMetadata(propertyName, methodOptions);
-            cls.prototype[propertyName] = function (this: cls, ...args) {
-                return this.$initPromise.then(() => {
-                    return this.$namespace.get_method(metadata).apply(this, args);
-                });
-            };
-        });
         return cls as unknown as PromisifyClass<T & Remote>;
     }
-    public def_class(id: string, clazz: AnyConstructor);
-    public def_class(clazz: AnyConstructor);
-    public def_class(...args) {
+    private generateRemoteMemberMethod<T extends InternalRemoteClass>(methodName: string) {
+        const metadata = new RMIMethodMetadata(methodName, {});
+        return async function (this: T, ...args: unknown[]) {
+            await this.$initPromise;
+            return this.$namespace.get_method(metadata).apply(this, args);
+        };
+    }
+    public def_class(id: string, clazz: AnyConstructor): void;
+    public def_class(clazz: AnyConstructor): void;
+    public def_class(...args: Array<unknown>): void {
         const id = args[0] as string;
         const clazz = args[1] as AnyConstructor;
 
@@ -166,25 +141,16 @@ export class Channel {
         });
         this.namespaces[namespace.id] = namespace;
     }
-
     public get_method<F extends AnyFunction, T = void>(
-        methodNameOrmetadataOrOptions?: string | RMIMethodMetadata | GetRemoteMethodOptions,
-        func?: F
+        methodNameOrMetadataOrOptions?: string | RMIMethodMetadata | GetRemoteMethodOptions
     ): (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>> {
-        if (!methodNameOrmetadataOrOptions) {
-            throw new TypeError(`Invalid Parameter Error: methodName: ${methodNameOrmetadataOrOptions}`);
+        if (!methodNameOrMetadataOrOptions) {
+            throw new TypeError(`Invalid Parameter Error: methodName: ${methodNameOrMetadataOrOptions}`);
         }
-        const {
-            metadata: inputMetadata,
-            options,
-            methodName
-        } = this.resolveRemoteMethodOptions(methodNameOrmetadataOrOptions);
+        const { metadata: inputMetadata, methodName } = this.resolveRemoteMethodOptions(methodNameOrMetadataOrOptions);
         let metadata = inputMetadata;
         if (!metadata) {
-            metadata = new RMIMethodMetadata(
-                methodName,
-                Object.assign({}, (func as unknown as RMIMethod)?.options || {}, options || {})
-            );
+            metadata = new RMIMethodMetadata(methodName, {});
         }
         return this.globalNamespace.get_method(metadata) as Promisify<F, T>;
     }
@@ -208,14 +174,14 @@ export class Channel {
         };
     }
 
-    public def_method<T extends AnyFunction = AnyFunction>(name: string, func: T);
-    public def_method<T extends AnyFunction = AnyFunction>(func: T);
-    public def_method(...args) {
-        const name = args[0] as string;
-        const func = args[1] as AnyFunction;
-        if (typeof name !== 'string') {
+    public def_method<T extends AnyFunction = AnyFunction>(name: string, func: T): void;
+    public def_method<T extends AnyFunction = AnyFunction>(func: T): void;
+    public def_method(...args: unknown[]): void {
+        if (typeof args[0] !== 'string') {
             throw new Error('Illegal argument: name is not a string!');
         }
+        const name = args[0] as string;
+        const func = args[1] as AnyFunction;
         this.globalNamespace.def_method(name, func);
     }
 
