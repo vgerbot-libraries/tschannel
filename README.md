@@ -1,34 +1,30 @@
-# @vgerbot/channel ![tschannel workflow](https://github.com/y1j2x34/channel-ts/actions/workflows/runtest.yml/badge.svg) [![Codacy Badge](https://app.codacy.com/project/badge/Grade/31decce284d2467fbcbf17bbdf189cf5)](https://www.codacy.com/gh/vgerbot-libraries/tschannel/dashboard?utm_source=github.com&amp;utm_medium=referral&amp;utm_content=vgerbot-libraries/tschannel&amp;utm_campaign=Badge_Grade) [![Codacy Badge](https://app.codacy.com/project/badge/Coverage/31decce284d2467fbcbf17bbdf189cf5)](https://www.codacy.com/gh/vgerbot-libraries/tschannel/dashboard?utm_source=github.com&utm_medium=referral&utm_content=vgerbot-libraries/tschannel&utm_campaign=Badge_Coverage) [![PRs Welcome](https://img.shields.io/badge/PRs-welcome-brightgreen.svg?style=square)](https://makeapullrequest.com)
+# @vgerbot/channel ![Build Status](https://github.com/y1j2x34/channel-ts/actions/workflows/runtest.yml/badge.svg) [![codecov](https://codecov.io/gh/vgerbot-libraries/tschannel/branch/master/graph/badge.svg?token=fPomBmOknB)](https://codecov.io/gh/vgerbot-libraries/tschannel)
 
-This is a message-passing abstraction layer implemented by Typescript. Its purpose is to encapsulate the details of messaging, allowing js to construct classes that exist in different contexts and call methods in different contexts in an idiomatic way.
+`@vgerbot/channel` is a message-passing abstraction layer implemented in TypeScript. It simplifies communication between different contexts, allowing developers to create and call classes and methods across different environments (e.g., main thread and Web Workers) in a clean, idiomatic way.
 
-## 💪 Features
+## ✨ Key Features
 
-1. Encapsulation: Encapsulates communication details and provides consistent upper-layer APIs
-2. Isolation: Data is securely isolated in different channel-ids.
-3. API: Idiomatic API, remote calls are as simple as ordinary asynchronous calls, support callback functions, and exception handling is consistent with ordinary asynchronous methods
-4. Parallel: support decomposing tasks into multiple target contexts for parallel execution
-5. Extension: support custom communicator to for more features
+1. **Encapsulation**: Abstracts communication details and provides a consistent high-level API.
+2. **Isolation**: Data is securely isolated using `channel-id` to ensure safe communication.
+3. **Simple API**: Remote calls are as easy as regular asynchronous function calls, with support for callbacks and consistent error handling.
+4. **Parallel Execution**: Supports task decomposition into multiple target contexts for parallel execution, enhancing performance.
+5. **Extensibility**: Allows for custom communicators, making it easy to extend and add new features.
 
-## 📖 Getting started
+## 🚀 Getting Started
 
-### 🔌 Install
+### 📦 Installation
 
-```sh
-npm i -s @vgerbot/channel
-```
-
-Then install `@vgerbot/channel-transformer`, this is to simplify things and make channel APIs more convenient to use
+Install the library using npm:
 
 ```sh
-npm i -D @vgerbot/channel-transformer
+npm install @vgerbot/channel
 ```
 
-For more information about the usage of `@vgerbot/channel-transformer` please refer <https://github.com/vgerbot-libraries/tschannel/blob/master/packages/transformer/README.md>
+### 📘 Example Usage
 
-### 📚 Sample Usage
+Here’s a simple example demonstrating communication between the main thread and a Web Worker.
 
-api.ts
+#### Define the interface `api.ts`
 
 ```ts
 export interface SpellChecker {
@@ -38,77 +34,76 @@ export interface SpellChecker {
 }
 ```
 
-worker.ts
+#### Implement the interface in the Worker `task.ts`
 
 ```ts
 import { channel } from '@vgerbot/channel';
-import { SpellChecker } form './api';
+import { SpellChecker } from './api';
 
+// Create a channel named 'worker-channel' and connect it to the main thread
 const chnl = channel('worker-channel')
     .connectToMainThread()
     .create();
 
+// Define a CPU-intensive method
 chnl.def_method(function performCPUIntensiveCalculation() {
     return 'Result!';
 });
 
+// Implement the SpellChecker interface
 chnl.def_class(class DefaultSpellCheckerImpl implements SpellChecker {
-    saveToDictionary(word: string) {}
-    setCaseSensitive(caseSensitive: boolean) {}
-    check(sentence) {
-        return true;
+    saveToDictionary(word: string) {
+        console.log(`Saving ${word} to dictionary`);
     }
-})
+    setCaseSensitive(caseSensitive: boolean) {
+        console.log(`Set case sensitive: ${caseSensitive}`);
+    }
+    check(sentence: string) {
+        return sentence === sentence.toLowerCase();
+    }
+});
 ```
 
-client.ts
+#### Call the Worker from the main thread `main.ts`
 
 ```ts
 import { channel } from '@vgerbot/channel';
-import { SpellChecker } form './api';
+import { SpellChecker } from './api';
 
+// Create a channel named 'worker-channel' and connect it to the Worker
 const chnl = channel('worker-channel')
-    .connectToWorker('./worker.js') // This is the path to the compiled js file for worker.ts
+    .connectToWorker('./task.js')
     .create();
 
+// Call the CPU-intensive method defined in the Worker
 const performCPUIntensiveCalculation = chnl.get_method<() => string>('performCPUIntensiveCalculation');
-performCPUIntensiveCalculation().then(console.log) // Console Output: "Result!"
+performCPUIntensiveCalculation().then(console.log); // Output: "Result!"
 
+// Retrieve the SpellChecker class from the Worker
 const DefaultSpellCheckerImpl = chnl.get_class<SpellChecker>('DefaultSpellCheckerImpl');
 
-// DefaultSpellCheckerImpl is defined as follows
-/*
-class DefaultSpellCheckerImpl {
-    saveToDictionary(word: string): Promise<void> {
-        //  REMOVE METHOD
-    }
-    setCaseSensitive(caseSensitive: boolean): Promise<void> {
-        //  REMOVE METHOD
-    }
-    check(sentence: string): Promise<boolean> {
-        //  REMOVE METHOD
-    }
-}
-*/
-
-// You can construct an instance as you would a normal object, and then call the interface methods, except that they are all asynchronous, i.e. the return value is a Promise
+// Create an instance of SpellChecker
 const spellChecker = new DefaultSpellCheckerImpl();
-
 spellChecker.saveToDictionary('halo');
 spellChecker.setCaseSensitive(false);
-spellChecker.check('Halo world!').then(console.log); // Console Output: true
+spellChecker.check('Halo world!').then(console.log); // Output: false
 
-spellChecker.__destroy__(); // Since the remote instance cannot be automatically cleared by the GC, it must be destroyed manually.
+// Manually destroy the remote instance to free up resources
+spellChecker.__destroy__();
 ```
+
+### Notes
+
+Since JavaScript’s garbage collection cannot automatically clean up remote instances, it is recommended to call `__destroy__()` when the instance is no longer needed to avoid memory leaks.
 
 For more examples, please refer to [examples](https://github.com/vgerbot-libraries/tschannel/tree/master/packages/examples) and unit tests.
 
-## 🛴 Supported parameter types
+## 🔧 Supported Parameter Types
 
-Like the postMessage API, it supports all types that can be cloned using the structured clone algorithm. For more detailed description, please refer to[The structured clone algorithm](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm)
-In addition to supporting the parameter types of postMessage, remote objects and callback functions are also supported, but these two types cannot be nested in other objects.
+`@vgerbot/channel` supports all data types that can be cloned using the Structured Clone Algorithm. For more details, refer to the [MDN documentation](https://developer.mozilla.org/en-US/docs/Web/API/Web_Workers_API/Structured_clone_algorithm).
 
+Additionally, it supports remote objects and callback functions as parameters, but these types cannot be nested within other objects.
 
-## 📘 LICENSE
+## 📜 License
 
-The `@vgerbot/channel` library is released under the terms of the [![MIT License](https://badgen.net/github/license/y1j2x34/tschannel)](https://github.com/y1j2x34/tschannel/blob/master/LICENSE).
+`@vgerbot/channel` is open-source and released under the terms of the [MIT License](https://github.com/y1j2x34/tschannel/blob/master/LICENSE).
