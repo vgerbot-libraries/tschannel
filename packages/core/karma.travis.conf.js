@@ -5,7 +5,6 @@ const plugins = require('./build/rollup.plugins');
 const rollupPluginIstanbul = require('rollup-plugin-istanbul');
 const baseConfig = require('./karma.base.conf');
 const pkg = require('./package.json');
-const channelTsTransformer = require('@vgerbot/channel-transformer').channelTransformerFactory;
 
 module.exports = function (config) {
     const coverageIstanbulReporter = {
@@ -18,12 +17,12 @@ module.exports = function (config) {
         plugins.typescript({
             tsconfig: 'test/tsconfig.json',
             transformers: [
-                (languageService) => {
-                    const program = languageService.getProgram();
-                    return {
-                        before: [channelTsTransformer(program)]
-                    };
-                }
+                // (languageService) => {
+                //     const program = languageService.getProgram();
+                //     return {
+                //         before: [channelTsTransformer(program)]
+                //     };
+                // }
             ]
         }),
         plugins.nodeResolve(),
@@ -44,41 +43,39 @@ module.exports = function (config) {
         }),
         plugins.printError()
     ];
-    config.set(Object.assign({}, baseConfig, {
-        preprocessors: {
-            'test/**/*.ts': ['rollup']
-        },
-        files: baseConfig.files.concat(
-            'test/utils/coverage-utils.ts'
-        ),
-        rollupPreprocessor: {
-            context: 'this',
-            watch: false,
-            output: {
-                format: 'iife',
-                name: pkg.library,
-                sourcemap: false
+    config.set(
+        Object.assign({}, baseConfig, {
+            preprocessors: {
+                'test/**/*.ts': ['rollup']
             },
-            plugins: rollupPlugins,
-            onwarn: function(warning) {
-                if (warning.code === 'CIRCULAR_DEPENDENCY') {
-                    return;
+            files: baseConfig.files.concat('test/utils/coverage-utils.ts'),
+            rollupPreprocessor: {
+                context: 'this',
+                watch: false,
+                output: {
+                    format: 'iife',
+                    name: pkg.library,
+                    sourcemap: false
+                },
+                plugins: rollupPlugins,
+                onwarn: function (warning) {
+                    if (warning.code === 'CIRCULAR_DEPENDENCY') {
+                        return;
+                    }
+                    // console.warn(`(!) ${warning.message}`);
                 }
-                // console.warn(`(!) ${warning.message}`);
-            }
-        },
-        reporters: ['mocha', 'coverage-istanbul'],
-        coverageIstanbulReporter: coverageIstanbulReporter,
+            },
+            reporters: ['mocha', 'coverage-istanbul'],
+            coverageIstanbulReporter: coverageIstanbulReporter,
 
-        pingTimeout: 1000 * 3000,
-        browserNoActivityTimeout: 1000 * 300,
+            pingTimeout: 1000 * 3000,
+            browserNoActivityTimeout: 1000 * 300,
 
-        logLevel: config.LOG_ERROR,
+            logLevel: config.LOG_ERROR,
 
-        singleRun: true,
+            singleRun: true,
 
-        plugins: baseConfig.plugins.concat([
-            'karma-coverage-istanbul-reporter'
-        ])
-    }));
+            plugins: baseConfig.plugins.concat(['karma-coverage-istanbul-reporter'])
+        })
+    );
 };

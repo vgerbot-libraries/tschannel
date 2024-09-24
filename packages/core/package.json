@@ -74,7 +74,6 @@
         "@vgerbot/karma-rollup-preprocessor": "^7.0.2",
         "chai": "^4.3.6",
         "chai-as-promised": "^7.1.1",
-        "@vgerbot/channel-transformer": "^1.0.0",
         "codecov": "*",
         "eslint": "^8.22.0",
         "eslint-config-prettier": "^8.5.0",

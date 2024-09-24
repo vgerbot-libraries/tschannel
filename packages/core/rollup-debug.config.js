@@ -1,6 +1,5 @@
 const plugins = require('./build/rollup.plugins');
 const pkg = require('./package.json');
-const channelTsTransformer = require('@vgerbot/channel-transformer').channelTransformerFactory;
 
 const rollupPlugins = [
     plugins.typescript({
@@ -11,12 +10,12 @@ const rollupPlugins = [
             }
         },
         transformers: [
-            (languageService) => {
-                const program = languageService.getProgram();
-                return {
-                    before: [channelTsTransformer(program)]
-                };
-            }
+            // (languageService) => {
+            //     const program = languageService.getProgram();
+            //     return {
+            //         before: [channelTsTransformer(program)]
+            //     };
+            // }
         ]
     }),
     plugins.nodeResolve(),
@@ -38,7 +37,7 @@ module.exports = {
         sourcemap: 'inline'
     },
     plugins: rollupPlugins,
-    onwarn: function(warning) {
+    onwarn: function (warning) {
         if (warning.code === 'CIRCULAR_DEPENDENCY') {
             return;
         }
