@@ -46,7 +46,7 @@ export class Channel {
         this.def_instance(this.globalNamespace, this.globalInstance);
     }
 
-    public get_class<T>(remoteClassIdOrOptions?: string | RemoteClassOptions): PromisifyClass<T & Remote> {
+    public get_class<T>(remoteClassIdOrOptions: string | RemoteClassOptions): PromisifyClass<T & Remote> {
         if (!remoteClassIdOrOptions) {
             throw new TypeError(`Invalid Parameter Error: remoteClassId: ${remoteClassIdOrOptions}`);
         }
@@ -105,12 +105,7 @@ export class Channel {
             return this.$namespace.get_method(metadata).apply(this, args);
         };
     }
-    public def_class(id: string, clazz: AnyConstructor): void;
-    public def_class(clazz: AnyConstructor): void;
-    public def_class(...args: Array<unknown>): void {
-        const id = args[0] as string;
-        const clazz = args[1] as AnyConstructor;
-
+    public def_class(id: string, clazz: AnyConstructor): void {
         const constructorMethodName = id + '-new-instance';
         if (this.globalNamespace.containsMethod(constructorMethodName)) {
             throw new Error(`Duplicate local class id: ${id}`);
@@ -142,7 +137,7 @@ export class Channel {
         this.namespaces[namespace.id] = namespace;
     }
     public get_method<F extends AnyFunction, T = void>(
-        methodNameOrMetadataOrOptions?: string | RMIMethodMetadata | GetRemoteMethodOptions
+        methodNameOrMetadataOrOptions: string | RMIMethodMetadata | GetRemoteMethodOptions
     ): (this: T, ...args: Parameters<F>) => Promise<ReturnType<F>> {
         if (!methodNameOrMetadataOrOptions) {
             throw new TypeError(`Invalid Parameter Error: methodName: ${methodNameOrMetadataOrOptions}`);

@@ -63,8 +63,8 @@ describe('channel adaptor', () => {
         //     }
         // }
 
-        const RemoteA = localChannel.get_class<A>();
-        const RemoteB = localChannel.get_class<B>();
+        const RemoteA = localChannel.get_class<A>('A');
+        const RemoteB = localChannel.get_class<B>('B');
 
         const remoteA = new RemoteA();
         const remoteB = new RemoteB();

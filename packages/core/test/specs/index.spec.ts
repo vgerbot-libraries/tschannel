@@ -64,7 +64,7 @@ describe('Remote method invocation', () => {
         }
         remoteChannel.def_class('Animal', DogImpl);
 
-        const RemoteDogClass = localChannel.get_class<Animal>();
+        const RemoteDogClass = localChannel.get_class<Animal>('Animal');
 
         const remoteDog = new RemoteDogClass('dog');
 
@@ -82,7 +82,7 @@ describe('Remote method invocation', () => {
             method();
         }
 
-        const RemoteDef = localChannel.get_class<Def>();
+        const RemoteDef = localChannel.get_class<Def>('Def');
         const instance = new RemoteDef();
         const promise = instance.method();
         await expect(promise).to.be.eventually.rejected;
@@ -105,7 +105,7 @@ describe('Remote method invocation', () => {
         }
         remoteChannel.def_class('MediaProcessor', MediaProcessorImpl);
 
-        const RemoteMediaProcessorImpl = localChannel.get_class<MediaProcessor>();
+        const RemoteMediaProcessorImpl = localChannel.get_class<MediaProcessor>('MediaProcessor');
 
         const processor = new RemoteMediaProcessorImpl();
 
@@ -183,8 +183,8 @@ describe('Remote method invocation', () => {
         remoteChannel.def_class('A', A);
         remoteChannel.def_class('B', B);
 
-        const RemoteA = localChannel.get_class<A>();
-        const RemoteB = localChannel.get_class<B>();
+        const RemoteA = localChannel.get_class<A>('A');
+        const RemoteB = localChannel.get_class<B>('B');
 
         const remoteA = new RemoteA();
         const remoteB = new RemoteB();
