@@ -12,7 +12,6 @@
     "private": true,
     "devDependencies": {
         "@parcel/ts-utils": "^2.7.0",
-        "@vgerbot/channel-transformer": "1.0.0",
         "@vgerbot/parcel-transformer-ttypescript": "^1.0.2",
         "eslint-config-prettier": "^8.5.0",
         "parcel": "^2.7.0",

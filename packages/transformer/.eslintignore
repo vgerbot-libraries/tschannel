@@ -1,6 +1,0 @@
-commitlint.config.js
-jest.config.js
-{dist,test_dist}/**/*.js
-test/fixtures
-test/mock
-node_modules

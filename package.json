@@ -6,8 +6,6 @@
     "scripts": {
         "commit": "git-cz",
         "lint:all": "zx ./scripts/run.mjs lint",
-        "transformer": "yarn workspace @vgerbot/channel-transformer",
-        "transformer:test": "yarn workspace @vgerbot/channel-transformer test",
         "debug:ci": "yarn workspace @vgerbot/channel debug:ci",
         "example": "yarn workspace @vgerbot/channel-examples start",
         "build": "zx ./scripts/build.mjs",

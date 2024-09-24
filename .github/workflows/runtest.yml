@@ -43,14 +43,10 @@ jobs:
         run: yarn workspace @vgerbot/channel test
       - name: Build @vgerbot/channel
         run: yarn workspace @vgerbot/channel build
-      - name: Test @vgerbot/channel-transformer
-        run: yarn workspace @vgerbot/channel-transformer test
       - name: Upload coverage data of @vgerbot/channel to codecov
         run: yarn workspace @vgerbot/channel codecov
-      - name: Upload coverage data pf @vgerbot/channel-transformer to codecov
-        run: yarn workspace @vgerbot/channel-transformer codecov
       - name: Upload coverage reports to codacy
         uses: codacy/codacy-coverage-reporter-action@master
         with:
           project-token: ${{ secrets.CODACY_PROJECT_TOKEN }}
-          coverage-reports: packages/core/coverage/cobertura-coverage.xml,packages/transformer/coverage/cobertura-coverage.xml
+          coverage-reports: packages/core/coverage/cobertura-coverage.xml
